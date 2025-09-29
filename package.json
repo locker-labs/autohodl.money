@@ -1,0 +1,49 @@
+{
+  "name": "autohodl.money",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "description": "Save while you spend",
+  "workspaces": [
+    "packages/contracts",
+    "apps/web"
+  ],
+  "scripts": {
+    "build": "bun --filter '@autohodl.money/*' build",
+    "build:contracts": "bun --filter @autohodl.money/contracts build",
+    "build:web": "bun --filter @autohodl.money/web build",
+    "check": "biome check .",
+    "check:write": "biome check --write .",
+    "clean": "rm -rf node_modules packages/*/node_modules apps/*/node_modules",
+    "dev": "bun --filter @autohodl.money/web dev",
+    "format": "biome format --write .",
+    "format:changed": "biome format --changed --write",
+    "format:check": "biome format .",
+    "format:commit": "biome format --since=HEAD~1 --write",
+    "format:staged": "biome format --staged --write",
+    "lint": "biome lint --write .",
+    "lint:check": "biome lint .",
+    "lint:error": "biome lint . --diagnostic-level=error",
+    "test": "bun --filter='@autohodl.money/*' test"
+  },
+  "keywords": [
+    "blockchain",
+    "crypto",
+    "dapp",
+    "decentralized",
+    "ethereum",
+    "finance",
+    "foundry",
+    "autohodl.money",
+    "monorepo",
+    "nextjs",
+    "personal-finance",
+    "round-up",
+    "savings",
+    "smart-contracts",
+    "solidity",
+    "web3"
+  ],
+  "author": "Locker",
+  "license": "ISC"
+}
