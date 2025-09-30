@@ -1,17 +1,19 @@
-import { concat, keccak256, toBytes } from 'viem';
+import Web3 from 'web3';
 import { MM_CARD_ADDRESSES, USDC_ADDRESSES } from '@/lib/constants';
 
 // Helper function to verify webhook signature
-export function verifySignature(body: string, secret: string, signature: string) {
+export function verifySignature(body: string, signature: string, secret: string): boolean {
   console.log('verifySignature', body, signature, secret);
   if (!signature) {
     throw new Error('Signature not provided');
   }
 
-  // Compute keccak256 hash of body + secret
-  const generatedSignature = keccak256(concat([toBytes(body), toBytes(secret)]));
+  // Generate signature using the same method as Moralis
+  // Use web3.utils.sha3 (which is actually keccak256) as per Moralis documentation
+  const web3 = new Web3();
+  const generatedSignature = web3.utils.sha3(body + secret);
 
-  // Ensure input signature has 0x prefix
+  // Both signatures should include the '0x' prefix
   const cleanSignature = signature.startsWith('0x') ? signature : `0x${signature}`;
 
   return generatedSignature === cleanSignature;
