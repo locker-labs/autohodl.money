@@ -1,4 +1,5 @@
 import { chain } from '@/config';
+import { secrets } from './secrets';
 
 const chainId = chain.id;
 
@@ -17,6 +18,9 @@ export const MM_CARD_ADDRESSES = [
 export const USDC_ADDRESSES = [
   // Linea
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
+
+  // Ethereum Sepolia
+  '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
 
   // Linea Sepolia
   '0xFEce4462D57bD51A6A552365A011b95f0E16d9B7',
@@ -80,3 +84,5 @@ export const TOKEN_ADDRESS = TokenAddressMap[chainId];
 export const TOKEN_DECIMALS = TokenDecimalMap[TOKEN_ADDRESS];
 
 export const TOKEN_DECIMAL_MULTIPLIER = 10 ** TOKEN_DECIMALS;
+
+export const DELEGATE = secrets.delegate;

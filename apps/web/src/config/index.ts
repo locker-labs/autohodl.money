@@ -1,9 +1,9 @@
 import type { AppKitNetwork } from '@reown/appkit/networks';
-import { linea, lineaSepolia } from '@reown/appkit/networks';
+import { linea, sepolia } from '@reown/appkit/networks';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { secrets } from '@/lib/secrets';
 
-export const chain = secrets.env === 'production' || secrets.env === 'staging' ? linea : lineaSepolia;
+export const chain = secrets.env === 'production' || secrets.env === 'staging' ? linea : sepolia;
 
 // Get projectId from https://dashboard.reown.com
 export const projectId = secrets.reownProjectId as string;
