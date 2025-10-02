@@ -3,4 +3,7 @@ export const secrets = {
   env: process.env.NEXT_PUBLIC_ENV || 'development',
   reownProjectId: process.env.NEXT_PUBLIC_PROJECT_ID || '',
   delegate: process.env.NEXT_PUBLIC_DELEGATE || '',
+  privateKeyDelegate: process.env.PRIVATE_KEY_DELEGATE || '',
+  rpcUrl: process.env.RPC_URL || '',
+  savingsFrom: process.env.SAVINGS_FROM_ADDRESS || '',
 };

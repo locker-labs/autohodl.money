@@ -3,7 +3,6 @@ import { MM_CARD_ADDRESSES, USDC_ADDRESSES } from '@/lib/constants';
 
 // Helper function to verify webhook signature
 export function verifySignature(body: string, signature: string, secret: string): boolean {
-  console.log('verifySignature', body, signature, secret);
   if (!signature) {
     throw new Error('Signature not provided');
   }

@@ -14,6 +14,11 @@ export const MM_CARD_ADDRESSES = [
   '0x1ECF3f51A771983C150b3cB4A2162E89c0A046Fc',
 ];
 
+export const MMC_TOKENS = [
+  // USDC on Linea
+  '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
+];
+
 // https://developers.circle.com/stablecoins/usdc-contract-addresses
 export const USDC_ADDRESSES = [
   // Linea
