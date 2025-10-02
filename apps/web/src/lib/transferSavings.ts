@@ -6,8 +6,6 @@ import { fetchAllowance } from '@/lib/helpers';
 import { secrets } from './secrets';
 
 export async function processSavingsTransfer(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
-  console.log('Processing savings transfer:', erc20Transfer);
-
   const { from: fromTransfer, contract: tokenAddress } = erc20Transfer;
 
   let from: Address;
@@ -58,6 +56,7 @@ export async function processSavingsTransfer(erc20Transfer: IERC20Transfer): Pro
 
   if (allowance < savingsAmountBigInt) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmountBigInt}`);
+    // TODO: add a user notification when allowance is less
     return;
   }
 
