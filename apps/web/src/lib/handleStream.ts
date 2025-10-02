@@ -1,6 +1,7 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
 import { verifySignature } from './moralis';
+import { processSavingsTransfer } from './transferSavings';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -39,8 +40,26 @@ export async function handleStream(body: string, signature: string, webhookSecre
     return NextResponse.json({ message: 'Unconfirmed transactions are ignored.' });
   }
 
+  // Process ERC20 transfers
+  if (!payload.erc20Transfers || payload.erc20Transfers.length === 0) {
+    console.warn('No ERC20 transfers to process.');
+    return NextResponse.json({ message: 'No transfers to process.' });
+  }
+
+  let processedTransfers = 0;
+
+  for (const transfer of payload.erc20Transfers) {
+    console.log(`Processing ERC20 transfer: ${transfer.transactionHash}`);
+    const txHash = await processSavingsTransfer(transfer);
+
+    if (txHash) {
+      processedTransfers++;
+    }
+  }
+
   return NextResponse.json({
     message: 'Webhook processed successfully',
-    processedTransfers: 0,
+    erc20Transfers: payload.erc20Transfers.length,
+    processedTransfers,
   });
 }
