@@ -3,6 +3,15 @@ import { secrets } from './secrets';
 
 const chainId = chain.id;
 
+export const AUTOHODL_ADDRESSES = [
+  // Linea
+  '0x0',
+  // Sepolia
+  '0x2F5A51BE7fA829038eF58305Ef332ae1c003Ebe1',
+];
+
+export const AUTOHODL_ADDRESS = AUTOHODL_ADDRESSES[1] as `0x${string}`;
+
 export const MM_CARD_ADDRESSES = [
   // US
   '0xA90b298d05C2667dDC64e2A4e17111357c215dD2',
@@ -34,7 +43,7 @@ export const USDC_ADDRESSES = [
   '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a',
 ];
 
-export const USDC_ADDRESS = USDC_ADDRESSES[0] as `0x${string}`;
+export const USDC_ADDRESS = USDC_ADDRESSES[1] as `0x${string}`;
 
 // Aave Addresses
 // https://aave.com/docs/resources/addresses
