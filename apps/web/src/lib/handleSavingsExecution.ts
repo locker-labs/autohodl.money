@@ -1,11 +1,14 @@
 import type { IERC20Transfer } from '@moralisweb3/streams-typings';
-import { erc20Abi, type Hex, type Address } from 'viem';
-import { viemPublicClient, walletClient, account } from '@/lib/clients';
-import { DELEGATE, MMC_TOKENS, TokenDecimalMap } from '@/lib/constants';
+import type { SavingsConfig } from '@/types/autohodl';
+import type { Hex, Address } from 'viem';
+import { DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/helpers';
 import { secrets } from './secrets';
+import { executeSavingsTx } from './contract/executeSavingsTx';
+import { getSavingsConfig } from './contract/getSavingsConfig';
+import { chain } from '@/config';
 
-export async function processSavingsTransfer(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
+export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
   const { from: fromTransfer, contract: tokenAddress } = erc20Transfer;
 
   let from: Address;
@@ -40,11 +43,15 @@ export async function processSavingsTransfer(erc20Transfer: IERC20Transfer): Pro
 
   // Check the current approval amount for the delegate from user's address
   let allowance: bigint;
+
+  // Use USDC address for Sepolia, MMC_TOKENS[0] for Linea
+  const savingsToken: Address = chain.id === 11155111 ? USDC_ADDRESS : (tokenAddress as Address);
+
   try {
     allowance = await fetchAllowance({
-      tokenAddress: tokenAddress as Address,
-      from: from as Address,
-      to: DELEGATE as Address,
+      tokenAddress: savingsToken,
+      owner: from,
+      spender: DELEGATE as Address,
     });
   } catch (allowanceError) {
     console.error(
@@ -60,30 +67,41 @@ export async function processSavingsTransfer(erc20Transfer: IERC20Transfer): Pro
     return;
   }
 
-  // TODO: Call the executeSavings fn of the SC.
-  // for now, Execute the transferFrom transaction using an EOA (delegate)
+  // Fetch savings config for user and token (to verify delegate is set correctly)
+  let savingsConfig: Readonly<SavingsConfig>;
   try {
-    // Simulate the transferFrom transaction
-    const { request, result } = await viemPublicClient.simulateContract({
-      account,
-      address: tokenAddress as Address,
-      abi: erc20Abi,
-      functionName: 'transferFrom',
-      args: [from as Address, DELEGATE as Address, savingsAmountBigInt],
+    savingsConfig = await getSavingsConfig(from as Address, savingsToken);
+  } catch (configError) {
+    console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
+    return;
+  }
+
+  // Check if config is active
+  if (!savingsConfig[3]) {
+    console.warn(`Savings config is not active for user ${from} and token ${savingsToken}. Aborting execution.`);
+    return;
+  }
+
+  // Check if delegate is set correctly in the config
+  if (savingsConfig[1].toLowerCase() !== DELEGATE.toLowerCase()) {
+    console.warn(
+      `Delegate mismatch in savings config. Expected: ${DELEGATE}, Found: ${savingsConfig[1]}. Aborting execution.`,
+    );
+    return;
+  }
+
+  // Call the executeSavings fn of the SC.
+  try {
+    const txHash = await executeSavingsTx({
+      user: from as Address,
+      token: savingsToken,
+      value: savingsAmountBigInt,
     });
-
-    console.log('Simulation result:', result);
-
-    // Execute the transferFrom transaction
-    const txHash = await walletClient.writeContract(request);
-
-    console.log('Transaction Hash:', txHash);
-
-    return txHash;
-  } catch (transferError) {
+    console.log('Savings transaction executed:', txHash);
+  } catch (executionError) {
     console.error(
-      'Error during transfer simulation or execution:',
-      transferError instanceof Error ? transferError.message : transferError,
+      'Error executing savings transaction:',
+      executionError instanceof Error ? executionError.message : executionError,
     );
   }
 }

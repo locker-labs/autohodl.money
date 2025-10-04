@@ -1,7 +1,7 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
 import { verifySignature } from './moralis';
-import { processSavingsTransfer } from './transferSavings';
+import { handleSavingsExecution } from './handleSavingsExecution';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -22,8 +22,6 @@ export async function handleStream(body: string, signature: string, webhookSecre
     console.error('Error parsing webhook payload:', error);
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
-
-  console.log('handleStream payload:', payload);
 
   // Log incoming webhook for debugging
   console.log('Received Moralis webhook:', {
@@ -50,7 +48,7 @@ export async function handleStream(body: string, signature: string, webhookSecre
 
   for (const transfer of payload.erc20Transfers) {
     console.log(`Processing ERC20 transfer: ${transfer.transactionHash}`);
-    const txHash = await processSavingsTransfer(transfer);
+    const txHash = await handleSavingsExecution(transfer);
 
     if (txHash) {
       processedTransfers++;
