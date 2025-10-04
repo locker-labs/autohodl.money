@@ -5,6 +5,7 @@ import { USDC_ADDRESS, DELEGATE, TokenDecimalMap } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
 import { getBlockExplorerTxUrl } from '@/lib/blockExplorer';
+import ErrorDisplay from './ErrorDisplay';
 
 export default function USDCApprovalChecker() {
   const { address, isConnected } = useAccount();
@@ -142,11 +143,7 @@ export default function USDCApprovalChecker() {
           </div>
         )}
 
-        {writeError && (
-          <div className='p-4 bg-red-50 text-red-700 rounded-md break-all'>
-            <p className='font-medium'>Error: {writeError.message}</p>
-          </div>
-        )}
+        <ErrorDisplay error={writeError} />
       </div>
     </div>
   );
