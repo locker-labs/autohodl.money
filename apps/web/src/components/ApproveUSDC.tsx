@@ -1,48 +1,45 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
-import { erc20Abi, formatUnits, parseUnits } from 'viem';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { USDC_ADDRESS, DELEGATE } from '@/lib/constants';
+import { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { USDC_ADDRESS, DELEGATE, TokenDecimalMap } from '@/lib/constants';
+import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
+import { chain } from '@/config';
+import { getBlockExplorerTxUrl } from '@/lib/blockExplorer';
 
 export default function USDCApprovalChecker() {
-  const threshold = 10;
   const { address, isConnected } = useAccount();
-
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    address: USDC_ADDRESS,
-    abi: erc20Abi,
-    functionName: 'allowance',
-    args: address && DELEGATE ? [address, DELEGATE as `0x${string}`] : undefined,
-    query: {
-      enabled: Boolean(address && DELEGATE),
-    },
+  const [autohodlAllowance, setAutohodlAllowance] = useState<number>(20);
+  const {
+    allowance,
+    allowanceFormatted,
+    isLoading: isLoadingAllowance,
+    refetch: refetchAllowance,
+  } = useErc20Allowance({
+    token: USDC_ADDRESS,
+    owner: address as `0x${string}` | undefined,
+    spender: DELEGATE as `0x${string}` | undefined,
+    decimals: TokenDecimalMap[USDC_ADDRESS],
+    enabled: isConnected,
   });
 
-  const { data: hash, writeContract, isPending, error } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
+  const { approve, isPending, isConfirming, isConfirmed, writeError, hash } = useERC20Approve({
+    token: USDC_ADDRESS,
+    spender: DELEGATE as `0x${string}` | undefined,
+    amount: BigInt(autohodlAllowance * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+    enabled: isConnected,
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isConfirmed) {
       refetchAllowance();
     }
-  }, [isSuccess, refetchAllowance]);
+  }, [isConfirmed, refetchAllowance]);
 
   const handleApprove = () => {
     if (!DELEGATE) return;
-
-    writeContract({
-      address: USDC_ADDRESS,
-      abi: erc20Abi,
-      functionName: 'approve',
-      args: [DELEGATE as `0x${string}`, parseUnits('20', 6)],
-    });
+    approve();
   };
-
-  const currentAllowance = allowance ? formatUnits(allowance as bigint, 6) : '0';
-  const needsApproval = allowance !== undefined ? Number(formatUnits(allowance as bigint, 6)) < threshold : false;
+  const needsApproval = allowanceFormatted !== undefined ? Number(allowanceFormatted) < autohodlAllowance : false;
 
   if (!isConnected) {
     return (
@@ -76,12 +73,12 @@ export default function USDCApprovalChecker() {
 
         <div>
           <label className='block text-sm font-medium text-gray-700 mb-1'>
-            Threshold (USDC)
+            AutoHodl Allowance (USDC)
             <input
               type='number'
-              value={threshold}
+              value={autohodlAllowance}
+              onChange={(e) => setAutohodlAllowance(Number(e.target.value))}
               className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              readOnly
             />
           </label>
         </div>
@@ -89,11 +86,11 @@ export default function USDCApprovalChecker() {
         {DELEGATE && (
           <div className='p-4 bg-gray-50 rounded-md'>
             <p className='text-sm text-gray-600'>Current Allowance:</p>
-            <p className='text-2xl font-bold text-gray-800'>{currentAllowance} USDC</p>
+            <p className='text-2xl font-bold text-gray-800'>{allowanceFormatted} USDC</p>
           </div>
         )}
 
-        {allowance === undefined && (
+        {isLoadingAllowance && (
           <button
             type='button'
             onClick={() => {}}
@@ -109,7 +106,7 @@ export default function USDCApprovalChecker() {
           <button
             type='button'
             onClick={handleApprove}
-            disabled={isPending || isConfirming}
+            disabled={isPending || isConfirming || autohodlAllowance === 0}
             className='w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-md transition-colors flex items-center justify-center gap-2'
           >
             {isPending || isConfirming ? (
@@ -118,7 +115,7 @@ export default function USDCApprovalChecker() {
                 {isPending ? 'Waiting for approval...' : 'Confirming...'}
               </>
             ) : (
-              'Approve 20 USDC'
+              `${autohodlAllowance === 0 ? 'Enter autohodlAllowance' : `Approve ${autohodlAllowance} USDC`}`
             )}
           </button>
         )}
@@ -126,27 +123,28 @@ export default function USDCApprovalChecker() {
         {allowance !== undefined && !needsApproval && DELEGATE && (
           <div className='flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-md'>
             <CheckCircle className='w-5 h-5' />
-            <p className='font-medium'>Allowance is above threshold</p>
+            <p className='font-medium'>AutoHodl can now save up to {autohodlAllowance} USDC</p>
           </div>
         )}
 
-        {isSuccess && (
+        {isConfirmed && (
           <div className='p-4 bg-green-50 text-green-700 rounded-md'>
             <p className='font-medium'>Approval successful!</p>
             <a
-              href={`https://lineascan.build/tx/${hash}`}
+              href={getBlockExplorerTxUrl(chain.id, hash as string)}
               target='_blank'
               rel='noopener noreferrer'
               className='text-sm underline'
             >
-              View on Lineascan
+              View on{' '}
+              {chain.id === 59144 ? 'Lineascan' : chain.id === 11155111 ? 'Sepolia Etherscan' : 'Block Explorer'}
             </a>
           </div>
         )}
 
-        {error && (
-          <div className='p-4 bg-red-50 text-red-700 rounded-md'>
-            <p className='font-medium'>Error: {error.message}</p>
+        {writeError && (
+          <div className='p-4 bg-red-50 text-red-700 rounded-md break-all'>
+            <p className='font-medium'>Error: {writeError.message}</p>
           </div>
         )}
       </div>

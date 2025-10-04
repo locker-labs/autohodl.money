@@ -1,0 +1,112 @@
+export const AutoHodlAbi = [
+  {
+    type: "function",
+    name: "executeSavingsTx",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "token", type: "address", internalType: "address" },
+      { name: "value", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "savings",
+    inputs: [
+      { name: "", type: "address", internalType: "address" },
+      { name: "", type: "address", internalType: "address" },
+    ],
+    outputs: [
+      { name: "savingAddress", type: "address", internalType: "address" },
+      { name: "delegate", type: "address", internalType: "address" },
+      { name: "roundUp", type: "uint256", internalType: "uint256" },
+      { name: "active", type: "bool", internalType: "bool" },
+      { name: "toYield", type: "bool", internalType: "bool" },
+      { name: "extraData", type: "bytes", internalType: "bytes" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "setSavingConfig",
+    inputs: [
+      { name: "token", type: "address", internalType: "address" },
+      { name: "savingAddress", type: "address", internalType: "address" },
+      { name: "delegate", type: "address", internalType: "address" },
+      { name: "roundUp", type: "uint256", internalType: "uint256" },
+      { name: "active", type: "bool", internalType: "bool" },
+      { name: "toYield", type: "bool", internalType: "bool" },
+      { name: "extraData", type: "bytes", internalType: "bytes" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setSavingConfigForUser",
+    inputs: [
+      { name: "user", type: "address", internalType: "address" },
+      { name: "token", type: "address", internalType: "address" },
+      { name: "savingAddress", type: "address", internalType: "address" },
+      { name: "delegate", type: "address", internalType: "address" },
+      { name: "roundUp", type: "uint256", internalType: "uint256" },
+      { name: "active", type: "bool", internalType: "bool" },
+      { name: "toYield", type: "bool", internalType: "bool" },
+      { name: "extraData", type: "bytes", internalType: "bytes" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setTokenAllowlist",
+    inputs: [
+      { name: "token", type: "address", internalType: "address" },
+      { name: "isAllowed", type: "bool", internalType: "bool" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "tokenAllowlist",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "bool", internalType: "bool" }],
+    stateMutability: "view",
+  },
+  {
+    type: "event",
+    name: "SavingConfigSet",
+    inputs: [
+      { name: "user", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "token",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "SavingExecuted",
+    inputs: [
+      { name: "user", type: "address", indexed: true, internalType: "address" },
+      {
+        name: "token",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+] as const;
