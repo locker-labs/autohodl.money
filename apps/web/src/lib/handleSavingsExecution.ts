@@ -1,7 +1,7 @@
 import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { Hex, Address } from 'viem';
-import { DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/helpers';
 import { secrets } from './secrets';
 import { executeSavingsTx } from './contract/executeSavingsTx';
@@ -51,7 +51,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     allowance = await fetchAllowance({
       tokenAddress: savingsToken,
       owner: from,
-      spender: DELEGATE as Address,
+      spender: AUTOHODL_ADDRESS,
     });
   } catch (allowanceError) {
     console.error(
