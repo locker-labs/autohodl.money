@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS, TokenDecimalMap, AUTOHODL_ADDRESS } from '@/lib/constants';
+import { USDC_ADDRESS, AUTOHODL_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
 import { getBlockExplorerTxUrl } from '@/lib/blockExplorer';
