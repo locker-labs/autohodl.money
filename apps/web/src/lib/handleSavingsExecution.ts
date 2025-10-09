@@ -98,6 +98,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
       value: savingsAmountBigInt,
     });
     console.log('Savings transaction executed:', txHash);
+    return txHash;
   } catch (executionError) {
     console.error(
       'Error executing savings transaction:',
