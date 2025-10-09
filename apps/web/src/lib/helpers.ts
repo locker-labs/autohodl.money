@@ -4,18 +4,18 @@ import { viemPublicClient } from '@/lib/clients';
 
 export async function fetchAllowance({
   tokenAddress,
-  from,
-  to,
+  owner,
+  spender,
 }: {
   tokenAddress: Address;
-  from: Address;
-  to: Address;
+  owner: Address;
+  spender: Address;
 }): Promise<bigint> {
   const allowance: bigint = await viemPublicClient.readContract({
     address: tokenAddress,
     abi: erc20Abi,
     functionName: 'allowance',
-    args: [from, to],
+    args: [owner, spender],
   });
 
   console.log('Current allowance:', allowance);
