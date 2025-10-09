@@ -1,18 +1,16 @@
 'use client';
 
 import { useAppKitAccount } from '@reown/appkit/react';
-import USDCApprovalChecker from '@/components/ApproveUSDC';
-import { ConnectButton } from '@/components/ConnectButton';
-import UserOnboarding from '@/components/UserOnboarding';
+import USDCApprovalChecker from "@/components/ApproveUSDC";
+import UserOnboarding from "@/components/UserOnboarding";
+import Header from "@/components/Header";
 
 export default function Home() {
   const { isConnected } = useAppKitAccount();
   return (
-    <div className={'min-h-screen flex flex-col items-center justify-center gap-4'}>
-      <h1 className='text-4xl font-bold'>Welcome to AutoHodl</h1>
-      <ConnectButton />
-      {isConnected ? <UserOnboarding /> : null}
-      {isConnected ? <USDCApprovalChecker /> : null}
+    <div className={"h-screen w-full flex flex-col items-center gap-8 p-8"}>
+      <Header />
+      {isConnected && <UserOnboarding />}
     </div>
   );
 }

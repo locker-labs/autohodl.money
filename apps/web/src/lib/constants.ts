@@ -4,6 +4,11 @@ import { secrets } from './secrets';
 
 const chainId = chain.id;
 
+export enum SupportedAccounts {
+  MetaMask = "MetaMask Card",
+  EOA = "EOA",
+}
+
 export const AutoHodlAddressMap: Record<number, Address> = {
   59144: '0x0', // Linea
   11155111: '0x2F5A51BE7fA829038eF58305Ef332ae1c003Ebe1', // Sepolia
