@@ -3,13 +3,16 @@ import { SetupRouter } from '@/components/setup/SetupRouter';
 import StepContainer from '@/components/view/StepContainer';
 import type { SupportedAccounts } from '@/lib/constants';
 import { getSupportedAccounts } from '@/lib/userAccounts';
+import { useAccount } from 'wagmi';
 
 const UserOnboarding: React.FC = () => {
   const [accounts, setAccounts] = useState<SupportedAccounts[]>([]);
+  const { address } = useAccount();
 
   useEffect(() => {
     async function fetchAccounts() {
-      const fetchedAccounts = await getSupportedAccounts();
+      if (!address) return;
+      const fetchedAccounts = await getSupportedAccounts(address);
       setAccounts(fetchedAccounts);
       console.log('Supported accounts:', fetchedAccounts);
     }

@@ -10,6 +10,7 @@ import type { FC, ReactNode } from 'react';
 type AutoHodlContextType = {
   loading: boolean;
   config: SavingsConfig | null;
+  setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -35,7 +36,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
   // Fetch savings config when wallet connects
   useEffect(() => {
-    async function fetchSavingsConfig() {
+    async function fetchSavingsConfigArray() {
       if (!address || !isConnected) {
         return;
       }
@@ -44,7 +45,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
         setLoading(true);
         console.log('Fetching savings config for user:', address, 'Token:', USDC_ADDRESS);
         const config = await getSavingsConfig(address, USDC_ADDRESS);
-        const found = config && config[0] !== '0x0000000000000000000000000000000000000000';
+        const found = config && config.savingAddress !== '0x0000000000000000000000000000000000000000';
         if (found) {
           setConfig(config);
         } else {
@@ -58,8 +59,12 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
       }
     }
 
-    fetchSavingsConfig();
+    fetchSavingsConfigArray();
   }, [address, isConnected, refetchFlag]);
 
-  return <AutoHodlContext.Provider value={{ loading, config, setRefetchFlag }}>{children}</AutoHodlContext.Provider>;
+  return (
+    <AutoHodlContext.Provider value={{ loading, config, setRefetchFlag, setConfig }}>
+      {children}
+    </AutoHodlContext.Provider>
+  );
 };

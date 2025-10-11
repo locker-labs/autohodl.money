@@ -4,7 +4,7 @@ import { useAccount } from 'wagmi';
 import { USDC_ADDRESS, AUTOHODL_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
-import { getBlockExplorerTxUrl } from '@/lib/blockExplorer';
+import { getTransactionLink } from '@/lib/blockExplorer';
 import ErrorDisplay from './ErrorDisplay';
 
 export default function USDCApprovalChecker() {
@@ -132,7 +132,7 @@ export default function USDCApprovalChecker() {
           <div className='p-4 bg-green-50 text-green-700 rounded-md'>
             <p className='font-medium'>Approval successful!</p>
             <a
-              href={getBlockExplorerTxUrl(chain.id, hash as string)}
+              href={getTransactionLink(hash as string)}
               target='_blank'
               rel='noopener noreferrer'
               className='text-sm underline'

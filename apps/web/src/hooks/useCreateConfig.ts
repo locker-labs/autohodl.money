@@ -13,9 +13,18 @@ const defaultConfig = {
   extraData: '0x' as Hex,
 };
 
+type CreateConfigParams = {
+  active?: boolean;
+  toYield?: boolean;
+  roundUp: number;
+  savingsAddress: Address;
+  extraData?: Hex;
+};
+
 type UseCreateConfigReturn = {
   error: string | null;
-  handleCreateConfig: (params: { roundUp: number; savingsAddress: Address }) => Promise<void>;
+  createConfig: (params: CreateConfigParams) => Promise<Hex>;
+  handleCreateConfig: (params: CreateConfigParams) => Promise<void>;
   loading: boolean;
   waitingForConfirmation: boolean;
 };
@@ -29,7 +38,54 @@ const useCreateConfig = (): UseCreateConfigReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleCreateConfig = async ({ roundUp, savingsAddress }: { roundUp: number; savingsAddress: Address }) => {
+  const createConfig = async ({
+    roundUp,
+    savingsAddress,
+    active = defaultConfig.active,
+    toYield = defaultConfig.toYield,
+    extraData = defaultConfig.extraData,
+  }: {
+    active?: boolean;
+    toYield?: boolean;
+    roundUp: number;
+    savingsAddress: Address;
+    extraData?: Hex;
+  }) => {
+    if (!walletClient) throw new Error('WalletClient not initialized');
+
+    const args = [
+      USDC_ADDRESS,
+      savingsAddress as Address,
+      secrets.delegate as Address,
+      BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+      active,
+      toYield,
+      extraData,
+    ] as const;
+    const tx = await walletClient.writeContract({
+      address: AUTOHODL_ADDRESS,
+      abi: AutoHodlAbi,
+      functionName: 'setSavingConfig',
+      args,
+    });
+    await viemPublicClient.waitForTransactionReceipt({ hash: tx, confirmations: 1 });
+    setRefetchFlag((flag) => !flag);
+    return tx;
+  };
+
+  const handleCreateConfig = async ({
+    roundUp,
+    savingsAddress,
+    active = defaultConfig.active,
+    toYield = defaultConfig.toYield,
+    extraData = defaultConfig.extraData,
+  }: {
+    active?: boolean;
+    toYield?: boolean;
+    roundUp: number;
+    savingsAddress: Address;
+    extraData?: Hex;
+  }) => {
     if (!isConnected || !address || !walletClient) return;
 
     setLoading(true);
@@ -41,9 +97,9 @@ const useCreateConfig = (): UseCreateConfigReturn => {
         savingsAddress as Address,
         secrets.delegate as Address,
         BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
-        defaultConfig.active,
-        defaultConfig.toYield,
-        defaultConfig.extraData,
+        active,
+        toYield,
+        extraData,
       ] as const;
       const tx = await walletClient.writeContract({
         address: AUTOHODL_ADDRESS,
@@ -67,6 +123,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
 
   return {
     error,
+    createConfig,
     handleCreateConfig,
     loading,
     waitingForConfirmation,

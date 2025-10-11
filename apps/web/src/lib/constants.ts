@@ -16,12 +16,14 @@ export const AutoHodlAddressMap: Record<number, Address> = {
 
 export const AUTOHODL_ADDRESS: Address = AutoHodlAddressMap[chainId];
 
-export const MM_CARD_ADDRESSES: Address[] = [
-  // US
-  '0xA90b298d05C2667dDC64e2A4e17111357c215dD2',
+export const MetaMaskCard: Record<'US' | 'International', Address> = {
+  US: '0xA90b298d05C2667dDC64e2A4e17111357c215dD2',
+  International: '0x9dd23A4a0845f10d65D293776B792af1131c7B30',
+};
 
-  // International
-  '0x9dd23A4a0845f10d65D293776B792af1131c7B30',
+export const MM_CARD_ADDRESSES: Address[] = [
+  MetaMaskCard.US,
+  MetaMaskCard.International,
 
   // Locker checking
   '0x1ECF3f51A771983C150b3cB4A2162E89c0A046Fc',

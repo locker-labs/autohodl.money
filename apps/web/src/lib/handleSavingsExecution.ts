@@ -1,11 +1,11 @@
 import type { IERC20Transfer } from '@moralisweb3/streams-typings';
-import type { SavingsConfig } from '@/types/autohodl';
+import type { SavingsConfigArray } from '@/types/autohodl';
 import type { Hex, Address } from 'viem';
 import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/helpers';
 import { secrets } from './secrets';
 import { executeSavingsTx } from './contract/server/executeSavingsTx';
-import { getSavingsConfig } from './contract/server/getSavingsConfig';
+import { getSavingsConfigArray } from './contract/server/getSavingsConfig';
 import { chain } from '@/config';
 
 export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
@@ -68,9 +68,9 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   }
 
   // Fetch savings config for user and token (to verify delegate is set correctly)
-  let savingsConfig: Readonly<SavingsConfig>;
+  let savingsConfig: Readonly<SavingsConfigArray>;
   try {
-    savingsConfig = await getSavingsConfig(from as Address, savingsToken);
+    savingsConfig = await getSavingsConfigArray(from as Address, savingsToken);
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
     return;
