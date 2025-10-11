@@ -1,9 +1,11 @@
 // components/Button.tsx
-import React from 'react';
+
+import type { ReactNode } from 'react';
 
 type ButtonType = 'button' | 'submit' | 'reset';
 
 type Props = {
+  children?: ReactNode;
   title: string;
   onAction?: () => void;
   type?: ButtonType;
@@ -11,7 +13,14 @@ type Props = {
   className?: string;
 };
 
-export default function Button({ title, onAction, type = 'button', disabled = false, className = '' }: Props) {
+export default function Button({
+  children,
+  title,
+  onAction,
+  type = 'button',
+  disabled = false,
+  className = '',
+}: Props) {
   return (
     <button
       type={type}
@@ -19,7 +28,8 @@ export default function Button({ title, onAction, type = 'button', disabled = fa
       disabled={disabled}
       aria-disabled={disabled}
       className={[
-        'inline-flex items-center justify-center rounded-md',
+        'transition-colors duration-300',
+        'inline-flex items-center justify-center rounded-[12px]',
         'px-4 py-2 text-sm font-medium',
         'bg-[#78E76E] text-black hover:bg-white',
         'disabled:opacity-50 disabled:pointer-events-none',
@@ -28,7 +38,7 @@ export default function Button({ title, onAction, type = 'button', disabled = fa
       ].join(' ')}
       title={title}
     >
-      {title}
+      {children ?? title}
     </button>
   );
 }

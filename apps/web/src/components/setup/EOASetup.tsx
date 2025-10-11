@@ -1,24 +1,16 @@
-import Image from 'next/image';
-import Button from '../subcomponents/Button';
 import { useState } from 'react';
-import SetSavingConfig from '../subcomponents/SetSavingConfig';
+import SetSavingConfig from '@/components/subcomponents/SetSavingConfig';
 import { SupportedAccounts } from '@/lib/constants';
-import DetectedCard from '../view/DetectedCard';
+import DetectedCard from '@/components/view/DetectedCard';
+import { paths } from '@/lib/paths';
+
 const EOASetup: React.FC = () => {
-  const pastTxns = 23;
-  const possibleSavings = 100;
-  const [loading, setLoading] = useState(false);
-  const [stepTitle, setStepTitle] = useState('Continue without card, use EOA');
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
 
   const handleButtonClick = () => {
-    setLoading(true);
-    setCurrentStep(currentStep + 1);
-    setStepTitle('Finish Setup');
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
+    setCurrentStep(2);
   };
+
   return (
     <div className='flex flex-col items-center gap-8'>
       {currentStep === 1 && (
@@ -28,23 +20,20 @@ const EOASetup: React.FC = () => {
           image='/Gear.png'
           imageWidth={200}
           imageHeight={120}
+          buttonTitle={'Continue without card'}
+          handleButtonClick={handleButtonClick}
         >
           {/* Link to get a MetaMask Card */}
           <a
-            href='./'
+            href={paths.GetMetaMaskCard}
+            target='_blank'
             className='underline decoration-black decoration-2 underline-offset-4 hover:decoration-4 transition-colors'
           >
             Get a MetaMask Card
           </a>
         </DetectedCard>
       )}
-      {currentStep === 2 && (
-        <>
-          <SetSavingConfig account={SupportedAccounts.EOA} />
-        </>
-      )}
-
-      <Button title={stepTitle} onAction={handleButtonClick} />
+      {currentStep === 2 && <SetSavingConfig account={SupportedAccounts.EOA} />}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import type { Address, Hex } from 'viem';
 import { erc20Abi } from 'viem';
-import { viemPublicClient, walletClient } from './clients';
+import { viemPublicClient, walletClient } from './clients/server';
 
 export async function transferFrom({
   account,

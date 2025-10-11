@@ -1,7 +1,7 @@
 import type { Address, Hex } from 'viem';
-import { AutoHodlAbi } from '../abis/AutoHodl';
-import { walletClient } from '../clients';
-import { AUTOHODL_ADDRESS } from '../constants';
+import { AutoHodlAbi } from '../../abis/AutoHodl';
+import { walletClient } from '../../clients/server';
+import { AUTOHODL_ADDRESS } from '../../constants';
 
 /**
  * Executes a savings transaction on the AutoHodl contract.

@@ -4,8 +4,8 @@ import type { Hex, Address } from 'viem';
 import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/helpers';
 import { secrets } from './secrets';
-import { executeSavingsTx } from './contract/executeSavingsTx';
-import { getSavingsConfig } from './contract/getSavingsConfig';
+import { executeSavingsTx } from './contract/server/executeSavingsTx';
+import { getSavingsConfig } from './contract/server/getSavingsConfig';
 import { chain } from '@/config';
 
 export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
