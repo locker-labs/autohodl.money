@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { usePublicClient, useWalletClient } from 'wagmi';
-import {
-  AUTOHODL_ADDRESS,
-  USDC_ADDRESS,
-  DELEGATE,
-  TokenDecimalMap,
-  SupportedAccounts,
-} from "../lib/constants";
-import { AutoHodlAbi } from "../lib/abis/AutoHodl";
-import { type Address, type Hex, isAddress } from "viem";
-import type { SavingsConfig } from "@/types/autohodl";
-import ErrorDisplay from "./ErrorDisplay";
-import StepContainer from "@/components/view/StepContainer";
-import { SetupRouter } from "./setup/SetupRouter";
-import { getSupportedAccounts } from "@/lib/userAccounts";
+import { AUTOHODL_ADDRESS, USDC_ADDRESS, DELEGATE, TokenDecimalMap, SupportedAccounts } from '../lib/constants';
+import { AutoHodlAbi } from '../lib/abis/AutoHodl';
+import { type Address, type Hex, isAddress } from 'viem';
+import type { SavingsConfig } from '@/types/autohodl';
+import ErrorDisplay from './ErrorDisplay';
+import StepContainer from '@/components/view/StepContainer';
+import { SetupRouter } from './setup/SetupRouter';
+import { getSupportedAccounts } from '@/lib/userAccounts';
 
 // Helper: default config values
 const DEFAULT_CONFIG = {
@@ -22,7 +16,7 @@ const DEFAULT_CONFIG = {
   roundUp: 1, // a dollar
   active: true,
   toYield: false,
-  extraData: "0x",
+  extraData: '0x',
 };
 
 const UserOnboarding: React.FC = () => {
@@ -34,13 +28,13 @@ const UserOnboarding: React.FC = () => {
   const [hasConfig, setHasConfig] = useState<boolean | null>(null);
   const [config, setConfig] = useState<null | SavingsConfig>(null);
   const [error, setError] = useState<string | null>(null);
-  const [savingsAddress, setSavingsAddress] = useState("");
+  const [savingsAddress, setSavingsAddress] = useState('');
   // Only $1 is selectable, but keep state for future extensibility
   const [roundUp] = useState<1 | 5 | 10>(1);
 
   const [supportedAccounts, setSupportedAccounts] = useState<string[]>([]);
 
-  const isInvalidAddress = savingsAddress !== "" && !isAddress(savingsAddress);
+  const isInvalidAddress = savingsAddress !== '' && !isAddress(savingsAddress);
 
   // Check if user has savings config for USDC
   useEffect(() => {
@@ -53,9 +47,7 @@ const UserOnboarding: React.FC = () => {
         setSupportedAccounts(accounts);
         setLoading(false);
       } catch (e) {
-        setError(
-          e instanceof Error ? e.message : "Failed to get supported accounts."
-        );
+        setError(e instanceof Error ? e.message : 'Failed to get supported accounts.');
       }
     })();
   }, [isConnected, address, publicClient]);
@@ -79,12 +71,12 @@ const UserOnboarding: React.FC = () => {
       await walletClient.writeContract({
         address: AUTOHODL_ADDRESS,
         abi: AutoHodlAbi,
-        functionName: "setSavingConfig",
+        functionName: 'setSavingConfig',
         args,
       });
       setHasConfig(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create config.");
+      setError(e instanceof Error ? e.message : 'Failed to create config.');
     } finally {
       setLoadingTx(false);
     }
@@ -94,7 +86,7 @@ const UserOnboarding: React.FC = () => {
 
   if (error)
     return (
-      <div className="max-w-md mx-auto mt-4">
+      <div className='max-w-md mx-auto mt-4'>
         <ErrorDisplay error={error} />
       </div>
     );
@@ -102,7 +94,7 @@ const UserOnboarding: React.FC = () => {
   const disabled = loading || loadingTx || !savingsAddress || isInvalidAddress;
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className='w-full h-full flex justify-center items-center'>
       <StepContainer>
         {loading && <div>Loading...</div>}
         <SetupRouter accounts={[SupportedAccounts.EOA]} />

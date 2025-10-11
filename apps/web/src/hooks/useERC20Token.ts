@@ -1,11 +1,7 @@
-import { useMemo } from "react";
-import { erc20Abi, formatUnits } from "viem";
-import {
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useMemo } from 'react';
+import { erc20Abi, formatUnits } from 'viem';
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAppKitAccount } from '@reown/appkit/react';
 
 type Address = `0x${string}`;
 
@@ -20,27 +16,23 @@ export function useErc20Allowance(params: {
 
   const owner = (params.owner ?? appkitAddress) as Address | undefined;
   const decimals = params.decimals ?? 6;
-  const enabled =
-    Boolean(params.enabled ?? true) &&
-    Boolean(isConnected && params.token && owner && params.spender);
+  const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && owner && params.spender);
 
-  const { data, error, isLoading, isFetching, isSuccess, status, refetch } =
-    useReadContract({
-      address: params.token as Address,
-      abi: erc20Abi,
-      functionName: "allowance",
-      args: owner && params.spender ? [owner, params.spender] : undefined,
-      query: {
-        enabled,
-        staleTime: 15_000,
-      },
-    });
+  const { data, error, isLoading, isFetching, isSuccess, status, refetch } = useReadContract({
+    address: params.token as Address,
+    abi: erc20Abi,
+    functionName: 'allowance',
+    args: owner && params.spender ? [owner, params.spender] : undefined,
+    query: {
+      enabled,
+      staleTime: 15_000,
+    },
+  });
 
   const allowance = data as bigint | undefined;
   const allowanceFormatted = useMemo(
-    () =>
-      allowance !== undefined ? formatUnits(allowance, decimals) : undefined,
-    [allowance, decimals]
+    () => (allowance !== undefined ? formatUnits(allowance, decimals) : undefined),
+    [allowance, decimals],
   );
 
   return {
@@ -68,24 +60,16 @@ export function useERC20Approve(params: {
   const { isConnected } = useAppKitAccount();
   const decimals = params.decimals ?? 6;
 
-  const enabled =
-    Boolean(params.enabled ?? true) &&
-    Boolean(isConnected && params.token && params.spender);
+  const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.spender);
 
-  const {
-    writeContract,
-    data: hash,
-    isPending,
-    error: writeError,
-    reset: resetWrite,
-  } = useWriteContract();
+  const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
 
   const approve = () => {
     if (!enabled) return;
     writeContract({
       address: params.token as Address,
       abi: erc20Abi,
-      functionName: "approve",
+      functionName: 'approve',
       args: [params.spender as Address, params.amount],
     });
   };

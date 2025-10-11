@@ -5,8 +5,8 @@ import { secrets } from './secrets';
 const chainId = chain.id;
 
 export enum SupportedAccounts {
-  MetaMask = "MetaMask Card",
-  EOA = "EOA",
+  MetaMask = 'MetaMask Card',
+  EOA = 'EOA',
 }
 
 export const AutoHodlAddressMap: Record<number, Address> = {
