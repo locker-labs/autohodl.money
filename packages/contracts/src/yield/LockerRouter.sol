@@ -29,7 +29,7 @@ contract LockerRouter is ILockerRouter, Ownable {
 
     function deposit(address asset, uint256 amount) external {
         IERC20(asset).transferFrom(msg.sender, address(this), amount);
-         _deposit(msg.sender, asset, amount);
+        _deposit(msg.sender, asset, amount);
     }
 
     function depositFor(address user, address asset, uint256 amount) external {
@@ -184,7 +184,10 @@ contract LockerRouter is ILockerRouter, Ownable {
         emit AdapterSet(asset, adapter, allowed);
     }
 
-    function setDefaultAlloc(address[] memory assets, address[] memory adapters, uint32[] memory bps ) external onlyOwner{
+    function setDefaultAlloc(address[] memory assets, address[] memory adapters, uint32[] memory bps)
+        external
+        onlyOwner
+    {
         require(assets.length == adapters.length && assets.length == bps.length, "Mismatched lengths");
         for (uint256 i = 0; i < assets.length; i++) {
             Allocation storage alloc = defaultAllocation[assets[i]];

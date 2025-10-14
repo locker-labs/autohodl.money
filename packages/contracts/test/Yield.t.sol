@@ -8,27 +8,27 @@ import {LockerRouter} from "../src/yield/LockerRouter.sol";
 import {LockerSYT} from "../src/yield/LockerSYT.sol";
 import {AAVEAdapter} from "../src/yield/adapters/AAVEAdapter.sol";
 
-
 contract MockAAVEPool {
-      function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external {
-            IERC20(asset).transferFrom(msg.sender, address(this), amount);
-      }
-      function withdraw(address asset, uint256 amount, address to) external returns (uint256){
-            IERC20(asset).transfer(to, amount);
-            return amount;
-      }
+    function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external {
+        IERC20(asset).transferFrom(msg.sender, address(this), amount);
+    }
 
+    function withdraw(address asset, uint256 amount, address to) external returns (uint256) {
+        IERC20(asset).transfer(to, amount);
+        return amount;
+    }
 }
 
 contract ERC20TOKEN is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }
 }
 
 contract RouterSetupTest is Test {
-     struct Allocation {
+    struct Allocation {
         address[] adapters; // venue adapter
         uint256[] amount; // total amount of underlying deposited
         uint32[] bps; // 0..10000; if non-empty, sum must equal 10000
@@ -68,10 +68,10 @@ contract RouterSetupTest is Test {
         assets[0] = asset;
         address[] memory aavePools = new address[](1);
         aavePools[0] = mockAAVEPool;
-        aave = new AAVEAdapter(address(router),assets,aavePools);    
+        aave = new AAVEAdapter(address(router), assets, aavePools);
 
         // Configure Router
-        address[] memory adapters= new address[](1);
+        address[] memory adapters = new address[](1);
         adapters[0] = address(aave);
         uint32[] memory bps = new uint32[](1);
         bps[0] = 10000;
@@ -127,5 +127,4 @@ contract RouterSetupTest is Test {
         assertEq(token.balanceOf(userB), 500e18);
         assertEq(token.balanceOf(mockAAVEPool), 500e18);
     }
-
 }
