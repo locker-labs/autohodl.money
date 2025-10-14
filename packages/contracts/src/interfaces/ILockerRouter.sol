@@ -37,7 +37,6 @@ interface ILockerRouter {
     // Claim-to-pool pathway
     event ClaimTransferredToPool(address indexed user, address indexed asset, uint256 amount);
 
-
     /*=============================*
      *        USER ACTIONS         *
      *=============================*/

@@ -8,7 +8,7 @@ import {ILockerRouter} from "../src/interfaces/ILockerRouter.sol";
 
 contract SetupUsdcSYT is Script {
     LockerSYT public syt;
-    uint256 pk = vm.envUint("PRIVATE_KEY"); 
+    uint256 pk = vm.envUint("PRIVATE_KEY");
     address public lockerRouter = vm.envAddress("LOCKER_ROUTER");
     address public tokenAddress = vm.envAddress("TOKEN_ADDRESS"); // USDC on Ethereum Mainnet
     string public name = "Staked Yield Token: USDC"; // Update for each token
