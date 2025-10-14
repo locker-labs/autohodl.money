@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/IDelegate.sol";
 import "./interfaces/IERC20.sol";
+import "./interfaces/ILockerRouter.sol";
 
 contract AutoHodl {
     struct SavingConfig {
@@ -79,7 +80,9 @@ contract AutoHodl {
         require(config.active, "Savings not active for this token.");
         require(config.delegate == msg.sender, "Only delegate can execute savings tx.");
         if (config.toYield) {
-            // Logic to send to yield platform
+            IERC20(token).transferFrom(user, address(this), value);
+            // Logic to send to yield platform, using default allocation for v1
+            ILockerRouter(config.delegate).depositFor(user, token, value);
         }
         IERC20(token).transferFrom(user, config.savingAddress, value);
 
