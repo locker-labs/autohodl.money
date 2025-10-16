@@ -6,16 +6,16 @@ import { useAppKitAccount } from '@reown/appkit/react';
 type Address = `0x${string}`;
 
 export function useErc20Allowance(params: {
-  token: Address | undefined;
+  token: Address;
   owner?: Address; // optional; defaults to AppKit-connected address
-  spender: Address | undefined;
-  decimals?: number; // Defaults to 6 (USDC)
+  spender: Address;
+  decimals?: number; // Defaults to 18
   enabled?: boolean;
 }) {
   const { address: appkitAddress, isConnected } = useAppKitAccount();
 
   const owner = (params.owner ?? appkitAddress) as Address | undefined;
-  const decimals = params.decimals ?? 6;
+  const decimals = params.decimals ?? 18;
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && owner && params.spender);
 
   const { data, error, isLoading, isFetching, isSuccess, status, refetch } = useReadContract({
@@ -28,10 +28,11 @@ export function useErc20Allowance(params: {
       staleTime: 15_000,
     },
   });
+  console.log({owner, spender: params.spender, token: params.token, data});
 
   const allowance = data as bigint | undefined;
   const allowanceFormatted = useMemo(
-    () => (allowance !== undefined ? formatUnits(allowance, decimals) : undefined),
+    () => (Number(allowance !== undefined ? formatUnits(allowance, decimals) : undefined)),
     [allowance, decimals],
   );
 
@@ -53,13 +54,13 @@ export function useErc20Allowance(params: {
 export function useERC20Approve(params: {
   token: Address | undefined;
   spender: Address | undefined;
-  amount: bigint; // e.g. 20n
-  decimals?: number; // e.g., 6 for USDC
+  amount: number; // e.g. 20n
+  decimals?: number; // e.g., 18
   enabled?: boolean;
 }) {
   const { isConnected } = useAppKitAccount();
-  const decimals = params.decimals ?? 6;
-
+  const decimals = params.decimals ?? 18;
+  const amount = BigInt(params.amount * 10 ** decimals);
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.spender);
 
   const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
@@ -70,7 +71,7 @@ export function useERC20Approve(params: {
       address: params.token as Address,
       abi: erc20Abi,
       functionName: 'approve',
-      args: [params.spender as Address, params.amount],
+      args: [params.spender as Address, amount],
     });
   };
 

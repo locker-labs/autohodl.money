@@ -11,7 +11,7 @@ export enum SupportedAccounts {
 
 export const AutoHodlAddressMap: Record<number, Address> = {
   59144: '0x0', // Linea
-  11155111: '0x2F5A51BE7fA829038eF58305Ef332ae1c003Ebe1', // Sepolia
+  11155111: '0x69C6A0F3Cf595267ef1b7357922c382EA0464D6D', // Sepolia
 };
 
 export const AUTOHODL_ADDRESS: Address = AutoHodlAddressMap[chainId];
@@ -33,12 +33,14 @@ export const MM_CARD_ADDRESSES: Address[] = [
 export const MMC_TOKENS: Address[] = [
   // USDC on Linea
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
-];
+  // USDC on Sepolia
+  '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+]; 
 
 // https://developers.circle.com/stablecoins/usdc-contract-addresses
 export const UsdcAddressMap: Record<number, Address> = {
   59144: '0x176211869cA2b568f2A7D4EE941E073a821EE1ff', // Linea
-  11155111: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238', // Ethereum Sepolia
+  11155111: '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a', // AAVE token on Ethereum Sepolia
 };
 
 export const USDC_ADDRESSES: Address[] = Object.values(UsdcAddressMap);
@@ -83,7 +85,7 @@ export const TokenAddressMap: Record<number, Address> = {
 
 export const TokenDecimalMap: Record<Address, number> = {
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff': 6, // USDC Linea
-  '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238': 6, // USDC Sepolia
+  '0x69C6A0F3Cf595267ef1b7357922c382EA0464D6D': 18, // AAVE Sepolia
   '0xFEce4462D57bD51A6A552365A011b95f0E16d9B7': 6, // USDC Linea Sepolia
   '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a': 18, // AAVE Sepolia
 };
