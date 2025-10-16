@@ -4,8 +4,9 @@ pragma solidity ^0.8.13;
 import "./interfaces/IDelegate.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/ILockerRouter.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract AutoHodl {
+contract AutoHodl is Ownable {
     struct SavingConfig {
         address savingAddress; // Address where the savings will be sent
         address delegate; // Address to delegate the savings tx
@@ -15,6 +16,8 @@ contract AutoHodl {
         bytes extraData; // Extra data for future use
     }
 
+    address public lockerRouter;
+
     mapping(address => mapping(address => SavingConfig)) public savings; // user => token => config
     mapping(address => bool) public tokenAllowlist; // token => isAllowed
 
@@ -22,9 +25,18 @@ contract AutoHodl {
 
     event SavingExecuted(address indexed user, address indexed token, uint256 amount);
 
+    constructor(address _lockerRouter, address[] memory tokens) Ownable(msg.sender) {
+        lockerRouter = _lockerRouter;
+        for (uint256 i = 0; i < tokens.length; i++) {
+            tokenAllowlist[tokens[i]] = true;
+            IERC20(tokens[i]).approve(lockerRouter, type(uint256).max);
+        }
+    }
+
     // Admin function to set token allowlist
     function setTokenAllowlist(address token, bool isAllowed) external {
         tokenAllowlist[token] = isAllowed;
+        IERC20(token).approve(lockerRouter, type(uint256).max);
     }
 
     // Function to set saving configuration for a user and token
@@ -82,9 +94,10 @@ contract AutoHodl {
         if (config.toYield) {
             IERC20(token).transferFrom(user, address(this), value);
             // Logic to send to yield platform, using default allocation for v1
-            ILockerRouter(config.delegate).depositFor(user, token, value);
+            ILockerRouter(lockerRouter).depositFor(user, token, value);
+        } else {
+            IERC20(token).transferFrom(user, config.savingAddress, value);
         }
-        IERC20(token).transferFrom(user, config.savingAddress, value);
 
         emit SavingExecuted(user, token, value);
     }
