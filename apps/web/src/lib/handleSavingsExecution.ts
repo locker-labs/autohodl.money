@@ -3,23 +3,15 @@ import type { SavingsConfigArray } from '@/types/autohodl';
 import type { Hex, Address } from 'viem';
 import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/helpers';
-import { secrets } from './secrets';
 import { executeSavingsTx } from './contract/server/executeSavingsTx';
 import { getSavingsConfigArray } from './contract/server/getSavingsConfig';
 import { chain } from '@/config';
 
 export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
-  const { from: fromTransfer, contract: tokenAddress } = erc20Transfer;
-
-  let from: Address;
-  if (secrets.savingsFrom) {
-    from = secrets.savingsFrom as Address;
-  } else {
-    from = fromTransfer as Address;
-  }
+  const { from, contract: tokenAddress, value: transferAmount } = erc20Transfer;
 
   // For debugging
-  console.debug(JSON.stringify({ fromTransfer, from, DELEGATE, tokenAddress }));
+  console.debug(JSON.stringify({ from, DELEGATE, tokenAddress }));
 
   // TODO: Check if the from address is an autohodl user (check savings config)
   // for now, assume all transfers are from autohodl users
@@ -30,16 +22,12 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     return;
   }
 
-  // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
-  // For now, we will support only USDC savings transfers.
-  if (tokenAddress.toLowerCase() !== MMC_TOKENS[0].toLowerCase()) {
-    console.warn('Only USDC is supported for now. Unsupported token:', tokenAddress);
-    return;
-  }
-
-  // TODO: calculate the savings amount based on user's config
-  // for now: hardcode to 0.01 USDC
-  const savingsAmountBigInt = BigInt(0.01 * 10 ** TokenDecimalMap[MMC_TOKENS[0] as Address]); // in smallest unit (e.g., 0.01 USDC = 1,000,000 wei)
+  // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
+  // // For now, we will support only USDC savings transfers.
+  // if (tokenAddress.toLowerCase() !== MMC_TOKENS[0].toLowerCase()) {
+  //   console.warn('Only USDC is supported for now. Unsupported token:', tokenAddress);
+  //   return;
+  // }
 
   // Check the current approval amount for the delegate from user's address
   let allowance: bigint;
@@ -50,7 +38,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   try {
     allowance = await fetchAllowance({
       tokenAddress: savingsToken,
-      owner: from,
+      owner: from as Address,
       spender: AUTOHODL_ADDRESS,
     });
   } catch (allowanceError) {
@@ -61,18 +49,19 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     return;
   }
 
-  if (allowance < savingsAmountBigInt) {
-    console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmountBigInt}`);
-    // TODO: add a user notification when allowance is less
-    return;
-  }
-
   // Fetch savings config for user and token (to verify delegate is set correctly)
   let savingsConfig: Readonly<SavingsConfigArray>;
   try {
     savingsConfig = await getSavingsConfigArray(from as Address, savingsToken);
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
+    return;
+  }
+  const roundUpAmount = savingsConfig[2];
+  const savingsAmountBigInt = computeRoundUpAndSavings(BigInt(transferAmount), roundUpAmount).savingsAmount;
+  if (allowance < savingsAmountBigInt) {
+    console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmountBigInt}`);
+    // TODO: add a user notification when allowance is less
     return;
   }
 
@@ -90,6 +79,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     return;
   }
 
+
   // Call the executeSavings fn of the SC.
   try {
     const txHash = await executeSavingsTx({
@@ -105,4 +95,20 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
       executionError instanceof Error ? executionError.message : executionError,
     );
   }
+}
+
+export function computeRoundUpAndSavings(
+  transferAmount: bigint,
+  roundUpTo: bigint
+): { roundUpAmount: bigint; savingsAmount: bigint } {
+  if (roundUpTo <= BigInt(0)) {
+    throw new Error("roundUpTo must be > 0");
+  }
+  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
+  const roundUpAmount =
+    ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
+
+  const savingsAmount = roundUpAmount - transferAmount;
+
+  return { roundUpAmount, savingsAmount };
 }
