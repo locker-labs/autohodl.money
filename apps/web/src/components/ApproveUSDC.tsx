@@ -18,15 +18,16 @@ export default function USDCApprovalChecker() {
   } = useErc20Allowance({
     token: USDC_ADDRESS,
     owner: address as `0x${string}` | undefined,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
+    spender: AUTOHODL_ADDRESS as `0x${string}`,
     decimals: TokenDecimalMap[USDC_ADDRESS],
     enabled: isConnected,
   });
 
   const { approve, isPending, isConfirming, isConfirmed, writeError, hash } = useERC20Approve({
     token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
-    amount: BigInt(autohodlAllowance * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+    spender: AUTOHODL_ADDRESS as `0x${string}`,
+    amount: autohodlAllowance,
+    decimals: TokenDecimalMap[USDC_ADDRESS],
     enabled: isConnected,
   });
 
