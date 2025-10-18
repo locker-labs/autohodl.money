@@ -35,7 +35,7 @@ export const MMC_TOKENS: Address[] = [
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
   // USDC on Sepolia
   '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
-]; 
+];
 
 // https://developers.circle.com/stablecoins/usdc-contract-addresses
 export const UsdcAddressMap: Record<number, Address> = {
@@ -103,3 +103,8 @@ export const TOKEN_DECIMALS = TokenDecimalMap[TOKEN_ADDRESS];
 export const TOKEN_DECIMAL_MULTIPLIER = 10 ** TOKEN_DECIMALS;
 
 export const DELEGATE = secrets.delegate;
+
+export const AlchemyChainMap = {
+  11155111: 'eth-sepolia',
+  59144: 'linea-mainnet',
+};

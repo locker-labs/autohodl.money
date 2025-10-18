@@ -6,4 +6,5 @@ export const secrets = {
   privateKeyDelegate: process.env.PRIVATE_KEY_DELEGATE || '',
   rpcUrl: process.env.RPC_URL || '',
   savingsFrom: process.env.SAVINGS_FROM_ADDRESS || '',
+  alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '',
 };
