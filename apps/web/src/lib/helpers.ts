@@ -1,6 +1,6 @@
 import type { Address } from 'viem';
 import { erc20Abi } from 'viem';
-import { viemPublicClient } from '@/lib/clients';
+import { viemPublicClient } from '@/lib/clients/server';
 
 export async function fetchAllowance({
   tokenAddress,

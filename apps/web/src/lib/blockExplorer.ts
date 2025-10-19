@@ -1,10 +1,19 @@
-export const getBlockExplorerTxUrl = (chainId: number, txHash: string): string => {
-  switch (chainId) {
-    case 59144:
-      return `https://lineascan.build/tx/${txHash}`;
-    case 11155111:
-      return `https://sepolia.etherscan.io/tx/${txHash}`;
-    default:
-      return `https://explorer.com/tx/${txHash}`;
-  }
+import { chain } from '@/config';
+
+const chainId = chain.id;
+
+const chainIdToBlockExplorer: Record<number, string> = {
+  59144: 'https://lineascan.build',
+  11155111: 'https://sepolia.etherscan.io',
+  8453: 'https://basescan.org',
+  84532: 'https://sepolia.basescan.org',
+  42161: 'https://arbiscan.io',
+};
+
+export const getTransactionLink = (txHash: string): string => {
+  return `${chainIdToBlockExplorer[chainId]}/tx/${txHash}`;
+};
+
+export const getAddressLink = (address: string): string => {
+  return `${chainIdToBlockExplorer[chainId]}/address/${address}`;
 };
