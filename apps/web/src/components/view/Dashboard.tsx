@@ -13,6 +13,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
 import Button from '@/components/subcomponents/Button';
 import ActiveSwitch from '@/components/subcomponents/ActiveSwitch';
+import YieldSwitch from '../subcomponents/YieldSwitch';
 
 const Dashboard = (): React.JSX.Element => {
   const { txs: transactions, loading } = useTransactions();
@@ -102,11 +103,20 @@ const Dashboard = (): React.JSX.Element => {
 
             <div className='mt-4 flex items-center justify-between gap-2'>
               <div>
-                <p className='text-lg'>Auto HODL Status</p>
+                <p className='text-lg'>Savings Status</p>
                 <p className='text-[#4D4A4A] text-sm'>{config?.active ? 'Active' : 'Paused'}</p>
               </div>
 
               <ActiveSwitch />
+            </div>
+
+            <div className='mt-4 flex items-center justify-between gap-2'>
+              <div>
+                <p className='text-lg'>Earn Yield</p>
+                <p className='text-[#4D4A4A] text-sm'>{config?.toYield ? 'Active' : 'Paused'}</p>
+              </div>
+
+              <YieldSwitch />
             </div>
 
             <div className='mt-4'>
