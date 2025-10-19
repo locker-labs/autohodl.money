@@ -5,6 +5,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {ILockerRouter} from "../interfaces/ILockerRouter.sol";
 
+/// @title LockerSYT
+/// @notice SYT (Spendable Yield Token) representing a share of a user's deposited assets in the LockerRouter.
+
 contract LockerSYT is IERC20 {
     // Metadata
     string public name;
