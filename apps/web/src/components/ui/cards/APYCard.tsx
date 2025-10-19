@@ -1,4 +1,5 @@
-import { Loader2, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
+import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function APYCard({ loading, value }: { loading: boolean; value: string }) {
@@ -10,7 +11,7 @@ export function APYCard({ loading, value }: { loading: boolean; value: string })
         <div>
           <div className='flex items-end gap-1'>
             <p className='leading-none font-bold text-[#78E76E] text-2xl text-left sm:text-center md:text-left'>
-              {loading ? <Loader2 className={'animate-spin size-8'} color={'#78E76E'} /> : `${value}%`}
+              {loading ? <PriceSkeleton /> : `${value}%`}
             </p>
           </div>
           <p className='mt-2 text-black text-base text-left sm:text-center md:text-left'>Current APY</p>

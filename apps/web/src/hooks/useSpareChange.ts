@@ -20,12 +20,12 @@ export function useSpareChange() {
     enabled: isConnected && !!fromAddress,
   });
 
-  const changeSaved = useMemo(() => {
+  const changeSaved: number = useMemo(() => {
     if (!data) return 0;
     const total: number = data.reduce((total, transfer) => {
       return total + Number(transfer.rawContract.value) / 10 ** Number(transfer.rawContract.decimal);
     }, 0);
-    return total.toFixed(2);
+    return Number(total.toFixed(2));
     // return Math.trunc(total * 100) / 100; // round to 2 decimal places
   }, [data]);
 
