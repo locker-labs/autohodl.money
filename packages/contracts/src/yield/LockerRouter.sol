@@ -93,15 +93,29 @@ contract LockerRouter is ILockerRouter, Ownable {
     {
         LockerSYT syt = LockerSYT(assetSYT[asset]);
         require(msg.sender == address(syt), "Invalid SYT");
-        // For v1, assume instant withdrawal from first adapter in default allocation
+
         Allocation memory allocations = defaultAllocation[asset];
         if (allocations.adapters.length == 0) {
             revert("No default allocation");
         }
-        IVenueAdapter(allocations.adapters[0]).requestRedeem(asset, amount);
-        IERC20(asset).transfer(to, amount);
-        emit Sent(from, asset, to, amount, 0);
-        return to;
+        uint256 toTransfer = 0;
+        for (uint256 i = 0; i < allocations.adapters.length; i++) {
+            uint256 adapterAssets = IVenueAdapter(allocations.adapters[i]).positionAssets(asset);
+            if (adapterAssets == 0) {
+                continue;
+            }
+            uint256 toWithdraw = amount < adapterAssets ? amount : adapterAssets;
+            uint256 received = IVenueAdapter(allocations.adapters[i]).requestRedeem(asset, toWithdraw);
+            toTransfer += received;
+            amount -= toWithdraw;
+            if (amount == 0) {
+                break;
+            }
+        }
+        require(amount == 0, "Insufficient assets in adapters");
+        IERC20(asset).transfer(to, toTransfer);
+        emit Sent(from, asset, to, toTransfer, 0);
+        return address(0); // burn SYT, only for v1
     }
 
     // Internal functions

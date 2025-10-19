@@ -33,10 +33,19 @@ contract AutoHodl is Ownable {
         }
     }
 
+    // Admin function to set locker router address
+    function setLockerRouter(address _lockerRouter) external onlyOwner {
+        lockerRouter = _lockerRouter;
+    }
+
     // Admin function to set token allowlist
-    function setTokenAllowlist(address token, bool isAllowed) external {
+    function setTokenAllowlist(address token, bool isAllowed) external onlyOwner {
         tokenAllowlist[token] = isAllowed;
-        IERC20(token).approve(lockerRouter, type(uint256).max);
+        if (isAllowed) {
+            IERC20(token).approve(lockerRouter, type(uint256).max);
+        } else {
+            IERC20(token).approve(lockerRouter, 0);
+        }
     }
 
     // Function to set saving configuration for a user and token
@@ -89,6 +98,7 @@ contract AutoHodl is Ownable {
     // Function to execute savings transaction
     function executeSavingsTx(address user, address token, uint256 value) external {
         SavingConfig memory config = savings[user][token];
+        require(value < config.roundUp, "Value exceeds round up amount.");
         require(config.active, "Savings not active for this token.");
         require(config.delegate == msg.sender, "Only delegate can execute savings tx.");
         if (config.toYield) {

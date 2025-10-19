@@ -21,9 +21,6 @@ interface IVenueAdapter {
     /// @notice Human-readable venue/strategy ID (optional but helpful for UIs).
     function venueId() external view returns (bytes32);
 
-    /// @notice Current Net Asset Value in underlying units (principal + realized yield - realized fees).
-    function nav() external view returns (uint256);
-
     /// @notice Current amount of underlying assets managed by this adapter (principal + accrued yield).
     function positionAssets(address asset) external view returns (uint256);
 
