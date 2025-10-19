@@ -19,7 +19,6 @@ export default function USDCApprovalChecker() {
     token: USDC_ADDRESS,
     owner: address as `0x${string}` | undefined,
     spender: AUTOHODL_ADDRESS as `0x${string}`,
-    decimals: TokenDecimalMap[USDC_ADDRESS],
     enabled: isConnected,
   });
 

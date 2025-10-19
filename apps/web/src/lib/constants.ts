@@ -85,7 +85,6 @@ export const TokenAddressMap: Record<number, Address> = {
 
 export const TokenDecimalMap: Record<Address, number> = {
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff': 6, // USDC Linea
-  '0x69C6A0F3Cf595267ef1b7357922c382EA0464D6D': 18, // AAVE Sepolia
   '0xFEce4462D57bD51A6A552365A011b95f0E16d9B7': 6, // USDC Linea Sepolia
   '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a': 18, // AAVE Sepolia
 };
