@@ -7,7 +7,6 @@ import {
   TOKEN_ADDRESS,
   TOKEN_DECIMALS,
 } from '@/lib/constants';
-// import { useAutoHodl } from '@/context/AutoHodlContext';
 import { chain } from '@/config';
 
 const chainId = chain.id;
@@ -27,8 +26,6 @@ export interface IUserReserveData {
 // uses env configured chain id
 export const useAaveYieldBalance = () => {
   const { isConnected, address: userAddress } = useAccount();
-  // const { tokenSourceAddress } = useAutoHodl();
-  const tokenSourceAddress = userAddress;
 
   const {
     data: raw,
@@ -41,18 +38,16 @@ export const useAaveYieldBalance = () => {
     abi,
     address: AAVE_UI_POOL_DATA_PROVIDER,
     functionName: 'getUserReservesData',
-    args: [AAVE_POOL_ADDRESSES_PROVIDER, tokenSourceAddress],
+    args: [AAVE_POOL_ADDRESSES_PROVIDER, userAddress],
     chainId,
     query: {
-      enabled: isConnected && !!tokenSourceAddress && !!userAddress,
+      enabled: isConnected && !!userAddress && !!userAddress,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       refetchInterval: 5000,
       staleTime: 0,
     },
   });
-
-  console.log('useAaveATokenBalance', { isFetched, isFetching });
 
   let balanceData = { balance: BigInt(0), balanceFormatted: 0 };
 
@@ -63,7 +58,7 @@ export const useAaveYieldBalance = () => {
 
     const balance = tokenData[0].scaledATokenBalance;
 
-    console.log('\nToken Source `aToken` Balance in Pool:', balance);
+    console.log('aToken Balance in Pool:', balance);
 
     balanceData = { balance, balanceFormatted: Number(formatUnits(balance, TOKEN_DECIMALS)) };
   }
