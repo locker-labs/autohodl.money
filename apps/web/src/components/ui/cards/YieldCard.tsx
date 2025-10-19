@@ -1,4 +1,5 @@
-import { CreditCard, Loader2 } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
+import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function YieldCard({ loading, value }: { loading: boolean; value: string }) {
@@ -10,7 +11,7 @@ export function YieldCard({ loading, value }: { loading: boolean; value: string 
         <div>
           <div className='flex items-end gap-1'>
             <p className='leading-none font-bold text-[#000000] text-2xl text-left sm:text-center md:text-left'>
-              {loading ? <Loader2 className={'animate-spin size-8'} color={'#000000'} /> : `$${value}`}
+              {loading ? <PriceSkeleton /> : `$${value}`}
             </p>
             <p className='font-light text-sm'>USDC</p>
           </div>
