@@ -27,7 +27,7 @@ const DetectedCard: React.FC<DetectedCardProps> = ({
 }) => {
   return (
     <div className='flex flex-col items-center gap-8'>
-      <Image className='p-4' src={image} alt='MetaMask Setup' width={imageWidth} height={imageHeight} />
+      <Image className='p-4' src={image} alt='MetaMask Setup' width={imageWidth} height={imageHeight} priority />
       <div className='flex flex-col w-full items-center justify-center gap-4'>
         <h2 className='text-2xl font-bold'>{title}</h2>
         <p className='text-center w-2/3 text-gray-600'>{description}</p>

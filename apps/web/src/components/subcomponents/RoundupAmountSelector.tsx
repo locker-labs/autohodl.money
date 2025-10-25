@@ -1,20 +1,18 @@
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { Loader2 } from 'lucide-react';
 
 const savingOptions = [
-  { label: '$1 (Small saver)', value: 1, purchase: '$3.56', savings: '$0.44' },
-  { label: '$10 (Medium saver)', value: 10, purchase: '$35', savings: '$5' },
-  { label: '$100 (Large saver)', value: 100, purchase: '$850', savings: '$50' },
+  { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
+  { label: '$10', value: 10, purchase: '$35', savings: '$5' },
+  { label: '$100', value: 100, purchase: '$850', savings: '$50' },
 ];
 
 const RoundupAmountSelector = () => {
   const [roundUpLocal, setRoundUpLocal] = useState(savingOptions[0].value);
-  const selectedOption = savingOptions.find((opt) => opt.value === roundUpLocal);
 
   const { config, setConfig } = useAutoHodl();
 
@@ -54,18 +52,19 @@ const RoundupAmountSelector = () => {
           )}
         </span>
       </label>
-      <Select value={String(roundUpLocal)} onValueChange={(value) => setRoundUpLocal(Number(value))}>
-        <SelectTrigger className='w-full h-10'>
-          <SelectValue placeholder={selectedOption?.label} />
-        </SelectTrigger>
-        <SelectContent>
-          {savingOptions.map((opt) => (
-            <SelectItem key={String(opt.value)} value={String(opt.value)}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className='w-full grid grid-cols-3 gap-2'>
+        {savingOptions.map((opt) => (
+          <button
+            type='button'
+            onClick={() => setRoundUpLocal(Number(opt.value))}
+            className={`border border-black rounded-xl px-2 py-2 text-center
+              ${opt.value === roundUpLocal ? 'bg-[#78E76E]/40 font-bold' : ''}`}
+            key={String(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

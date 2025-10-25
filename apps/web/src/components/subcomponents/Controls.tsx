@@ -52,7 +52,7 @@ export function Controls(): React.JSX.Element {
           <div>
             <p className='text-lg'>Deposit Destination</p>
           </div>
-          <div className='mt-2 w-full h-20 border border-black rounded-lg flex items-center justify-start gap-3 px-3'>
+          <div className='mt-2 w-full h-20 border border-black rounded-xl flex items-center justify-start gap-3 px-3'>
             <Lock className='min-w-5 min-h-5' size={20} />
             <div>
               <p className='text-[15px]'>Aave Protocol</p>
