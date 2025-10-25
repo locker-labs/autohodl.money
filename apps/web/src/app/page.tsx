@@ -9,10 +9,10 @@ import UserOnboarding from '@/components/view/UserOnboarding';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 
 export default function Home() {
-  const { isConnected } = useAccount();
+  const { isConnected, isConnecting, isReconnecting } = useAccount();
   const { loading, config } = useAutoHodl();
 
-  if (loading) {
+  if (loading || isConnecting || isReconnecting) {
     return (
       <div className={'h-screen w-full flex flex-col items-center justify-center gap-4 p-8'}>
         <Loader2 className='animate-spin' color='#78E76E' />

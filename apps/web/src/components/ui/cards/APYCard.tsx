@@ -10,9 +10,9 @@ export function APYCard({ loading, value }: { loading: boolean; value: string })
         <TrendingUp className='min-w-10 min-h-10' size={40} strokeWidth={1} color='#1CB01C' />
         <div>
           <div className='flex items-end gap-1'>
-            <p className='leading-none font-bold text-[#78E76E] text-2xl text-left sm:text-center md:text-left'>
-              {loading ? <PriceSkeleton /> : `${value}%`}
-            </p>
+            <div className='leading-none font-bold text-[#78E76E] text-2xl text-left sm:text-center md:text-left'>
+              {loading ? <PriceSkeleton /> : <p>{value}%</p>}
+            </div>
           </div>
           <p className='mt-2 text-black text-base text-left sm:text-center md:text-left'>Current APY</p>
         </div>

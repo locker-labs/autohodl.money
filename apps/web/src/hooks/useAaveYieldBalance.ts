@@ -8,6 +8,7 @@ import {
   TOKEN_DECIMALS,
 } from '@/lib/constants';
 import { chain } from '@/config';
+import { truncateToTwoDecimals } from '@/lib/math';
 
 const chainId = chain.id;
 
@@ -41,11 +42,10 @@ export const useAaveYieldBalance = () => {
     args: [AAVE_POOL_ADDRESSES_PROVIDER, userAddress],
     chainId,
     query: {
-      enabled: isConnected && !!userAddress && !!userAddress,
+      enabled: isConnected && !!userAddress,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       refetchInterval: 5000,
-      staleTime: 0,
     },
   });
 
@@ -58,9 +58,7 @@ export const useAaveYieldBalance = () => {
 
     const balance = tokenData[0].scaledATokenBalance;
 
-    console.log('aToken Balance in Pool:', balance);
-
-    balanceData = { balance, balanceFormatted: Number(formatUnits(balance, TOKEN_DECIMALS)) };
+    balanceData = { balance, balanceFormatted: truncateToTwoDecimals(formatUnits(balance, TOKEN_DECIMALS)) };
   }
 
   return {
@@ -71,5 +69,6 @@ export const useAaveYieldBalance = () => {
     isError,
     isLoading,
     isLoadingError,
+    isReady: isFetched && !isLoading,
   };
 };

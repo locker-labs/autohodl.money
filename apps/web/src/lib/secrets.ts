@@ -1,4 +1,5 @@
 export const secrets = {
+  MoralisApiKey: process.env.MORALIS_API_KEY || '',
   MoralisStreamSecret: process.env.MORALIS_STREAM_SECRET || '',
   env: process.env.NEXT_PUBLIC_ENV || 'development',
   reownProjectId: process.env.NEXT_PUBLIC_PROJECT_ID || '',

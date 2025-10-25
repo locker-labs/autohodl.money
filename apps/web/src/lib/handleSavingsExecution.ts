@@ -2,10 +2,11 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import { parseSavingsConfig, type SavingsConfigArray } from '@/types/autohodl';
 import type { Hex, Address } from 'viem';
 import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { fetchAllowance } from '@/lib/helpers';
+import { fetchAllowance } from '@/lib/erc20/allowance';
 import { executeSavingsTx } from './contract/server/executeSavingsTx';
 import { getSavingsConfigArray } from './contract/server/getSavingsConfig';
 import { chain } from '@/config';
+import { viemPublicClient } from '@/lib/clients/server';
 import { secrets } from '@/lib/secrets';
 import { getTransactionLink } from './blockExplorer';
 
@@ -69,6 +70,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   let allowance: bigint;
   try {
     allowance = await fetchAllowance({
+      publicClient: viemPublicClient,
       tokenAddress: savingsToken,
       owner: from as Address,
       spender: AUTOHODL_ADDRESS,

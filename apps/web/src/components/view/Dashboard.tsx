@@ -7,7 +7,6 @@ import { formatUnits } from 'viem';
 import { TOKEN_DECIMALS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
-// import { UpdateChainModeModal } from '@/components/feature/UpdateChainModeModal';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
 import { useTransactions } from '@/hooks/useTransactions';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
@@ -147,8 +146,6 @@ const Dashboard = (): React.JSX.Element => {
                 <span>Withdraw Savings</span>
               </Button>
             </div>
-
-            {/* <UpdateChainModeModal /> */}
           </CardContent>
         </Card>
       </div>

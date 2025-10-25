@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { MM_CARD_ADDRESSES, USDC_ADDRESSES } from '@/lib/constants';
+import { secrets } from '@/lib/secrets';
 
 // Helper function to verify webhook signature
 export function verifySignature(body: string, signature: string, secret: string): boolean {
@@ -42,7 +43,7 @@ export async function addAddressToMoralisStream(streamId: string, address: strin
     // Initialize Moralis if not already done
     if (!Moralis.default.Core.isStarted) {
       await Moralis.default.start({
-        apiKey: process.env.MORALIS_API_KEY,
+        apiKey: secrets.MoralisApiKey,
       });
     }
 
