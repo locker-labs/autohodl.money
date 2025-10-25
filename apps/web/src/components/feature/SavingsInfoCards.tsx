@@ -4,7 +4,7 @@ import { useAaveYieldBalance } from '@/hooks/useAaveYieldBalance';
 import { useSpareChange } from '@/hooks/useSpareChange';
 
 export function SavingsInfoCards(): React.JSX.Element {
-  const { apy, loading: apyLoading } = useAaveAPY();
+  const { data: apy, isLoading: apyLoading } = useAaveAPY();
 
   const { changeSaved, isReady: readyChange } = useSpareChange();
 

@@ -12,6 +12,7 @@ interface Erc20TransferParams {
   toAddress?: string;
   contractAddresses: string[];
   maxCount?: number;
+  pageKey?: string;
 }
 
 export interface Erc20Transfer {
@@ -36,12 +37,21 @@ export interface Erc20Transfer {
   };
 }
 
-interface Erc20TransferResponse {
+export interface Erc20TransferResponse {
   transfers: Erc20Transfer[];
+  pageKey?: string;
 }
 
 export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<Erc20TransferResponse> {
-  const { fromBlock = '0x0', toBlock = 'latest', fromAddress, toAddress, contractAddresses, maxCount = 100 } = params;
+  const {
+    fromBlock = '0x0',
+    toBlock = 'latest',
+    fromAddress,
+    toAddress,
+    contractAddresses,
+    maxCount = 100,
+    pageKey = '0x0',
+  } = params;
 
   const requestBody = {
     id: 1,
@@ -58,12 +68,13 @@ export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<
         withMetadata: true,
         excludeZeroValue: true,
         maxCount: `0x${maxCount.toString(16)}`,
+        pageKey,
       },
     ],
   };
 
   try {
-    const response = await axios.post(ALCHEMY_API_URL, requestBody, {
+    const response = await axios.post<{ result: Erc20TransferResponse }>(ALCHEMY_API_URL, requestBody, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -71,9 +82,7 @@ export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<
 
     const { result } = response.data;
     if (result) {
-      return {
-        transfers: result.transfers,
-      };
+      return result;
     }
     return {
       transfers: [],

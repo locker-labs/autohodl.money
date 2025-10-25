@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { createPublicClient, http, type Address } from 'viem';
 import { linea, sepolia } from 'viem/chains';
 import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
@@ -58,58 +58,45 @@ const CHAIN_CONFIGS = {
 } as const;
 
 export function useAaveAPY() {
-  const [apy, setApy] = useState<string>('--');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  async function fetchAaveAPY() {
+    try {
+      const config = CHAIN_CONFIGS[chain.id];
 
-  useEffect(() => {
-    async function fetchAaveAPY() {
-      try {
-        setLoading(true);
-        setError(null);
+      // Create public client for the specified chain
+      const publicClient = createPublicClient({
+        chain: config.chain,
+        transport: http(config.rpcUrl),
+      });
 
-        const config = CHAIN_CONFIGS[chain.id];
+      // Call getReserveData directly on the Pool contract for USDC
+      const reserveData = await publicClient.readContract({
+        address: config.aavePoolAddress as Address,
+        abi: simplePoolAbi,
+        functionName: 'getReserveData',
+        args: [config.usdcAddress as Address],
+      });
 
-        // Create public client for the specified chain
-        const publicClient = createPublicClient({
-          chain: config.chain,
-          transport: http(config.rpcUrl),
-        });
+      if (reserveData?.currentLiquidityRate) {
+        // Convert currentLiquidityRate from ray (1e27) to APY percentage
+        const liquidityRateRay = Number(reserveData.currentLiquidityRate);
+        const apyValue = (liquidityRateRay / 1e27) * 100;
 
-        // Call getReserveData directly on the Pool contract for USDC
-        const reserveData = await publicClient.readContract({
-          address: config.aavePoolAddress as Address,
-          abi: simplePoolAbi,
-          functionName: 'getReserveData',
-          args: [config.usdcAddress as Address],
-        });
-
-        if (reserveData?.currentLiquidityRate) {
-          // Convert currentLiquidityRate from ray (1e27) to APY percentage
-          const liquidityRateRay = Number(reserveData.currentLiquidityRate);
-          const apyValue = (liquidityRateRay / 1e27) * 100;
-
-          setApy(apyValue.toFixed(2));
-        } else {
-          setError('No liquidity rate found');
-          setApy('--');
-        }
-      } catch (err) {
-        console.error('Error fetching Aave APY:', err);
-        setError('Failed to fetch APY');
-        setApy('--');
-      } finally {
-        setLoading(false);
+        return apyValue.toFixed(2);
       }
+
+      throw new Error('No liquidity rate found');
+    } catch (err) {
+      console.error('Error fetching Aave APY:', err);
+      throw new Error('Failed to fetch APY');
     }
+  }
 
-    fetchAaveAPY();
-
-    // Refresh APY every 5 minutes
-    const interval = setInterval(fetchAaveAPY, 5 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return { apy, loading, error };
+  return useQuery({
+    queryKey: ['aave-apy', chain.id],
+    queryFn: fetchAaveAPY,
+    enabled: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchInterval: 15000, // 15 seconds
+  });
 }
