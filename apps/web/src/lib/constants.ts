@@ -47,6 +47,19 @@ export const USDC_ADDRESSES: Address[] = Object.values(UsdcAddressMap);
 
 export const USDC_ADDRESS: Address = UsdcAddressMap[chainId];
 
+export const AutoHodlSupportedTokenMap: Record<number, Address[]> = {
+  59144: [
+    // USDC
+    '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
+  ],
+  11155111: [
+    // AAVE
+    '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a',
+  ],
+};
+
+export const AUTOHODL_SUPPORTED_TOKENS: Address[] = AutoHodlSupportedTokenMap[chainId];
+
 // Aave Addresses
 // https://aave.com/docs/resources/addresses
 
