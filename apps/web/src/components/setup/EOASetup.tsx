@@ -16,10 +16,11 @@ const EOASetup: React.FC = () => {
       {currentStep === 1 && (
         <DetectedCard
           title='Oh no, we didn’t find a MetaMask Card!'
-          description={`Auto HODL works whenever you spend with your MetaMask Card. Don’t worry  it only takes a few minutes to get one.`}
+          description={`Auto HODL works whenever you spend with your MetaMask Card.
+             Don’t worry  it only takes a few minutes to get one.`}
           image='/Gear.png'
-          imageWidth={200}
-          imageHeight={120}
+          imageWidth={274}
+          imageHeight={336}
           buttonTitle={'Continue without card'}
           handleButtonClick={handleButtonClick}
         >
@@ -27,7 +28,8 @@ const EOASetup: React.FC = () => {
           <a
             href={paths.GetMetaMaskCard}
             target='_blank'
-            className='underline decoration-black decoration-2 underline-offset-4 hover:decoration-4 transition-colors'
+            className={`underline decoration-black decoration-1 underline-offset-4
+               hover:decoration-2 hover:font-semibold transition-all duration-300`}
           >
             Get a MetaMask Card
           </a>

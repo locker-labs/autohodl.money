@@ -43,7 +43,6 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
-        console.log('Fetching savings config for user:', address, 'Token:', USDC_ADDRESS);
         const config = await getSavingsConfig(address, USDC_ADDRESS);
         const found = config && config.savingAddress !== '0x0000000000000000000000000000000000000000';
         if (found) {
