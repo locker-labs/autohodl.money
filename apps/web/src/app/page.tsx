@@ -27,7 +27,7 @@ export default function Home() {
     fetchAccounts();
   }, [address]);
 
-  if (loading || isConnecting || isReconnecting || !accounts.length) {
+  if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {
     return (
       <div className={'h-screen w-full flex flex-col items-center justify-center gap-4 p-8'}>
         <Loader2 className='animate-spin' color='#78E76E' />
