@@ -1,7 +1,10 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
-import { verifySignature } from './moralis';
-import { handleSavingsExecution } from './handleSavingsExecution';
+import type { Address } from 'viem';
+import { getAddress } from 'viem';
+import { SavingConfigSetEventSigHash, TokenToTransferStreamIdMap } from '@/lib/constants';
+import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
+import { addAddressToEoaErc20TransferMoralisStream, verifySignature } from '@/lib/moralis';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -36,6 +39,30 @@ export async function handleStream(body: string, signature: string, webhookSecre
   if (!payload.confirmed) {
     console.log('Skipping unconfirmed transaction.');
     return NextResponse.json({ message: 'Unconfirmed transactions are ignored.' });
+  }
+
+  if (payload.logs.length) {
+    const configSetLogs = payload.logs.filter((log) => log.topic0 === SavingConfigSetEventSigHash);
+    // if SavingConfigSet, then add user address to erc20 transfers stream
+
+    for (const configSetLog of configSetLogs) {
+      if (configSetLog?.topic1 && configSetLog.topic2) {
+        const user: Address = getAddress(`0x${configSetLog.topic1.slice(26)}`);
+        const token: Address = getAddress(`0x${configSetLog.topic2.slice(26)}`);
+        console.log(`New saving config set for user: ${user}, token: ${token}`);
+        const streamId: string | undefined = TokenToTransferStreamIdMap[token];
+        if (!streamId) {
+          console.error(`No stream ID configured for token: ${token}`);
+          // TODO: send alert to dev team
+        } else {
+          await addAddressToEoaErc20TransferMoralisStream(streamId, user);
+        }
+      }
+    }
+
+    if (configSetLogs.length) {
+      return NextResponse.json({ message: 'Processed SavingConfigSet event' });
+    }
   }
 
   // Process ERC20 transfers

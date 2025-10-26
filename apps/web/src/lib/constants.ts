@@ -120,3 +120,13 @@ export const AlchemyChainMap = {
   11155111: 'eth-sepolia',
   59144: 'linea-mainnet',
 };
+
+export const TransferEventSig = 'Transfer(address,address,uint256)';
+export const SavingConfigSetEventSigHash = '0x65ffc51d687a08ab0d99951353c570081e516436bbf9c43a74a3ac35987d8b7f';
+
+export const TokenToTransferStreamIdMap: Record<Address, string> = {
+  // sepolia AAVE
+  '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a': secrets.MoralisStreamIdEoaTransferUsdc,
+  // linea USDC
+  '0x176211869cA2b568f2A7D4EE941E073a821EE1ff': secrets.MoralisStreamIdEoaTransferUsdc,
+};

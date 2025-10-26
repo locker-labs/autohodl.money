@@ -11,7 +11,7 @@ import { secrets } from '@/lib/secrets';
 import { getTransactionLink } from './blockExplorer';
 
 export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
-  const { from: fromTransfer, contract: tokenAddress } = erc20Transfer;
+  const { from: fromTransfer, contract: tokenAddress, to } = erc20Transfer;
   const transferAmount: bigint = BigInt(erc20Transfer.value);
 
   // Since we dont have access to metamask card,
@@ -24,7 +24,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   }
 
   // For debugging
-  console.debug(JSON.stringify({ from, DELEGATE, tokenAddress }));
+  console.debug(JSON.stringify({ from, to, DELEGATE, tokenAddress }));
 
   // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
   // // For now, we will support only USDC savings transfers.
@@ -40,7 +40,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   let savingsConfig: Readonly<SavingsConfigArray>;
   try {
     savingsConfig = await getSavingsConfigArray(from as Address, savingsToken);
-    console.log('CONFIG:', JSON.stringify(parseSavingsConfig(savingsConfig)));
+    console.log('CONFIG:', parseSavingsConfig(savingsConfig));
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
     return;
