@@ -27,6 +27,8 @@ export default function Home() {
     fetchAccounts();
   }, [address]);
 
+  console.log({ loading, isConnecting, isReconnecting, accounts });
+
   if (loading || isConnecting || isReconnecting || !accounts.length) {
     return (
       <div className={'h-screen w-full flex flex-col items-center justify-center gap-4 p-8'}>
