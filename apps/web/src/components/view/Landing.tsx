@@ -15,16 +15,74 @@ export default function LandingPage() {
 
   return (
     <div className='w-full min-h-screen overflow-x-hidden'>
+      <div className='top-0 sticky w-full h-[64px] bg-[#f7feec] flex items-center justify-between px-[24px] border-b border-[#4D4A4A]/10'>
+        <Link href='/'>
+          <Image className='w-[100px]' src='/AutoHODL.png' alt='AutoHODL' width={200} height={100} priority />
+        </Link>
+
+        <Button
+          type={'button'}
+          onAction={() => open()}
+          disabled={false}
+          aria-disabled={false}
+          className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
+          title={'Connect Wallet'}
+        >
+          Get Started
+        </Button>
+      </div>
       <section className='px-[24px] bg-[#f7feec] h-screen flex flex-col items-center justify-center'>
-        <div className={'h-[120px] py-4 max-w-[1440px] w-full flex justify-between items-end'}>
+        <div className={'h-[120px] py-4 max-w-[1440px] w-full hidden lg:flex justify-between items-end'}>
           <Link href='/'>
-            <Image src='/AutoHODL.png' alt='AutoHODL' width={200} height={100} priority />
+            <Image
+              className='w-[150px] lg:w-[200px]'
+              src='/AutoHODL.png'
+              alt='AutoHODL'
+              width={200}
+              height={100}
+              priority
+            />
           </Link>
         </div>
 
-        <div className='h-[calc(100vh-120px)] w-full max-w-[1440px] grid grid-cols-2 items-center justify-between gap-[60px]'>
+        {/* Mobile */}
+        <div className='lg:hidden w-full max-w-[1440px] grid items-center justify-between gap-[60px]'>
           <div>
-            <h1 className='text-[42px] font-medium max-w-[600px]'>
+            <p className='mt-[80px] text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
+            <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
+              Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they
+              earn passive yield.
+            </p>
+            <div className='flex justify-center'>
+              <Button
+                type={'button'}
+                onAction={() => open()}
+                disabled={false}
+                aria-disabled={false}
+                className={'mt-[16px] w-[144px] h-[44px] font-bold rounded-[8px]'}
+                title={'Connect Wallet'}
+              >
+                Get Started
+              </Button>
+            </div>
+
+            <p className='mt-[16px] text-[14px] text-black text-center'>MetaMask card is supported, more coming soon</p>
+          </div>
+          <div className='w-full flex items-center justify-center'>
+            <Image
+              className='lg:max-w-[480px] aspect-auto'
+              src={'/hero.landing.png'}
+              alt='Welcome Image'
+              width={600}
+              height={400}
+            />
+          </div>
+        </div>
+
+        {/* Desktop */}
+        <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1440px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
+          <div>
+            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[600px]'>
               Saves your spare change,
               <br />
               Every time you spend with a Crypto Card
@@ -48,7 +106,7 @@ export default function LandingPage() {
           </div>
           <div className='w-full flex items-center justify-end'>
             <Image
-              className='max-w-[480px] aspect-auto'
+              className='lg:max-w-[480px] aspect-auto'
               src={'/hero.landing.png'}
               alt='Welcome Image'
               width={600}
@@ -60,7 +118,38 @@ export default function LandingPage() {
       </section>
 
       {/* Crypto Savings Simplified */}
-      <section className='p-[48px] bg-[#ffffff] h-screen flex flex-col items-center justify-center'>
+      {/* mobile */}
+      <section className='lg:hidden p-[48px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
+        <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+          <p className='text-[40px] font-medium'>
+            Crypto Savings, <span className='text-[#78E76E]'>Simplified</span>
+          </p>
+          <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
+            Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
+            passive yield.
+          </p>
+        </div>
+
+        <div className='mb-4 max-w-[1440px] grid gap-[32px]'>
+          <BorderCard
+            imgSrc='/coins.png'
+            title='Spend normally'
+            description='Use your MetaMask Card for daily purchases'
+          />
+          <BorderCard
+            imgSrc='/save.png'
+            title='Auto round-up'
+            description='Spare change ($0.37, $5.32, etc.) is deposited into Aave automatically'
+          />
+          <BorderCard
+            imgSrc='/grow.svg'
+            title='Grow passively'
+            description='Your savings earn yield while staying fully secure'
+          />
+        </div>
+      </section>
+      {/* Desktop */}
+      <section className='hidden p-[48px] bg-[#ffffff] h-screen lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             Crypto Savings, <span className='text-[#78E76E]'>Simplified</span>
@@ -91,12 +180,12 @@ export default function LandingPage() {
       </section>
 
       {/* Support for metamask card */}
-      <section className='px-[24px] bg-[#f7feec] h-[600px] flex items-center justify-center'>
-        <div className={'max-w-[1440px] w-full grid grid-cols-2 gap-[32px]'}>
+      <section className='px-[24px] bg-[#f7feec] lg:h-[600px] flex items-center justify-center'>
+        <div className={'mb-12 lg:mb-0 max-w-[1440px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='flex flex-col items-start justify-center'>
-            <p className='mb-2 text-[24px] font-base'>Support for</p>
+            <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Support for</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
-            <p className='mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
+            <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
               1st place: MetaMask x Circle - Smart Agents & Liquidity Automation
             </p>
 
@@ -105,25 +194,25 @@ export default function LandingPage() {
               onAction={() => window.open(paths.GetMetaMaskCard, '_blank')}
               disabled={false}
               aria-disabled={false}
-              className={'w-[245px] h-[52px] font-bold rounded-[8px]'}
+              className={'w-[140px] lg:w-[245px] h-[38px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Learn more'}
             >
               Learn more
             </Button>
           </div>
-          <div className='transition-transform duration-500 hover:rotate-[-8deg] size-[800px] flex items-center justify-center'>
+          <div className='my-8 lg:my-0 transition-transform duration-500 hover:rotate-[-8deg] lg:size-[800px] flex items-center justify-center'>
             <Image src='/mmcards.png' alt='img' width={800} height={800} />
           </div>
         </div>
       </section>
 
       {/* Grant & Bounties */}
-      <section className='p-[48px] bg-[#ffffff] h-[67vh] flex flex-col items-center justify-center'>
-        <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+      <section className='p-[48px] bg-[#ffffff] lg:h-[67vh] flex flex-col items-center justify-center'>
+        <div className={'mb-[40px] lg:mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>Grant & Bounties</p>
         </div>
 
-        <div className='max-w-[1440px] grid grid-cols-3 gap-[32px]'>
+        <div className='lg:mb-0 mb-4 max-w-[1440px] grid lg:grid-cols-3 gap-[32px]'>
           <BorderCard2 href={paths.CircleGrantee} imgSrc='/circle-logo.png' title='Grantee' />
           <BorderCard2
             href={paths.MetaMaskHackathonBounty}
@@ -135,13 +224,14 @@ export default function LandingPage() {
       </section>
 
       {/* Setup once, Save forever */}
-      <section className='px-[24px] bg-[#f7feec] h-[420px] flex flex-col items-center justify-center'>
+      <section className='px-[24px] bg-[#f7feec] lg:h-[420px] flex flex-col items-center justify-center'>
         <div className='w-full max-w-[1440px] flex items-center justify-between gap-[60px]'>
-          <div>
+          <div className='mt-8 lg:mt-0 mb-12 lg:mb-0'>
             <h1 className='text-[42px] font-medium max-w-[600px]'>
-              Setup once. <span className='text-[#78E76E] font-bold'>Save forever.</span>
+              Setup once. <br className='sm:hidden' />
+              <span className='text-[#78E76E] font-bold'>Save forever.</span>
             </h1>
-            <h4 className='mb-[40px] text-[24px]'>
+            <h4 className='mt-4 lg:mt-0 mb-[40px] text-[24px]'>
               Join thousands of users who are building wealth with every purchase.
               <br />
               No effort required.
@@ -161,7 +251,7 @@ export default function LandingPage() {
       </section>
       <hr className='bg-[#D0D0D0] h-[2px] opacity-70' />
       <footer className='px-[24px] bg-[#f7feec] w-full flex items-center justify-center py-[40px]'>
-        <div className='max-w-[1440px] w-full flex items-center justify-between'>
+        <div className='max-w-[1440px] w-full flex items-start lg:items-center justify-between'>
           <button
             type='button'
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -169,15 +259,16 @@ export default function LandingPage() {
           >
             Auto<span className='font-bold'>HODL</span>
           </button>
-          <div className='flex items-center justify-center gap-[32px] text-[16px] text-[#4D4A4A]'>
+          <div className='flex flex-col sm:flex-row items-start lg:items-center justify-center gap-[12px] lg:gap-[32px] text-[16px] text-[#4D4A4A]'>
+            <p className='sm:hidden text-sm font-bold'>Connect</p>
             {[
               { href: links.telegram, label: 'Telegram' },
               { href: links.twitter, label: 'Twitter' },
               { href: links.github, label: 'GitHub' },
-              { href: links.contact, label: 'Contact' },
+              { href: links.contact, label: 'Email' },
             ].map((item, idx) => (
               <ExternalLink href={item.href} key={`footer-link-${`${idx}`}`}>
-                {item.label}
+                <p className='text-sm lg:text-base'>{item.label}</p>
               </ExternalLink>
             ))}
           </div>
