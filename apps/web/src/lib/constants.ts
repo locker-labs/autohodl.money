@@ -43,9 +43,16 @@ export const UsdcAddressMap: Record<number, Address> = {
   11155111: '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a', // AAVE token on Ethereum Sepolia
 };
 
+export const SUsdcAddressMap: Record<number, Address> = {
+  59144: '0x0', // Linea
+  11155111: '0x8E6Bdbd276E1A54439B0d8f9465B02E5A403fbFB', // sUSDC on Ethereum Sepolia
+};
+
 export const USDC_ADDRESSES: Address[] = Object.values(UsdcAddressMap);
 
 export const USDC_ADDRESS: Address = UsdcAddressMap[chainId];
+
+export const S_USDC_ADDRESS: Address = SUsdcAddressMap[chainId];
 
 export const AutoHodlSupportedTokenMap: Record<number, Address[]> = {
   59144: [
