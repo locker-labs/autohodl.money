@@ -1,10 +1,10 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS, TokenDecimalMap, AUTOHODL_ADDRESS } from '@/lib/constants';
+import { USDC_ADDRESS, AUTOHODL_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
-import { getBlockExplorerTxUrl } from '@/lib/blockExplorer';
+import { getTransactionLink } from '@/lib/blockExplorer';
 import ErrorDisplay from './ErrorDisplay';
 
 export default function USDCApprovalChecker() {
@@ -18,15 +18,15 @@ export default function USDCApprovalChecker() {
   } = useErc20Allowance({
     token: USDC_ADDRESS,
     owner: address as `0x${string}` | undefined,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
-    decimals: TokenDecimalMap[USDC_ADDRESS],
+    spender: AUTOHODL_ADDRESS as `0x${string}`,
     enabled: isConnected,
   });
 
   const { approve, isPending, isConfirming, isConfirmed, writeError, hash } = useERC20Approve({
     token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
-    amount: BigInt(autohodlAllowance * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+    spender: AUTOHODL_ADDRESS as `0x${string}`,
+    amount: autohodlAllowance,
+    decimals: TokenDecimalMap[USDC_ADDRESS],
     enabled: isConnected,
   });
 
@@ -132,7 +132,7 @@ export default function USDCApprovalChecker() {
           <div className='p-4 bg-green-50 text-green-700 rounded-md'>
             <p className='font-medium'>Approval successful!</p>
             <a
-              href={getBlockExplorerTxUrl(chain.id, hash as string)}
+              href={getTransactionLink(hash as string)}
               target='_blank'
               rel='noopener noreferrer'
               className='text-sm underline'

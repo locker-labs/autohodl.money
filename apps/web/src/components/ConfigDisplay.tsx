@@ -1,6 +1,6 @@
-import type { SavingsConfig } from '@/types/autohodl';
+import type { SavingsConfigArray } from '@/types/autohodl';
 
-const ConfigDisplay = ({ config }: { config: null | SavingsConfig }) => {
+const ConfigDisplay = ({ config }: { config: null | SavingsConfigArray }) => {
   if (!config) return <div>No configuration found.</div>;
 
   return (
