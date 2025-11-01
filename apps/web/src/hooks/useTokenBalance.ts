@@ -19,19 +19,12 @@ export function useTokenBalance({ address, token }: { address: Address | undefin
       enabled: !!address,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      refetchInterval: 5000,
+      refetchInterval: 15000,
       staleTime: 0,
     },
   });
 
   const balanceFormatted = data ? truncateToTwoDecimals(formatUnits(data, decimals)) : 0;
-
-  console.log('useTokenBalance', {
-    balance: data,
-    balanceFormatted,
-    isFetched,
-    isFetching,
-  });
 
   return {
     balance: data,

@@ -1,6 +1,5 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import Header from '@/components/Header';
 import Dashboard from '@/components/view/Dashboard';
@@ -10,6 +9,7 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import type { SupportedAccounts } from '@/lib/constants';
 import { getSupportedAccounts } from '@/lib/userAccounts';
+import Loading from '@/app/loading';
 
 export default function Home() {
   const { isConnected, isConnecting, isReconnecting } = useAccount();
@@ -28,20 +28,16 @@ export default function Home() {
   }, [address]);
 
   if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {
-    return (
-      <div className={'h-screen w-full flex flex-col items-center justify-center gap-4 p-8'}>
-        <Loader2 className='animate-spin' color='#78E76E' />
-        <p>App is loading...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!isConnected) {
     return <LandingPage />;
   }
   return (
-    <div className={'h-screen w-full flex flex-col items-center gap-8 p-8'}>
+    <div className={'min-h-screen w-full flex flex-col items-center lg:gap-8 lg:p-8'}>
       <Header />
+
       {!config ? <UserOnboarding accounts={accounts} /> : <Dashboard />}
     </div>
   );

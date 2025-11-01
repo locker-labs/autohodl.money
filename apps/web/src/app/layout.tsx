@@ -3,6 +3,7 @@ import { Albert_Sans } from 'next/font/google';
 import { headers } from 'next/headers'; // added
 import './globals.css';
 import ContextProvider from '@/context';
+import { Toaster } from 'sonner';
 
 const albertSans = Albert_Sans({
   variable: '--font-albert-sans',
@@ -26,6 +27,7 @@ export default async function RootLayout({
     <html lang='en'>
       <body className={`${albertSans.variable} font-sans antialiased`}>
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
+        <Toaster position='top-center' />
       </body>
     </html>
   );

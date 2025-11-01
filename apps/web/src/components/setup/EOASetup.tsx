@@ -29,7 +29,7 @@ const EOASetup: React.FC = () => {
             href={paths.GetMetaMaskCard}
             target='_blank'
             className={`underline decoration-black decoration-1 underline-offset-4
-               hover:decoration-2 hover:font-semibold transition-all duration-300`}
+               transition-all duration-300`}
           >
             Get a MetaMask Card
           </a>

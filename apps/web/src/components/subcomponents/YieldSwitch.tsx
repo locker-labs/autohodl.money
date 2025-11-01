@@ -4,7 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
-import { Loader2 } from 'lucide-react';
+import { LoaderSecondary } from '@/components/ui/loader';
 
 const YieldSwitch = () => {
   const { config, setConfig } = useAutoHodl();
@@ -12,6 +12,7 @@ const YieldSwitch = () => {
   //   TODO: add error toast
 
   const [toYieldLocal, setToYieldLocal] = useState(config?.toYield ?? false);
+  const isPending = toYieldLocal !== config?.toYield;
 
   useEffect(() => {
     async function iife() {
@@ -36,9 +37,22 @@ const YieldSwitch = () => {
   }, [toYieldLocal, config?.savingAddress, createConfig]);
 
   return (
-    <div className='flex items-center justify-end gap-2'>
-      {toYieldLocal !== config?.toYield && <Loader2 className={`animate-spin size-5`} color={'#000000'} />}
-      <Switch checked={toYieldLocal} onCheckedChange={setToYieldLocal} />
+    <div className='flex items-center justify-between gap-2'>
+      <div>
+        <div className='flex items-center justify-start gap-2'>
+          <p className='text-lg'>Earn Yield</p>
+          {isPending && <LoaderSecondary />}
+        </div>
+
+        <p className='text-[#4D4A4A] text-sm'>{config?.toYield ? 'Active' : 'Paused'}</p>
+      </div>
+
+      <Switch
+        className={isPending ? 'cursor-progress' : 'disabled:cursor-not-allowed'}
+        disabled={isPending}
+        checked={toYieldLocal}
+        onCheckedChange={setToYieldLocal}
+      />
     </div>
   );
 };

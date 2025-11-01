@@ -6,7 +6,7 @@ const chainId = chain.id;
 
 export enum SupportedAccounts {
   MetaMask = 'MetaMask Card',
-  EOA = 'EOA',
+  EOA = 'EOA Wallet',
 }
 
 export const AutoHodlAddressMap: Record<number, Address> = {

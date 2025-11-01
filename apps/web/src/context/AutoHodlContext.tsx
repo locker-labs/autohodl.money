@@ -2,16 +2,19 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS } from '@/lib/constants';
+import { type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/contract/client/getSavingsConfig';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getSupportedAccounts } from '@/lib/userAccounts';
 
 type AutoHodlContextType = {
   loading: boolean;
   config: SavingsConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  accounts: SupportedAccounts[];
 };
 
 const AutoHodlContext = createContext<AutoHodlContextType | undefined>(undefined);
@@ -33,6 +36,14 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [config, setConfig] = useState<SavingsConfig | null>(null);
   const [refetchFlag, setRefetchFlag] = useState(false);
   const { address, isConnected } = useAccount();
+
+  const { data: accounts, isLoading: loadingAccounts } = useQuery({
+    enabled: !!address && isConnected,
+    queryFn: async () => {
+      return await getSupportedAccounts(address);
+    },
+    queryKey: ['supported-accounts', address, refetchFlag],
+  });
 
   // Fetch savings config when wallet connects
   useEffect(() => {
@@ -62,7 +73,9 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   }, [address, isConnected, refetchFlag]);
 
   return (
-    <AutoHodlContext.Provider value={{ loading, config, setRefetchFlag, setConfig }}>
+    <AutoHodlContext.Provider
+      value={{ loading: loading || loadingAccounts, config, setRefetchFlag, setConfig, accounts: accounts || [] }}
+    >
       {children}
     </AutoHodlContext.Provider>
   );

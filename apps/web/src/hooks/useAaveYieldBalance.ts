@@ -45,7 +45,7 @@ export const useAaveYieldBalance = () => {
       enabled: isConnected && !!userAddress,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
-      refetchInterval: 5000,
+      refetchInterval: 15000,
     },
   });
 

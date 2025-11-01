@@ -110,7 +110,7 @@ export default function SetSavingConfig({ account }: Props) {
             <label htmlFor={'toYield'} className='text-sm text-gray-700'>
               Yield savings (Earn yield on your savings.{' '}
               <a
-                href={paths.LearnMoreYieldSavings}
+                href={paths.GetMetaMaskCard}
                 className='text-blue-500 hover:underline hover:underline-offset-1 transition-colors'
                 target='_blank'
               >

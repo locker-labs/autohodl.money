@@ -5,7 +5,7 @@ import { formatAmount } from '@/lib/math';
 
 export function YieldCard({ loading, value }: { loading: boolean; value: number }) {
   return (
-    <Card className='flex items-center justify-start rounded-xl border border-[#1CB01C]'>
+    <Card className='flex items-center justify-start rounded-xl border border-app-green'>
       <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
         {/* Icon */}
         <CreditCard className='min-w-10 min-h-10' size={40} strokeWidth={1} color='#000000' />

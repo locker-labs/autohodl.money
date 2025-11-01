@@ -14,7 +14,7 @@ export function APYCard({
   return (
     <Card
       className={`flex items-center justify-start rounded-xl border 
-    ${showWarning ? 'border-red-500' : 'border-[#1CB01C]'}`}
+    ${showWarning ? 'border-red-500' : 'border-app-green'}`}
     >
       <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
         {/* Icon */}
@@ -44,7 +44,7 @@ export function APYCard({
               </p>
             </div>
           ) : (
-            <p className='mt-2 text-base text-left sm:text-center md:text-left text-black'>Current APY</p>
+            <p className='mt-2 text-lg text-left sm:text-center md:text-left text-black'>Current APY</p>
           )}
         </div>
       </CardContent>

@@ -3,7 +3,7 @@ import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
-import { Loader2 } from 'lucide-react';
+import { LoaderSecondary } from '@/components/ui/loader';
 
 const savingOptions = [
   { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
@@ -13,17 +13,16 @@ const savingOptions = [
 
 const RoundupAmountSelector = () => {
   const [roundUpLocal, setRoundUpLocal] = useState(savingOptions[0].value);
-
   const { config, setConfig } = useAutoHodl();
-
   //   TODO: add error toast
   const { createConfig } = useCreateConfig();
+
+  const roundUp = Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS]));
+  const isPending = roundUp !== roundUpLocal;
 
   useEffect(() => {
     async function iife() {
       if (!config?.savingAddress || !config?.roundUp) return;
-
-      const roundUp = Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS]));
 
       if (roundUp !== roundUpLocal) {
         try {
@@ -48,7 +47,7 @@ const RoundupAmountSelector = () => {
         <span>Round-up Amount</span>
         <span className='text-sm text-gray-500 block'>
           {roundUpLocal !== Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS])) && (
-            <Loader2 className={`animate-spin size-5`} color={'#000000'} />
+            <LoaderSecondary />
           )}
         </span>
       </label>
@@ -56,9 +55,19 @@ const RoundupAmountSelector = () => {
         {savingOptions.map((opt) => (
           <button
             type='button'
-            onClick={() => setRoundUpLocal(Number(opt.value))}
-            className={`border border-black rounded-xl px-2 py-2 text-center
-              ${opt.value === roundUpLocal ? 'bg-[#78E76E]/40 font-bold' : ''}`}
+            onClick={() => {
+              if (isPending) return;
+              setRoundUpLocal(Number(opt.value));
+            }}
+            className={`border rounded-lg px-2 py-2 text-center
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${
+                opt.value === roundUpLocal
+                  ? isPending
+                    ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold animate-pulse'
+                    : 'border-[#78E76E] bg-[#78E76E]/50 font-semibold'
+                  : 'border-gray-300'
+              }`}
             key={String(opt.value)}
           >
             {opt.label}

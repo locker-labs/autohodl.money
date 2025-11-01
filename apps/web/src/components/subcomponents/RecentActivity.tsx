@@ -13,7 +13,7 @@ export function RecentActivity(): React.JSX.Element {
   const { allTxs, loading, fetchNext, hasNext } = useSavingsTxs();
 
   return (
-    <Card className='w-full m-0 py-5 pl-5 pr-5 h-full rounded-xl shadow-[0px_1px_4.2px_#00000040]'>
+    <Card className='w-full m-0 py-5 pl-5 pr-5 h-full'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Recent Activity</h2>

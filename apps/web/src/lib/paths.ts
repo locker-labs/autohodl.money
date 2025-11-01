@@ -1,9 +1,9 @@
 export const paths = {
   GetMetaMaskCard: 'https://metamask.io/en-GB/card',
-  LearnMoreYieldSavings: 'https://autohodl.money/learn-more/yield-savings',
-  CircleGrantee: 'https://circle.com/en/grantees/meta-mask-smart-agents-and-liquidity-automation',
-  MetaMaskHackathonBounty: 'https://metamask.io/en-GB/hackathon-bounty',
-  EthGlobalHackathonBounty: 'https://ethglobal.com/showcase/metamask-smart-agents-and-liquidity-automation-3kz6s',
+  Arbitrum: 'https://arbitrum.io/',
+  Base: 'https://www.base.org/',
+  MetaMask: 'https://metamask.io/',
+  Circle: 'https://www.circle.com/',
 };
 
 export const links = {

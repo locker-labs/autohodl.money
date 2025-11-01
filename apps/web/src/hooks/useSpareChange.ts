@@ -21,7 +21,7 @@ export function useSpareChange() {
     enabled: isConnected && !!fromAddress,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
-    refetchInterval: 5000,
+    refetchInterval: 15000,
   });
 
   const changeSaved: number = useMemo(() => {

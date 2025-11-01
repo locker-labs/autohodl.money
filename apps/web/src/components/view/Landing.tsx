@@ -15,7 +15,7 @@ export default function LandingPage() {
 
   return (
     <div className='w-full min-h-screen overflow-x-hidden'>
-      <div className='top-0 sticky w-full h-[64px] bg-[#f7feec] flex items-center justify-between px-[24px] border-b border-[#4D4A4A]/10'>
+      <div className='lg:hidden top-0 sticky w-full h-[64px] bg-[#f7feec] flex items-center justify-between px-[24px] border-b border-[#4D4A4A]/10'>
         <Link href='/'>
           <Image className='w-[100px]' src='/AutoHODL.png' alt='AutoHODL' width={200} height={100} priority />
         </Link>
@@ -46,12 +46,11 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile */}
-        <div className='lg:hidden w-full max-w-[1440px] grid items-center justify-between gap-[60px]'>
+        <div className='lg:hidden w-full max-w-[1440px] flex flex-col items-center justify-center gap-[60px]'>
           <div>
             <p className='mt-[80px] text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
-              Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they
-              earn passive yield.
+              Earn yield on your spare change, earn points while you shop, and more ways to HODL.
             </p>
             <div className='flex justify-center'>
               <Button
@@ -65,14 +64,12 @@ export default function LandingPage() {
                 Get Started
               </Button>
             </div>
-
-            <p className='mt-[16px] text-[14px] text-black text-center'>MetaMask card is supported, more coming soon</p>
           </div>
           <div className='w-full flex items-center justify-center'>
-            <Image
+            <img
               className='lg:max-w-[480px] aspect-auto'
               src={'/hero.landing.png'}
-              alt='Welcome Image'
+              alt='hero'
               width={600}
               height={400}
             />
@@ -82,14 +79,13 @@ export default function LandingPage() {
         {/* Desktop */}
         <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1440px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
           <div>
-            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[600px]'>
-              Saves your spare change,
+            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[700px]'>
+              Saves your spare change.
               <br />
-              Every time you spend with a Crypto Card
+              Every time you spend with a crypto card
             </h1>
             <h4 className='mt-[16px] text-[#4D4A4A] text-[20px] max-w-[500px]'>
-              Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they
-              earn passive yield.
+              Earn yield on your spare change, earn points while you shop, and more ways to HODL.
             </h4>
             <Button
               type={'button'}
@@ -99,10 +95,8 @@ export default function LandingPage() {
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
               title={'Connect Wallet'}
             >
-              Start Saving Now
+              Get started
             </Button>
-
-            <p className='mt-[16px] text-[14px] text-black'>MetaMask card is supported now, but more coming soon</p>
           </div>
           <div className='w-full flex items-center justify-end'>
             <Image
@@ -117,12 +111,12 @@ export default function LandingPage() {
         <div className='h-[120px]' />
       </section>
 
-      {/* Crypto Savings Simplified */}
+      {/* On-chain Savings Simplified */}
       {/* mobile */}
       <section className='lg:hidden p-[48px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
-            Crypto Savings, <span className='text-[#78E76E]'>Simplified</span>
+            On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
           <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
             Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
@@ -152,7 +146,7 @@ export default function LandingPage() {
       <section className='hidden p-[48px] bg-[#ffffff] h-screen lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
-            Crypto Savings, <span className='text-[#78E76E]'>Simplified</span>
+            On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
           <p className='max-w-[600px] text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
             Auto HODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
@@ -179,14 +173,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Support for metamask card */}
+      {/* Launch Partner MetaMask Card */}
       <section className='px-[24px] bg-[#f7feec] lg:h-[600px] flex items-center justify-center'>
         <div className={'mb-12 lg:mb-0 max-w-[1440px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='flex flex-col items-start justify-center'>
-            <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Support for</p>
+            <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
-              1st place: MetaMask x Circle - Smart Agents & Liquidity Automation
+              Save & earn yield on your MetaMask Card transfers
             </p>
 
             <Button
@@ -194,10 +188,10 @@ export default function LandingPage() {
               onAction={() => window.open(paths.GetMetaMaskCard, '_blank')}
               disabled={false}
               aria-disabled={false}
-              className={'w-[140px] lg:w-[245px] h-[38px] lg:h-[52px] font-bold rounded-[8px]'}
-              title={'Learn more'}
+              className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
+              title={'Start now'}
             >
-              Learn more
+              Start now
             </Button>
           </div>
           <div className='my-8 lg:my-0 transition-transform duration-500 hover:rotate-[-8deg] lg:size-[800px] flex items-center justify-center'>
@@ -206,20 +200,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Grant & Bounties */}
+      {/* Recognized by */}
       <section className='p-[48px] bg-[#ffffff] lg:h-[67vh] flex flex-col items-center justify-center'>
         <div className={'mb-[40px] lg:mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
-          <p className='text-[40px] font-medium'>Grant & Bounties</p>
+          <p className='text-[40px] font-medium'>Recognized by</p>
         </div>
 
-        <div className='lg:mb-0 mb-4 max-w-[1440px] grid lg:grid-cols-3 gap-[32px]'>
-          <BorderCard2 href={paths.CircleGrantee} imgSrc='/circle-logo.png' title='Grantee' />
-          <BorderCard2
-            href={paths.MetaMaskHackathonBounty}
-            imgSrc='/MetaMask-icon-fox-with-margins.svg'
-            title='Hackathon Bounty'
-          />
-          <BorderCard2 href={paths.EthGlobalHackathonBounty} imgSrc='/ethglobal.png' title='Hackathon Bounty' />
+        <div className='lg:mb-0 mb-4 max-w-[1440px] grid grid-cols-2 gap-[32px]'>
+          <BorderCard2 href={paths.MetaMask} imgSrc='/MetaMask-icon-fox-with-margins.svg' />
+          <BorderCard2 href={paths.Circle} imgSrc='/circle-icon.svg' />
+          <BorderCard2 href={paths.Arbitrum} imgSrc='/0923_Arbitrum_Logos_Logomark_RGB.svg' />
+          <BorderCard2 href={paths.Base} imgSrc='/Base_square_blue.svg' />
         </div>
       </section>
 
@@ -241,10 +232,10 @@ export default function LandingPage() {
               onAction={() => open()}
               disabled={false}
               aria-disabled={false}
-              className={'w-[245px] h-[52px] font-bold rounded-[8px]'}
-              title={'Start Saving Now'}
+              className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
+              title={'Get started'}
             >
-              Start Saving Now
+              Get started
             </Button>
           </div>
         </div>
@@ -307,17 +298,7 @@ function BorderCard({
   );
 }
 
-function BorderCard2({
-  className,
-  title,
-  imgSrc,
-  href,
-}: {
-  className?: string;
-  title: string;
-  imgSrc: string;
-  href: string;
-}) {
+function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: string; href: string }) {
   return (
     <Link href={href} target='_blank' rel='noopener noreferrer'>
       <div
@@ -329,10 +310,6 @@ function BorderCard2({
 
         <div className='h-[150px] p-4 flex items-center justify-center'>
           <Image className='aspect-auto' src={imgSrc} alt='img' width={100} height={150} />
-        </div>
-
-        <div className='pt-4 px-4 pb-2'>
-          <p className='font-medium text-black text-[24px] text-center'>{title}</p>
         </div>
       </div>
     </Link>
