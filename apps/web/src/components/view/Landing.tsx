@@ -31,7 +31,8 @@ export default function LandingPage() {
           Get Started
         </Button>
       </div>
-      <section className='px-[24px] bg-[#f7feec] h-screen flex flex-col items-center justify-center'>
+
+      <section className='px-[24px] bg-[#f7feec] h-screen flex flex-col items-center lg:justify-center'>
         <div className={'h-[120px] py-4 max-w-[1440px] w-full hidden lg:flex justify-between items-end'}>
           <Link href='/'>
             <Image

@@ -58,8 +58,6 @@ export function useSavingsTxs() {
           pageKey,
         });
 
-        console.log('response', response);
-
         currentPageKey = response.pageKey;
 
         if (error) {

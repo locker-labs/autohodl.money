@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import { isAddress, type Address } from 'viem';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
+import { toastCustom } from '../ui/toast';
 
 type Props = {
   account: SupportedAccounts;
@@ -24,7 +25,8 @@ export default function SetSavingConfig({ account }: Props) {
   const [roundUp, setRoundUp] = useState(savingOptions[0].value);
   const [toYield, setToYield] = useState(true);
   const [savingsAddress, setSavingsAddress] = useState('');
-  const [savingCap, setSavingCap] = useState(100); // default 100 USDC
+  const [useSameAddress, setUseSameAddress] = useState(false);
+  const [savingsCap, setSavingsCap] = useState(100); // default 100 USDC
   const [isApprovalNeeded, setIsApprovalNeeded] = useState<boolean | null>(null);
   const { allowanceFormatted } = useErc20Allowance({
     owner: address as Address,
@@ -35,8 +37,16 @@ export default function SetSavingConfig({ account }: Props) {
   const { approve, isPending, isConfirming, isConfirmed } = useERC20Approve({
     token: USDC_ADDRESS,
     spender: AUTOHODL_ADDRESS,
-    amount: savingCap,
+    amount: savingsCap,
   });
+
+  const handleApprove = () => {
+    if (!savingsAddress || (isAddress(savingsAddress) === false && !useSameAddress)) {
+      toastCustom('Please enter a valid savings address');
+      return;
+    }
+    approve();
+  };
 
   const disabled = !!savingsAddress && isAddress(savingsAddress) === false;
 
@@ -55,10 +65,10 @@ export default function SetSavingConfig({ account }: Props) {
     });
   };
   useEffect(() => {
-    if (allowanceFormatted !== undefined && allowanceFormatted < savingCap) {
+    if (allowanceFormatted !== undefined && allowanceFormatted < savingsCap) {
       setIsApprovalNeeded(true);
     }
-  }, [allowanceFormatted, savingCap]);
+  }, [allowanceFormatted, savingsCap]);
   useEffect(() => {
     if (isConfirmed && isApprovalNeeded) {
       setIsApprovalNeeded(false);
@@ -69,15 +79,15 @@ export default function SetSavingConfig({ account }: Props) {
   const selectedOption = savingOptions.find((opt) => opt.value === roundUp);
 
   return (
-    <div className='flex flex-col items-center gap-8'>
-      <fieldset className='w-full rounded-lg p-6 shadow-smdisabled:opacity-60'>
+    <div className='flex flex-col items-center'>
+      <fieldset className='w-full py-6 disabled:opacity-60'>
         {title ? <legend className='px-1 text-xl font-bold text-center text-gray-700'>{title}</legend> : null}
 
-        <div className='flex flex-col gap-6 mt-4'>
+        <div className='flex flex-col gap-6'>
           {/* Choose Roundup amount */}
           {/* Dropdown */}
           <div className='flex flex-col gap-1'>
-            <label htmlFor={String(roundUp)} className='text-xs font-medium text-gray-600'>
+            <label htmlFor={String(roundUp)} className='text-sm font-medium text-gray-600'>
               Round-up amount
             </label>
             <div className='w-full grid grid-cols-3 gap-2'>
@@ -85,29 +95,78 @@ export default function SetSavingConfig({ account }: Props) {
                 <button
                   type='button'
                   onClick={() => setRoundUp(Number(opt.value))}
-                  className={`border border-black rounded-xl px-2 py-2 text-center
-              ${opt.value === roundUp ? 'bg-[#78E76E]/40 font-bold' : ''}`}
+                  className={`border rounded-lg px-2 py-2 text-center
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${
+                opt.value === roundUp
+                  ? isPending
+                    ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold animate-pulse'
+                    : 'border-[#78E76E] bg-[#78E76E]/50 font-semibold'
+                  : 'border-gray-300'
+              }
+              `}
                   key={String(opt.value)}
                 >
                   {opt.label}
                 </button>
               ))}
             </div>
-            <p className=''>
+            <p className='mt-2 text-gray-700'>
               Your {selectedOption?.purchase} purchase will help you save <strong>{selectedOption?.savings}</strong>!
             </p>
           </div>
 
-          {/* Checkbox */}
-          <div className='flex items-center gap-2'>
+          {/* Address input */}
+          {
+            <div className='flex flex-col gap-1'>
+              <label htmlFor={savingsAddress} className='text-sm font-medium text-gray-600'>
+                Savings address
+              </label>
+              <input
+                id={savingsAddress}
+                type='text'
+                inputMode='text'
+                autoComplete='off'
+                spellCheck={false}
+                placeholder='0x...'
+                value={savingsAddress}
+                onChange={(e) => setSavingsAddress(e.target.value)}
+                readOnly={useSameAddress}
+                className='h-10 rounded-md border border-gray-300 px-3 font-mono text-sm md:text-sm focus-visible:outline-none focus-visible:border-black transition-colors'
+              />
+              {/* Use same address Checkbox */}
+              <div className='mt-1 flex items-start gap-2'>
+                <input
+                  id={'useSameAddress'}
+                  type='checkbox'
+                  checked={useSameAddress}
+                  onChange={(e) => {
+                    setUseSameAddress(e.target.checked);
+                    if (e.target.checked) {
+                      setSavingsAddress(address as string);
+                    } else {
+                      setSavingsAddress('');
+                    }
+                  }}
+                  className='mt-1 accent-app-green h-4 w-4 border-gray-300 text-black focus:ring-black'
+                />
+                <label htmlFor={'toYield'} className='text-gray-700'>
+                  Use the connected address as Savings address
+                </label>
+              </div>
+            </div>
+          }
+
+          {/* Yield Checkbox */}
+          <div className='flex items-start gap-2'>
             <input
               id={'toYield'}
               type='checkbox'
               checked={toYield}
               onChange={(e) => setToYield(e.target.checked)}
-              className='h-4 w-4 rounded border-gray-300 text-black focus:ring-black'
+              className='mt-1 accent-app-green bg-white h-4 w-4 border-gray-300 text-black focus:ring-black'
             />
-            <label htmlFor={'toYield'} className='text-sm text-gray-700'>
+            <label htmlFor={'toYield'} className='text-gray-700'>
               Yield savings (Earn yield on your savings.{' '}
               <a
                 href={paths.GetMetaMaskCard}
@@ -120,49 +179,33 @@ export default function SetSavingConfig({ account }: Props) {
             </label>
           </div>
 
-          {/* Address input */}
-          {!toYield && (
-            <div className='flex flex-col gap-1'>
-              <label htmlFor={savingsAddress} className='text-xs font-medium text-gray-600'>
-                Saving Address
-              </label>
-              <input
-                id={savingsAddress}
-                type='text'
-                inputMode='text'
-                autoComplete='off'
-                spellCheck={false}
-                placeholder='0x...'
-                value={savingsAddress}
-                onChange={(e) => setSavingsAddress(e.target.value)}
-                className='h-10 rounded-md border border-gray-300 px-3 font-mono text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black'
-              />
-            </div>
-          )}
           <div className='flex flex-col gap-2'>
-            <label htmlFor={String(roundUp)} className='text-xs font-medium text-gray-600'>
-              Saving Cap (USDC)
+            <label htmlFor={String(roundUp)} className='text-sm font-medium text-gray-600'>
+              Savings cap (USDC)
             </label>
             <input
-              id={'savingCap'}
+              id={'savingsCap'}
               type='number'
-              value={savingCap}
-              onChange={(e) => setSavingCap(Number(e.target.value))}
-              className='h-10 rounded-md border border-gray-300 px-3 font-mono text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black'
+              value={savingsCap}
+              onChange={(e) => setSavingsCap(Number(e.target.value))}
+              className='h-10 rounded-md border border-gray-300 px-3 font-mono text-sm md:text-sm focus-visible:outline-none focus-visible:border-black transition-colors'
             />
           </div>
         </div>
       </fieldset>
-      {isApprovalNeeded ? (
-        <Button title={'Add token allowance'} onAction={approve} disabled={disabled}>
+      {isApprovalNeeded === true ? (
+        <Button title={'Add token allowance'} onAction={handleApprove} disabled={disabled}>
           {isConfirming ? 'Confirming...' : isPending ? 'Allowing AutoHodl...' : 'Allow AutoHodl to save for you'}
         </Button>
-      ) : null}
-      {isApprovalNeeded === false ? (
+      ) : isApprovalNeeded === false ? (
         <Button title={'Finish Setup'} onAction={handleButtonClick} disabled={disabled}>
           {waitingForConfirmation ? 'Confirming...' : loading ? 'Setting up...' : 'Finish Setup'}
         </Button>
-      ) : null}
+      ) : (
+        <Button title={'Loading'} onAction={() => {}} disabled={true}>
+          {'Loading'}
+        </Button>
+      )}
     </div>
   );
 }
