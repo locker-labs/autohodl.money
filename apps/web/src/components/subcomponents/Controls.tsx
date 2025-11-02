@@ -1,4 +1,5 @@
 import {
+  ExternalLink,
   Lock,
   // MoveDown
 } from 'lucide-react';
@@ -11,11 +12,13 @@ import YieldSwitch from '@/components/subcomponents/YieldSwitch';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
+import { SupportedAccounts, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
 import { useAccount } from 'wagmi';
 import { CopyContentButton } from '../feature/CopyContentButton';
 import { AccountBadge } from '../ui/account-badge';
+import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
 export function Controls(): React.JSX.Element {
   const { address: userAddress } = useAccount();
@@ -41,6 +44,21 @@ export function Controls(): React.JSX.Element {
               })}
             </div>
           </div>
+          {accounts.includes(SupportedAccounts.MetaMask) ? null : (
+            <div className='mt-4'>
+              <Link
+                href={paths.GetMetaMaskCard}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-base font-medium text-blue-600 hover:underline inline-block'
+              >
+                <div className='flex items-center justify-center gap-1'>
+                  <p>Get a MetaMask Card</p>
+                  <ExternalLink size={16} />
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className='mt-4'>
