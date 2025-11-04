@@ -3,6 +3,7 @@ import { createPublicClient, http, type Address } from 'viem';
 import { linea, sepolia } from 'viem/chains';
 import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
 import { chain } from '@/config';
+import { secrets } from '@/lib/secrets';
 
 // Simple Pool ABI for getting reserve data
 const simplePoolAbi = [
@@ -44,7 +45,7 @@ const CHAIN_CONFIGS = {
     chainId: linea.id,
     usdcAddress: AaveV3Linea.ASSETS.USDC.UNDERLYING,
     aavePoolAddress: AaveV3Linea.POOL,
-    rpcUrl: 'https://rpc.linea.build',
+    rpcUrl: `https://linea-mainnet.g.alchemy.com/v2/${secrets.alchemyApiKey}`,
     name: 'Linea',
   },
   [sepolia.id]: {
@@ -52,7 +53,7 @@ const CHAIN_CONFIGS = {
     chainId: sepolia.id,
     usdcAddress: AaveV3Sepolia.ASSETS.USDC.UNDERLYING,
     aavePoolAddress: AaveV3Sepolia.POOL,
-    rpcUrl: 'https://eth-sepolia.public.blastapi.io',
+    rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/${secrets.alchemyApiKey}`,
     name: 'Sepolia',
   },
 } as const;
