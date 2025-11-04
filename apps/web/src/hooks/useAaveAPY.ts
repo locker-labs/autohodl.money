@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { createPublicClient, http, type Address } from 'viem';
 import { linea, sepolia } from 'viem/chains';
 import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
 import { chain } from '@/config';
-import { secrets } from '@/lib/secrets';
+import { viemPublicClient } from '@/lib/clients/client';
 
 // Simple Pool ABI for getting reserve data
 const simplePoolAbi = [
@@ -41,20 +40,12 @@ const simplePoolAbi = [
 // Chain configurations
 const CHAIN_CONFIGS = {
   [linea.id]: {
-    chain: linea,
-    chainId: linea.id,
     usdcAddress: AaveV3Linea.ASSETS.USDC.UNDERLYING,
     aavePoolAddress: AaveV3Linea.POOL,
-    rpcUrl: `https://linea-mainnet.g.alchemy.com/v2/${secrets.alchemyApiKey}`,
-    name: 'Linea',
   },
   [sepolia.id]: {
-    chain: sepolia,
-    chainId: sepolia.id,
     usdcAddress: AaveV3Sepolia.ASSETS.USDC.UNDERLYING,
     aavePoolAddress: AaveV3Sepolia.POOL,
-    rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/${secrets.alchemyApiKey}`,
-    name: 'Sepolia',
   },
 } as const;
 
@@ -63,18 +54,12 @@ export function useAaveAPY() {
     try {
       const config = CHAIN_CONFIGS[chain.id];
 
-      // Create public client for the specified chain
-      const publicClient = createPublicClient({
-        chain: config.chain,
-        transport: http(config.rpcUrl),
-      });
-
       // Call getReserveData directly on the Pool contract for USDC
-      const reserveData = await publicClient.readContract({
-        address: config.aavePoolAddress as Address,
+      const reserveData = await viemPublicClient.readContract({
+        address: config.aavePoolAddress,
         abi: simplePoolAbi,
         functionName: 'getReserveData',
-        args: [config.usdcAddress as Address],
+        args: [config.usdcAddress],
       });
 
       if (reserveData?.currentLiquidityRate) {
