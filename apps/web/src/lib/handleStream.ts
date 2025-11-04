@@ -36,8 +36,9 @@ export async function handleStream(body: string, signature: string, webhookSecre
   });
 
   // Only process confirmed transactions
-  if (!payload.confirmed) {
-    console.log('Skipping unconfirmed transaction.');
+  // TODO: Handle only confirmed transactions
+  if (payload.confirmed) {
+    console.log('Skipping confirmed transaction.');
     return NextResponse.json({ message: 'Unconfirmed transactions are ignored.' });
   }
 
