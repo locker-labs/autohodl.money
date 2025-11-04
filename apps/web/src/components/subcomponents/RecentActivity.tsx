@@ -21,11 +21,11 @@ export function RecentActivity(): React.JSX.Element {
         </div>
 
         {allTxs.length === 0 ? (
-          <div className={'mt-[15px] w-full h-[393px] flex justify-center items-center'}>
+          <div className={'mt-[15px] w-full h-[540px] flex justify-center items-center'}>
             {loading ? <Loader2 className={'animate-spin'} color={'#78E76E'} /> : <p>No recent transactions</p>}
           </div>
         ) : (
-          <div className='mt-[15px] overflow-y-auto max-h-[393px]'>
+          <div className='mt-[15px] overflow-y-auto max-h-[540px]'>
             {allTxs.map((tx) => (
               <Link key={tx.id} href={getTransactionLink(tx.txHash)} target='_blank' className='no-underline'>
                 <div className='group border border-black/50 flex flex-col gap-5 mb-3 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'>

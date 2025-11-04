@@ -114,6 +114,7 @@ export async function addAddressToEoaErc20TransferMoralisStream(streamId: string
         if (inFilter?.in) {
           if (inFilter.in[1].includes(addressLowerCase)) {
             // Address already exists
+            console.warn(`Address ${address} already exists in Moralis stream ${streamId}`);
             return true;
           }
 

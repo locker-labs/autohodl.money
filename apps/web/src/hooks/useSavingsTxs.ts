@@ -72,10 +72,12 @@ export function useSavingsTxs() {
             timestamp: tx.metadata.blockTimestamp,
             to: tx.to,
             from: tx.from,
-            value: computeRoundUpAndSavings(BigInt(tx.value * 10 ** TOKEN_DECIMALS), BigInt(10 ** TOKEN_DECIMALS))
-              .savingsAmount,
+            value: BigInt(tx.value * 10 ** TOKEN_DECIMALS),
             txHash: tx.hash,
-            purchaseValue: BigInt(tx.value * 10 ** TOKEN_DECIMALS),
+            purchaseValue: computeRoundUpAndSavings(
+              BigInt(tx.value * 10 ** TOKEN_DECIMALS),
+              BigInt(10 ** TOKEN_DECIMALS),
+            ).savingsAmount,
           })),
         );
       } catch (error: unknown) {
