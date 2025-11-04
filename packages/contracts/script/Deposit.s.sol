@@ -22,4 +22,3 @@ contract Deposit is Script {
         vm.stopBroadcast();
     }
 }
-

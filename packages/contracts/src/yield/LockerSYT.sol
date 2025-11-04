@@ -104,7 +104,7 @@ contract LockerSYT is IERC20 {
         // Only consult router for regular transfers (not mints/burns)
         if (from == address(0) || to == address(0)) revert InvalidTransfer();
 
-        (uint256 sharesToSend,address routeTo) = router.sendUnderlying(parentToken, from, to, amount);
+        (uint256 sharesToSend, address routeTo) = router.sendUnderlying(parentToken, from, to, amount);
 
         if (routeTo == address(0)) {
             _burn(from, sharesToSend);

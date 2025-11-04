@@ -40,20 +40,20 @@ contract LockerRouter is ILockerRouter, Ownable {
 
     function sendUnderlying(address asset, address from, address to, uint256 amount)
         external
-        returns (uint256 sharesNeeded,address routeTo)
+        returns (uint256 sharesNeeded, address routeTo)
     {
         LockerSYT syt = LockerSYT(assetSYT[asset]);
-    require(msg.sender == address(syt), "Invalid SYT"); 
-    require(amount > 0, "ZERO_AMOUNT"); 
-    uint256 totalShares = syt.totalSupply(); 
-    uint256 totalAssets = navAcrossAdapters(asset); 
-    require(totalShares > 0 && totalAssets > 0, "INVALID_STATE"); 
+        require(msg.sender == address(syt), "Invalid SYT");
+        require(amount > 0, "ZERO_AMOUNT");
+        uint256 totalShares = syt.totalSupply();
+        uint256 totalAssets = navAcrossAdapters(asset);
+        require(totalShares > 0 && totalAssets > 0, "INVALID_STATE");
 
-    sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Floor);
+        sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Floor);
 
-    require(LockerSYT(assetSYT[asset]).balanceOfSYT(from) >= sharesNeeded, "INSUFFICIENT_SHARES"); 
-    Allocation memory alloc = defaultAllocation[asset];
-    require(alloc.adapters.length != 0, "NO_ADAPTERS");
+        require(LockerSYT(assetSYT[asset]).balanceOfSYT(from) >= sharesNeeded, "INSUFFICIENT_SHARES");
+        Allocation memory alloc = defaultAllocation[asset];
+        require(alloc.adapters.length != 0, "NO_ADAPTERS");
         uint256 toTransfer = _withdrawFromAdapters(alloc, asset, amount);
 
         require(amount == toTransfer, "Insufficient assets in adapters");

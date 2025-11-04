@@ -19,7 +19,7 @@ contract MMCardDelegate is IDelegate, Ownable {
         autoHodl = _autoHodl;
     }
 
-    function delegateSaving(address user,address asset,uint256 value, bytes calldata data) external override {
+    function delegateSaving(address user, address asset, uint256 value, bytes calldata data) external override {
         AutoHodl(autoHodl).executeSavingsTx(user, asset, value);
         emit SavingDelegated(data);
     }
@@ -28,5 +28,4 @@ contract MMCardDelegate is IDelegate, Ownable {
     function verifyRegisteration(address user, bytes calldata extraData) external view override returns (bool) {
         return false;
     }
-
 }
