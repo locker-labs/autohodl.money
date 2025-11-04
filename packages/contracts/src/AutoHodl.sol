@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 import "./interfaces/IDelegate.sol";
 import "./interfaces/IERC20.sol";
@@ -20,6 +20,7 @@ contract AutoHodl is Ownable {
 
     mapping(address => mapping(address => SavingConfig)) public savings; // user => token => config
     mapping(address => bool) public tokenAllowlist; // token => isAllowed
+    mapping(address => bool) public delegates; // delegate => isAllowed
 
     event SavingConfigSet(address indexed user, address indexed token);
 
@@ -46,6 +47,11 @@ contract AutoHodl is Ownable {
         } else {
             IERC20(token).approve(lockerRouter, 0);
         }
+    }
+
+    // Admin function to set delegate allowlist
+    function setDelegateAllowlist(address delegate, bool isAllowed) external onlyOwner {
+        delegates[delegate] = isAllowed;
     }
 
     // Function to set saving configuration for a user and token
@@ -82,6 +88,7 @@ contract AutoHodl is Ownable {
         bytes calldata extraData
     ) external {
         require(tokenAllowlist[token], "Token is not allowed.");
+        require(delegates[delegate], "Delegate is not allowed.");
         bool canConfigure = IDelegate(delegate).verifyRegisteration(user, extraData);
         require(canConfigure, "User has not registered with delegate.");
         savings[user][token] = SavingConfig({

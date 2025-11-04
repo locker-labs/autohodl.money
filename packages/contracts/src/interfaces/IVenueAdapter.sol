@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 /// @title IVenueAdapter
 /// @notice Standard interface for integrating a yield/cash venue with the Router.
@@ -20,9 +20,6 @@ interface IVenueAdapter {
 
     /// @notice Human-readable venue/strategy ID (optional but helpful for UIs).
     function venueId() external view returns (bytes32);
-
-    /// @notice Current amount of underlying assets managed by this adapter (principal + accrued yield).
-    function positionAssets(address asset) external view returns (uint256);
 
     /*=============================*
      *          MUTATIONS          *
@@ -46,4 +43,7 @@ interface IVenueAdapter {
 
     /// @notice Address with permission to call mutating methods (Router).
     function router() external view returns (address);
+
+    /// @notice Address of the yield token for a token.
+    function adapterPositionValue(address asset) external view returns (uint256);
 }

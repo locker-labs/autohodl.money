@@ -11,6 +11,7 @@ contract SetupAAVEAdapter is Script {
     address public lockerRouter = vm.envAddress("LOCKER_ROUTER");
     address public tokenAddress = vm.envAddress("TOKEN_ADDRESS"); // USDC on Ethereum Mainnet
     address public aavePoolAddress = vm.envAddress("AAVE_POOL_ADDRESS"); // AAVE Pool address on Ethereum Mainnet
+    address public aaveYieldTokenAddress = vm.envAddress("AAVE_YIELD_TOKEN_ADDRESS"); // aUSDC on Ethereum Mainnet
 
     function run() public {
         vm.startBroadcast(pk);
@@ -18,7 +19,9 @@ contract SetupAAVEAdapter is Script {
         aavePool[0] = aavePoolAddress;
         address[] memory tokenAddresses = new address[](1);
         tokenAddresses[0] = tokenAddress;
-        adapter = new AAVEAdapter(lockerRouter, tokenAddresses, aavePool);
+        address[] memory yieldTokens = new address[](1);
+        yieldTokens[0] = aaveYieldTokenAddress;
+        adapter = new AAVEAdapter(lockerRouter, tokenAddresses, aavePool, yieldTokens);
         ILockerRouter(lockerRouter).setAssetAdapter(tokenAddress, address(adapter), true);
         vm.stopBroadcast();
     }

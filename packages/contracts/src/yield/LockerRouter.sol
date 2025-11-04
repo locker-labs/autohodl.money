@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 import {ILockerRouter} from "../interfaces/ILockerRouter.sol";
 import {IVenueAdapter} from "../interfaces/IVenueAdapter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {LockerSYT} from "./LockerSYT.sol";
 
 contract LockerRouter is ILockerRouter, Ownable {
@@ -37,85 +38,28 @@ contract LockerRouter is ILockerRouter, Ownable {
         _deposit(user, asset, amount);
     }
 
-    function withdraw(address asset, uint256 amount) external returns (uint256) {
-        LockerSYT syt = LockerSYT(assetSYT[asset]);
-
-        // Price in shares using ERC-4626
-        uint256 totalShares = syt.totalSupply();
-        uint256 totalAssets = navAcrossAdapters(asset);
-        require(amount > 0 && totalShares > 0 && totalAssets > 0, "INVALID_STATE");
-
-        // shares = ceil(assets * totalShares / totalAssets)
-        uint256 shares = (amount * totalShares + totalAssets - 1) / totalAssets;
-
-        // Burn shares from sender
-        syt.burn(msg.sender, shares);
-
-        // Pro-rata withdraw from adapters by current portfolio weights
-        address[] memory adapters = assetAdapters[asset];
-        require(adapters.length > 0, "No adapters");
-
-        uint256 remaining = amount;
-        uint256 withdrawn;
-        for (uint256 i = 0; i < adapters.length; i++) {
-            uint256 adapterAssets = IVenueAdapter(adapters[i]).positionAssets(asset);
-            if (adapterAssets == 0) continue;
-
-            // target chunk = floor(assets * adapterAssets / totalAssets)
-            uint256 target = (amount * adapterAssets) / totalAssets;
-
-            // last adapter takes the remainder
-            if (i == adapters.length - 1) {
-                target = remaining;
-            } else if (target > remaining) {
-                target = remaining;
-            }
-
-            if (target == 0) continue;
-
-            // Execute withdraw, capture actual received
-            uint256 received = IVenueAdapter(adapters[i]).requestRedeem(asset, amount);
-            withdrawn += received;
-            remaining = remaining > received ? remaining - received : 0;
-
-            if (remaining == 0) break;
-        }
-
-        // Transfer what was actually withdrawn to the user
-        IERC20(asset).transfer(msg.sender, withdrawn);
-        emit Withdrawn(msg.sender, asset, withdrawn, 0);
-        return withdrawn;
-    }
-
     function sendUnderlying(address asset, address from, address to, uint256 amount)
         external
-        returns (address routeTo)
+        returns (uint256 sharesNeeded,address routeTo)
     {
         LockerSYT syt = LockerSYT(assetSYT[asset]);
-        require(msg.sender == address(syt), "Invalid SYT");
+    require(msg.sender == address(syt), "Invalid SYT"); 
+    require(amount > 0, "ZERO_AMOUNT"); 
+    uint256 totalShares = syt.totalSupply(); 
+    uint256 totalAssets = navAcrossAdapters(asset); 
+    require(totalShares > 0 && totalAssets > 0, "INVALID_STATE"); 
 
-        Allocation memory allocations = defaultAllocation[asset];
-        if (allocations.adapters.length == 0) {
-            revert("No default allocation");
-        }
-        uint256 toTransfer = 0;
-        for (uint256 i = 0; i < allocations.adapters.length; i++) {
-            uint256 adapterAssets = IVenueAdapter(allocations.adapters[i]).positionAssets(asset);
-            if (adapterAssets == 0) {
-                continue;
-            }
-            uint256 toWithdraw = amount < adapterAssets ? amount : adapterAssets;
-            uint256 received = IVenueAdapter(allocations.adapters[i]).requestRedeem(asset, toWithdraw);
-            toTransfer += received;
-            amount -= toWithdraw;
-            if (amount == 0) {
-                break;
-            }
-        }
-        require(amount == 0, "Insufficient assets in adapters");
+    sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Floor);
+
+    require(LockerSYT(assetSYT[asset]).balanceOfSYT(from) >= sharesNeeded, "INSUFFICIENT_SHARES"); 
+    Allocation memory alloc = defaultAllocation[asset];
+    require(alloc.adapters.length != 0, "NO_ADAPTERS");
+        uint256 toTransfer = _withdrawFromAdapters(alloc, asset, amount);
+
+        require(amount == toTransfer, "Insufficient assets in adapters");
         IERC20(asset).transfer(to, toTransfer);
         emit Sent(from, asset, to, toTransfer, 0);
-        return address(0); // burn SYT, only for v1
+        return (sharesNeeded, address(0)); // burn SYT, only for v1
     }
 
     // Internal functions
@@ -129,13 +73,13 @@ contract LockerRouter is ILockerRouter, Ownable {
         uint256 totalShares = syt.totalSupply();
 
         // totalAssets is the portfolio value across all adapters for this asset
-        uint256 totalAssets = navAcrossAdapters(_asset); // sums IVenueAdapter.positionAssets(_asset)
+        uint256 totalAssets = navAcrossAdapters(_asset); // sums IVenueAdapter.adapterPositionValue(_asset)
         uint256 mintedShares;
         if (totalShares == 0 || totalAssets == 0) {
             mintedShares = _amount; // initial price = 1.0
         } else {
             // shares = floor(_amount * totalShares / totalAssets)
-            mintedShares = (_amount * totalShares) / totalAssets;
+            mintedShares = Math.mulDiv(_amount, totalShares, totalAssets, Math.Rounding.Floor);
             require(mintedShares != 0, "ZERO_SHARES");
         }
         uint256[] memory amounts = new uint256[](allocations.adapters.length);
@@ -154,12 +98,31 @@ contract LockerRouter is ILockerRouter, Ownable {
         emit DepositRouted(_user, _asset, amounts, adapters);
     }
 
+    function _withdrawFromAdapters(Allocation memory allocations, address asset, uint256 amount)
+        internal
+        returns (uint256 toTransfer)
+    {
+        for (uint256 i = 0; i < allocations.adapters.length; i++) {
+            uint256 adapterAssets = IVenueAdapter(allocations.adapters[i]).adapterPositionValue(asset);
+            if (adapterAssets == 0) {
+                continue;
+            }
+            uint256 toWithdraw = amount < adapterAssets ? amount : adapterAssets;
+            uint256 received = IVenueAdapter(allocations.adapters[i]).requestRedeem(asset, toWithdraw);
+            toTransfer += received;
+            amount -= toWithdraw;
+            if (amount == 0) {
+                break;
+            }
+        }
+        return toTransfer;
+    }
+
     function navAcrossAdapters(address asset) public view returns (uint256 total) {
-        // Sum up positionAssets across all adapters for this asset
         // For v1, just use default allocation adapters
         address[] memory adapters = assetAdapters[asset];
         for (uint256 i = 0; i < adapters.length; i++) {
-            total += IVenueAdapter(adapters[i]).positionAssets(asset);
+            total += IVenueAdapter(adapters[i]).adapterPositionValue(asset);
         }
     }
 

@@ -10,10 +10,10 @@ contract SetupUsdcSYT is Script {
     LockerSYT public syt;
     uint256 pk = vm.envUint("PRIVATE_KEY");
     address public lockerRouter = vm.envAddress("LOCKER_ROUTER");
-    address public tokenAddress = vm.envAddress("TOKEN_ADDRESS"); // USDC on Ethereum Mainnet
-    string public name = "Staked Yield Token: USDC"; // Update for each token
-    string public symbol = "sytUSDC"; // Update for each token
-    uint8 public decimals = 6; // Update for each token
+    address public tokenAddress = vm.envAddress("TOKEN_ADDRESS");
+    string public name = "Spendable Yield Token: AAVE"; // Update for each token,
+    string public symbol = "sAAVE"; // Update for each token
+    uint8 public decimals = 18; // Update for each token
 
     function run() public {
         vm.startBroadcast(pk);

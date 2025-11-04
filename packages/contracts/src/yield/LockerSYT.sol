@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {ILockerRouter} from "../interfaces/ILockerRouter.sol";
 
@@ -17,7 +18,7 @@ contract LockerSYT is IERC20 {
 
     // ERC20 storage
     uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
+    mapping(address => uint256) public balanceOfSYT;
     mapping(address => mapping(address => uint256)) public allowance;
 
     // Immutable router
@@ -48,6 +49,20 @@ contract LockerSYT is IERC20 {
     // IERC20 metadata
     function decimals() external view returns (uint8) {
         return decimals_;
+    }
+
+    // Total underlying managed by the portfolio (Router aggregates adapters)
+    function totalAssets() public view returns (uint256) {
+        // Router is authoritative for NAV across adapters
+        return router.navAcrossAdapters(parentToken);
+    }
+
+    // ERC20 balance reflects current claim in assets (rebasing-style view)
+    function balanceOf(address account) public view returns (uint256) {
+        uint256 ts = totalSupply;
+        if (ts == 0) return 0;
+
+        return Math.mulDiv(balanceOfSYT[account], totalAssets(), ts, Math.Rounding.Floor);
     }
 
     // IERC20
@@ -89,13 +104,13 @@ contract LockerSYT is IERC20 {
         // Only consult router for regular transfers (not mints/burns)
         if (from == address(0) || to == address(0)) revert InvalidTransfer();
 
-        (address routeTo) = router.sendUnderlying(parentToken, from, to, amount);
+        (uint256 sharesToSend,address routeTo) = router.sendUnderlying(parentToken, from, to, amount);
 
         if (routeTo == address(0)) {
-            _burn(from, amount);
+            _burn(from, sharesToSend);
         } else {
-            _poolTransfer(from, routeTo, amount);
-            emit Routed(from, to, amount, routeTo);
+            _poolTransfer(from, routeTo, sharesToSend);
+            emit Routed(from, to, sharesToSend, routeTo);
         }
 
         emit Transfer(from, to, amount);
@@ -105,18 +120,18 @@ contract LockerSYT is IERC20 {
     // Internal mint/burn to be exposed by trusted system contracts via inheritance
     function _mint(address to, uint256 amount) internal {
         totalSupply += amount;
-        balanceOf[to] += amount;
+        balanceOfSYT[to] += amount;
         emit Transfer(address(0), to, amount);
     }
 
     function _poolTransfer(address from, address to, uint256 amount) internal {
-        balanceOf[from] = balanceOf[from] - amount;
-        balanceOf[to] = balanceOf[to] + amount;
+        balanceOfSYT[from] = balanceOfSYT[from] - amount;
+        balanceOfSYT[to] = balanceOfSYT[to] + amount;
     }
 
     function _burn(address from, uint256 amount) internal {
         unchecked {
-            balanceOf[from] = balanceOf[from] - amount;
+            balanceOfSYT[from] = balanceOfSYT[from] - amount;
             totalSupply = totalSupply - amount;
         }
         emit Transfer(from, address(0), amount);

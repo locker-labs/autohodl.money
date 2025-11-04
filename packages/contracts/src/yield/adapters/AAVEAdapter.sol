@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.0;
 
 import {IVenueAdapter} from "../../interfaces/IVenueAdapter.sol";
 
@@ -11,13 +11,15 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract AAVEAdapter is IVenueAdapter {
     address public lockerRouter;
     mapping(address => address) public aavePoolForAsset;
-    mapping(address => uint256) public depositedAssets;
+    mapping(address => address) public yieldTokens;
 
-    constructor(address _lockerRouter, address[] memory assets, address[] memory pools) {
+    constructor(address _lockerRouter, address[] memory assets, address[] memory pools, address[] memory yieldTokens_) {
         lockerRouter = _lockerRouter;
-        require(assets.length == pools.length, "Mismatched lengths");
+        require(assets.length == pools.length && assets.length == yieldTokens_.length, "Mismatched lengths");
         for (uint256 i = 0; i < assets.length; i++) {
             aavePoolForAsset[assets[i]] = pools[i];
+            yieldTokens[assets[i]] = yieldTokens_[i];
+            IERC20(assets[i]).approve(pools[i], type(uint256).max);
         }
     }
 
@@ -26,21 +28,19 @@ contract AAVEAdapter is IVenueAdapter {
     }
 
     function deposit(address asset, uint256 amount) external {
-        IERC20(asset).approve(aavePoolForAsset[asset], amount);
         IPool(aavePoolForAsset[asset]).supply(asset, amount, address(this), 0);
-        depositedAssets[asset] += amount;
         emit Deposited(amount);
     }
 
     function requestRedeem(address asset, uint256 amount) external returns (uint256) {
         uint256 withdrawnAmount = IPool(aavePoolForAsset[asset]).withdraw(asset, amount, lockerRouter);
-        depositedAssets[asset] -= withdrawnAmount;
         emit RedeemRequested(withdrawnAmount);
         return withdrawnAmount;
     }
 
-    function positionAssets(address asset) external view returns (uint256) {
-        return depositedAssets[asset];
+    function adapterPositionValue(address asset) external view returns (uint256) {
+        IERC20 yieldToken = IERC20(yieldTokens[asset]);
+        return yieldToken.balanceOf(address(this));
     }
 
     // For AAVE, redemptions are instant, so settleRedeem is a no-op
