@@ -11,10 +11,17 @@ export enum SupportedAccounts {
 
 export const AutoHodlAddressMap: Record<number, Address> = {
   59144: '0x0', // Linea
-  11155111: '0x69C6A0F3Cf595267ef1b7357922c382EA0464D6D', // Sepolia
+  11155111: '0xD7262C19249A34Df21d7Ad509b4Ed19657d903D3', // Sepolia
+};
+
+export const MMCardDelegateAddressMap: Record<number, Address> = {
+  59144: '0x0', // Linea
+  11155111: '0x7c334f35BF2B4a9e55f60CF3287c885598cF9A02', // Sepolia
 };
 
 export const AUTOHODL_ADDRESS: Address = AutoHodlAddressMap[chainId];
+
+export const DELEGATE = MMCardDelegateAddressMap[chainId];
 
 export const MetaMaskCard: Record<'US' | 'International', Address> = {
   US: '0xA90b298d05C2667dDC64e2A4e17111357c215dD2',
@@ -43,9 +50,14 @@ export const UsdcAddressMap: Record<number, Address> = {
   11155111: '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a', // AAVE token on Ethereum Sepolia
 };
 
+export const AaveYieldTokenAddressMap: Record<number, Address> = {
+  59144: '0x', // Linea
+  11155111: '0x6b8558764d3b7572136F17174Cb9aB1DDc7E1259', // aEthAAVE on Sepolia
+};
+
 export const SUsdcAddressMap: Record<number, Address> = {
   59144: '0x0', // Linea
-  11155111: '0x8E6Bdbd276E1A54439B0d8f9465B02E5A403fbFB', // sUSDC on Ethereum Sepolia
+  11155111: '0x9480D1c619A92F5434204072bdFBb48f16915920', // sUSDC on Ethereum Sepolia
 };
 
 export const USDC_ADDRESSES: Address[] = Object.values(UsdcAddressMap);
@@ -56,11 +68,11 @@ export const S_USDC_ADDRESS: Address = SUsdcAddressMap[chainId];
 
 export const AutoHodlSupportedTokenMap: Record<number, Address[]> = {
   59144: [
-    // USDC
+    // USDC Linea
     '0x176211869cA2b568f2A7D4EE941E073a821EE1ff',
   ],
   11155111: [
-    // AAVE
+    // AAVE Sepolia
     '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a',
   ],
 };
@@ -79,6 +91,11 @@ export const AavePoolAddressMap: Record<number, Address> = {
   59144: '0xc47b8C00b0f69a36fa203Ffeac0334874574a8Ac', // Linea
   // Not available on linea sepolia
   11155111: '0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951', // Sepolia
+};
+
+export const AaveAdapterAddressMap: Record<number, Address> = {
+  59144: '0x0', // Linea
+  11155111: '0xF6B9F6610bdcBbBaf4e959D66Df6cB587eCe6C8A', // Sepolia
 };
 
 // https://aave.com/docs/developers/smart-contracts/pool-addresses-provider
@@ -120,8 +137,6 @@ export const TOKEN_ADDRESS = TokenAddressMap[chainId];
 export const TOKEN_DECIMALS = TokenDecimalMap[TOKEN_ADDRESS];
 
 export const TOKEN_DECIMAL_MULTIPLIER = 10 ** TOKEN_DECIMALS;
-
-export const DELEGATE = secrets.delegate;
 
 export const AlchemyChainMap = {
   11155111: 'eth-sepolia',

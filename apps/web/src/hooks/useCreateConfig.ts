@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
-import { AUTOHODL_ADDRESS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { secrets } from '@/lib/secrets';
+import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { viemPublicClient } from '@/lib/clients/client';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 
@@ -56,7 +55,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     const args = [
       USDC_ADDRESS,
       savingsAddress as Address,
-      secrets.delegate as Address,
+      DELEGATE,
       BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
       active,
       toYield,
@@ -94,8 +93,8 @@ const useCreateConfig = (): UseCreateConfigReturn => {
       // Ensure types for contract call
       const args = [
         USDC_ADDRESS,
-        savingsAddress as Address,
-        secrets.delegate as Address,
+        savingsAddress,
+        DELEGATE,
         BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
         active,
         toYield,

@@ -3,11 +3,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/contract/client/getSavingsConfig';
+import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
+import { viemPublicClient } from '@/lib/clients/client';
+import { zeroAddress } from 'viem';
 
 type AutoHodlContextType = {
   loading: boolean;
@@ -54,8 +56,8 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
-        const config = await getSavingsConfig(address, USDC_ADDRESS);
-        const found = config && config.savingAddress !== '0x0000000000000000000000000000000000000000';
+        const config = await getSavingsConfig(viemPublicClient, address, USDC_ADDRESS);
+        const found = config && config.savingAddress !== zeroAddress;
         if (found) {
           setConfig(config);
         } else {
