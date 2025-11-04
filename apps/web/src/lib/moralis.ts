@@ -1,5 +1,7 @@
+import type { Address } from 'viem';
 import Web3 from 'web3';
-import { MM_CARD_ADDRESSES, USDC_ADDRESSES } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, MM_CARD_ADDRESSES, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
+import { secrets } from '@/lib/secrets';
 
 // Helper function to verify webhook signature
 export function verifySignature(body: string, signature: string, secret: string): boolean {
@@ -42,7 +44,7 @@ export async function addAddressToMoralisStream(streamId: string, address: strin
     // Initialize Moralis if not already done
     if (!Moralis.default.Core.isStarted) {
       await Moralis.default.start({
-        apiKey: process.env.MORALIS_API_KEY,
+        apiKey: secrets.MoralisApiKey,
       });
     }
 
@@ -56,6 +58,86 @@ export async function addAddressToMoralisStream(streamId: string, address: strin
     return true;
   } catch (error) {
     console.error('Error adding address to Moralis stream:', error);
+    return false;
+  }
+}
+
+/**
+ * Add an address to the EOA ERC20 Transfer Moralis stream to monitor transactions
+ * @param streamId - The Moralis stream ID
+ * @param address - The address to monitor (triggerAddress)
+ * @returns Promise<boolean> - Success status
+ */
+export async function addAddressToEoaErc20TransferMoralisStream(streamId: string, address: Address): Promise<boolean> {
+  const addressLowerCase = address.toLowerCase() as Address;
+  try {
+    // Import Moralis dynamically to avoid issues if not installed
+    const Moralis = await import('moralis');
+
+    // Initialize Moralis if not already done
+    if (!Moralis.default.Core.isStarted) {
+      await Moralis.default.start({
+        apiKey: secrets.MoralisApiKey,
+      });
+    }
+
+    // Get the stream
+    const stream = await Moralis.default.Streams.getById({
+      id: streamId,
+    });
+
+    const defaultAdvancedOptions = [
+      {
+        topic0: TransferEventSig,
+        filter: {
+          and: [
+            {
+              ne: ['to', AUTOHODL_ADDRESS.toLowerCase()],
+            },
+            {
+              in: ['from', [addressLowerCase]],
+            },
+          ],
+        },
+        includeNativeTxs: false,
+      },
+    ];
+
+    const advancedOptions = stream.result.advancedOptions;
+
+    // Extract existing address list from advancedOptions
+    if (advancedOptions) {
+      const transferObject = advancedOptions.find((option) => option.topic0 === TransferEventSig);
+      if (Array.isArray(transferObject?.filter?.and)) {
+        const inFilter = transferObject.filter.and.find((f) => f.in && Array.isArray(f.in) && f.in[0] === 'from');
+
+        if (inFilter?.in) {
+          if (inFilter.in[1].includes(addressLowerCase)) {
+            // Address already exists
+            return true;
+          }
+
+          // Add the existing list to the new address
+          (defaultAdvancedOptions[0].filter.and[1].in as [string, Address[]])[1] =
+            inFilter.in[1].concat(addressLowerCase);
+        }
+      }
+    }
+
+    /**
+     * @note There can be a race condition where another process added a new address between our get and update calls.
+     * And we are updating with an old list that doesn't include that new address.
+     * This will result in loss of the address that was added by another process.
+     */
+
+    // Update the stream with the new list of addresses
+    await Moralis.default.Streams.update({ id: streamId, advancedOptions: defaultAdvancedOptions });
+
+    console.log(`Successfully added address ${address} to Moralis stream ${streamId}`);
+    return true;
+  } catch (error) {
+    console.error('Error adding address to Moralis stream:', error);
+    // TODO: send alert to dev team
     return false;
   }
 }

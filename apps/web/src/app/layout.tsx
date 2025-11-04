@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Albert_Sans } from 'next/font/google';
 import { headers } from 'next/headers'; // added
 import './globals.css';
 import ContextProvider from '@/context';
+import { Toaster } from 'sonner';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const albertSans = Albert_Sans({
+  variable: '--font-albert-sans',
   subsets: ['latin'],
 });
 
@@ -29,8 +25,9 @@ export default async function RootLayout({
 
   return (
     <html lang='en'>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${albertSans.variable} font-sans antialiased`}>
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
+        <Toaster position='top-center' />
       </body>
     </html>
   );

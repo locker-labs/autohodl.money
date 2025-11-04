@@ -1,18 +1,44 @@
 'use client';
 
-import { useAppKitAccount } from '@reown/appkit/react';
-import USDCApprovalChecker from '@/components/ApproveUSDC';
-import { ConnectButton } from '@/components/ConnectButton';
-import UserOnboarding from '@/components/UserOnboarding';
+import { useAccount } from 'wagmi';
+import Header from '@/components/Header';
+import Dashboard from '@/components/view/Dashboard';
+import LandingPage from '@/components/view/Landing';
+import UserOnboarding from '@/components/view/UserOnboarding';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { useEffect, useState } from 'react';
+import type { SupportedAccounts } from '@/lib/constants';
+import { getSupportedAccounts } from '@/lib/userAccounts';
+import Loading from '@/app/loading';
 
 export default function Home() {
-  const { isConnected } = useAppKitAccount();
+  const { isConnected, isConnecting, isReconnecting } = useAccount();
+  const { loading, config } = useAutoHodl();
+
+  const [accounts, setAccounts] = useState<SupportedAccounts[]>([]);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    async function fetchAccounts() {
+      if (!address) return;
+      const fetchedAccounts = await getSupportedAccounts(address);
+      setAccounts(fetchedAccounts);
+    }
+    fetchAccounts();
+  }, [address]);
+
+  if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {
+    return <Loading />;
+  }
+
+  if (!isConnected) {
+    return <LandingPage />;
+  }
   return (
-    <div className={'min-h-screen flex flex-col items-center justify-center gap-4'}>
-      <h1 className='text-4xl font-bold'>Welcome to AutoHodl</h1>
-      <ConnectButton />
-      {isConnected ? <UserOnboarding /> : null}
-      {isConnected ? <USDCApprovalChecker /> : null}
+    <div className={'min-h-screen w-full flex flex-col items-center lg:gap-8 lg:p-8'}>
+      <Header />
+
+      {!config ? <UserOnboarding accounts={accounts} /> : <Dashboard />}
     </div>
   );
 }

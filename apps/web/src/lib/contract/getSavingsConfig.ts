@@ -1,16 +1,20 @@
-import type { Address } from 'viem';
-import type { SavingsConfig } from '@/types/autohodl';
-import { AutoHodlAbi } from '../abis/AutoHodl';
-import { viemPublicClient } from '../clients';
-import { AUTOHODL_ADDRESS } from '../constants';
+import type { Address, PublicClient } from 'viem';
+import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
+import { AUTOHODL_ADDRESS } from '@/lib/constants';
+import { parseSavingsConfig, type SavingsConfig, type SavingsConfigArray } from '@/types/autohodl';
 
-export async function getSavingsConfig(user: Address, token: Address): Promise<Readonly<SavingsConfig>> {
-  const config: Readonly<SavingsConfig> = await viemPublicClient.readContract({
+export async function getSavingsConfig(
+  viemPublicClient: PublicClient,
+  user: Address,
+  token: Address,
+): Promise<SavingsConfig> {
+  console.log('Fetching savings config for user:', user, 'and token:', token);
+  const configArray: Readonly<SavingsConfigArray> = await viemPublicClient.readContract({
     address: AUTOHODL_ADDRESS,
     abi: AutoHodlAbi,
     functionName: 'savings',
     args: [user, token],
   });
 
-  return config;
+  return parseSavingsConfig(configArray);
 }

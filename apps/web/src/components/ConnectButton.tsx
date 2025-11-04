@@ -1,9 +1,5 @@
 'use client';
 
 export const ConnectButton = () => {
-  return (
-    <div>
-      <appkit-button />
-    </div>
-  );
+  return <appkit-button balance='hide' />;
 };
