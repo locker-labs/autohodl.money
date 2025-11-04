@@ -110,14 +110,16 @@ export async function addAddressToEoaErc20TransferMoralisStream(streamId: string
       const transferObject = advancedOptions.find((option) => option.topic0 === TransferEventSig);
       if (Array.isArray(transferObject?.filter?.and)) {
         const inFilter = transferObject.filter.and.find((f) => f.in && Array.isArray(f.in) && f.in[0] === 'from');
-        if (inFilter) {
-          if (inFilter[1].includes(addressLowerCase)) {
+
+        if (inFilter?.in) {
+          if (inFilter.in[1].includes(addressLowerCase)) {
             // Address already exists
             return true;
           }
 
           // Add the existing list to the new address
-          (defaultAdvancedOptions[0].filter.and[1].in as [string, Address[]])[1] = inFilter[1].concat(addressLowerCase);
+          (defaultAdvancedOptions[0].filter.and[1].in as [string, Address[]])[1] =
+            inFilter.in[1].concat(addressLowerCase);
         }
       }
     }
