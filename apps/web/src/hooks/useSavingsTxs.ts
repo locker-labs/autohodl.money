@@ -54,7 +54,7 @@ export function useSavingsTxs() {
           fromAddress: address,
           toAddress: AUTOHODL_ADDRESS,
           contractAddresses: AUTOHODL_SUPPORTED_TOKENS,
-          maxCount: 5,
+          maxCount: 6,
           pageKey,
         });
 

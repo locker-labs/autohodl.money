@@ -86,7 +86,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
     address: address,
   });
 
-  // Get sToken Balance
+  // Get Token Balance
   const token = useERC20BalanceOf({
     token: USDC_ADDRESS,
     address: address,

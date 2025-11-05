@@ -29,6 +29,7 @@ const RoundupAmountSelector = () => {
           await createConfig({
             roundUp: roundUpLocal,
             savingsAddress: config.savingAddress,
+            mode: config.mode,
           });
           setConfig((prev) =>
             prev ? { ...prev, roundUp: BigInt(roundUpLocal * 10 ** TokenDecimalMap[USDC_ADDRESS]) } : prev,
@@ -39,7 +40,7 @@ const RoundupAmountSelector = () => {
       }
     }
     iife();
-  }, [roundUpLocal, config?.savingAddress, createConfig]);
+  }, [roundUpLocal]);
 
   return (
     <div className='flex flex-col gap-1'>

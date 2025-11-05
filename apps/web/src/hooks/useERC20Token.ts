@@ -115,7 +115,11 @@ export type UseERC20BalanceOfReturn = {
   isFetching: boolean;
 };
 
-export function useERC20BalanceOf(params: { address: Address | undefined; token: Address }): UseERC20BalanceOfReturn {
+export function useERC20BalanceOf(params: {
+  address: Address | undefined;
+  token: Address;
+  enabled?: boolean;
+}): UseERC20BalanceOfReturn {
   const decimals = TokenDecimalMap[params.token];
   if (!decimals) {
     throw new Error(`useERC20BalanceOf: Unsupported token: ${params.token}`);
@@ -127,7 +131,7 @@ export function useERC20BalanceOf(params: { address: Address | undefined; token:
     functionName: 'balanceOf',
     args: [params.address as Address],
     query: {
-      enabled: !!params.address,
+      enabled: params.enabled ?? !!params.address,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       refetchInterval: 15000,

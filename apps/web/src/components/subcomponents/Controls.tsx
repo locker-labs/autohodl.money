@@ -16,49 +16,27 @@ import { SupportedAccounts, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constant
 import { formatAddress } from '@/lib/string';
 import { useAccount } from 'wagmi';
 import { CopyContentButton } from '../feature/CopyContentButton';
-import { AccountBadge } from '../ui/account-badge';
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
+import { PriceSkeleton } from './PriceSkeleton';
+import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 
 export function Controls(): React.JSX.Element {
   const { address: userAddress } = useAccount();
-  const { config, accounts } = useAutoHodl();
+  const { config, accounts, token } = useAutoHodl();
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
+
+  const savingsAddressToken = useERC20BalanceOf({
+    token: USDC_ADDRESS,
+    address: config?.savingAddress,
+    enabled: !!config?.savingAddress && !config?.toYield,
+  });
 
   return (
     <Card className='w-full m-0 py-5 pl-5 pr-5 h-full'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Settings</h2>
-        </div>
-
-        <div className='mt-4 w-full'>
-          <p className='text-lg'>Connected Account</p>
-          <div className='mt-2 w-full border border-gray-300 rounded-xl px-3 py-3'>
-            <div className='flex gap-2'>
-              <CopyContentButton textToCopy={userAddress || ''} onCopyMessage='Address copied to clipboard'>
-                {formatAddress(userAddress)}
-              </CopyContentButton>
-              {accounts.map((account) => {
-                return <AccountBadge key={account} type={account} />;
-              })}
-            </div>
-          </div>
-          {accounts.includes(SupportedAccounts.MetaMask) ? null : (
-            <div className='mt-4'>
-              <Link
-                href={paths.GetMetaMaskCard}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-base font-medium text-blue-600 hover:underline inline-block'
-              >
-                <div className='flex items-center justify-center gap-1'>
-                  <p>Get a MetaMask Card</p>
-                  <ExternalLink size={16} />
-                </div>
-              </Link>
-            </div>
-          )}
         </div>
 
         <div className='mt-4'>
@@ -78,28 +56,80 @@ export function Controls(): React.JSX.Element {
           </p>
         </div>
 
-        {/* Deposit Destination */}
+        <Link
+          href={paths.GetMetaMaskCard}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='mt-4 w-full text-base font-medium hover:underline inline-block decoration-[#661800]'
+        >
+          <div className='border-[#FF5C16]/50 text-[#661800] bg-gradient-to-br from-[#FF5C16]/30 to-[#FFA680]/30 h-10 border rounded-xl flex items-center justify-center gap-3 px-3'>
+            {/* Get a MetaMask Card */}
+            {accounts.includes(SupportedAccounts.MetaMask) ? null : (
+              <div>
+                <div className='flex items-center justify-center gap-1'>
+                  <p>MetaMask Card not found! Get now</p>
+                  <ExternalLink size={16} />
+                </div>
+              </div>
+            )}
+          </div>
+        </Link>
+
+        {/* Source of Funds */}
+        <div className='mt-4 w-full'>
+          <p className='text-lg'>Source of Funds</p>
+
+          <div className='mt-2 w-full h-20 border border-gray-300 rounded-xl flex items-center justify-between gap-3 px-3'>
+            <div className='flex items-center justify-start gap-3'>
+              <Lock className='min-w-5 min-h-5' size={20} />
+              <div>
+                <div>
+                  <p className='text-[15px]'>Connected Wallet</p>
+                  <CopyContentButton textToCopy={userAddress || ''} onCopyMessage='Address copied to clipboard'>
+                    {formatAddress(userAddress)}
+                  </CopyContentButton>
+                </div>
+              </div>
+            </div>
+
+            <div className='flex items-center justify-end gap-1 px-3'>
+              <p>Balance: </p>
+              {!token.isReady ? <PriceSkeleton /> : <p>{token.balanceFormatted} USDC</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Savings Destination */}
         <div className='mt-4'>
           <div>
-            <p className='text-lg'>Deposit Destination</p>
+            <p className='text-lg'>Savings Destination</p>
           </div>
-          <div className='mt-2 w-full h-20 border border-gray-300 rounded-xl flex items-center justify-start gap-3 px-3'>
-            <Lock className='min-w-5 min-h-5' size={20} />
-            {config?.toYield ? (
-              <div>
-                <p className='text-[15px]'>Aave Protocol</p>
-                <p className='mt-1 text-[#4D4A4A] text-sm'>Earning ~{apyLoading ? '--' : apy}% APY</p>
-              </div>
-            ) : (
-              <div>
-                <p className='text-[15px]'>Savings Account</p>
-                <CopyContentButton
-                  textToCopy={config?.savingAddress || ''}
-                  onCopyMessage='Savings address copied to clipboard'
-                  className='mt-1'
-                >
-                  {formatAddress(config?.savingAddress)}
-                </CopyContentButton>
+          <div className='mt-2 w-full h-20 border border-gray-300 rounded-xl flex items-center justify-between gap-3 px-3'>
+            <div className='flex items-center justify-start gap-3'>
+              <Lock className='min-w-5 min-h-5' size={20} />
+              {config?.toYield ? (
+                <div>
+                  <p className='text-[15px]'>Aave Protocol</p>
+                  <p className='mt-1 text-[#4D4A4A] text-sm'>Earning ~{apyLoading ? '--' : apy}% APY</p>
+                </div>
+              ) : (
+                <div>
+                  <p className='text-[15px]'>Savings Account</p>
+                  <CopyContentButton
+                    textToCopy={config?.savingAddress || ''}
+                    onCopyMessage='Savings address copied to clipboard'
+                    className='mt-1'
+                  >
+                    {formatAddress(config?.savingAddress)}
+                  </CopyContentButton>
+                </div>
+              )}
+            </div>
+
+            {config?.toYield ? null : (
+              <div className='flex items-center justify-end gap-1 px-3'>
+                <p>Balance: </p>
+                {!savingsAddressToken.isReady ? <PriceSkeleton /> : <p>{savingsAddressToken.balanceFormatted} USDC</p>}
               </div>
             )}
           </div>

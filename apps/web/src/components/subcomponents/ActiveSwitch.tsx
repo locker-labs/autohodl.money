@@ -25,6 +25,7 @@ const ActiveSwitch = () => {
             active: activeLocal,
             roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
             savingsAddress: config.savingAddress,
+            mode: config.mode,
           });
           setConfig((prev) => (prev ? { ...prev, active: activeLocal } : prev));
         } catch {
@@ -33,7 +34,7 @@ const ActiveSwitch = () => {
       }
     }
     iife();
-  }, [activeLocal, config?.savingAddress, createConfig]);
+  }, [activeLocal]);
 
   return (
     <div className='flex items-center justify-between gap-2'>
