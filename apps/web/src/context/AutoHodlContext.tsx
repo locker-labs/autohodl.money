@@ -2,14 +2,15 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
+import { S_USDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
 import { viemPublicClient } from '@/lib/clients/client';
-import { zeroAddress } from 'viem';
+import { type Address, zeroAddress } from 'viem';
 
 type AutoHodlContextType = {
   loading: boolean;
@@ -17,6 +18,10 @@ type AutoHodlContextType = {
   setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
   accounts: SupportedAccounts[];
+  sToken: UseERC20BalanceOfReturn;
+  token: UseERC20BalanceOfReturn;
+  address: Address | undefined;
+  isConnected: boolean;
 };
 
 const AutoHodlContext = createContext<AutoHodlContextType | undefined>(undefined);
@@ -39,6 +44,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [refetchFlag, setRefetchFlag] = useState(false);
   const { address, isConnected } = useAccount();
 
+  // Get Supported Accounts
   const { data: accounts, isLoading: loadingAccounts } = useQuery({
     enabled: !!address && isConnected,
     queryFn: async () => {
@@ -74,9 +80,33 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
     fetchSavingsConfigArray();
   }, [address, isConnected, refetchFlag]);
 
+  // Get sToken Balance
+  const sToken = useERC20BalanceOf({
+    token: S_USDC_ADDRESS,
+    address: address,
+  });
+
+  // Get sToken Balance
+  const token = useERC20BalanceOf({
+    token: USDC_ADDRESS,
+    address: address,
+  });
+
+  console.log('AutoHodlContext render', { loading, config, accounts });
+
   return (
     <AutoHodlContext.Provider
-      value={{ loading: loading || loadingAccounts, config, setRefetchFlag, setConfig, accounts: accounts || [] }}
+      value={{
+        loading: loading || loadingAccounts,
+        config,
+        setRefetchFlag,
+        setConfig,
+        accounts: accounts || [],
+        sToken,
+        token,
+        address,
+        isConnected,
+      }}
     >
       {children}
     </AutoHodlContext.Provider>

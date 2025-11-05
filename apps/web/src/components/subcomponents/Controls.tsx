@@ -6,8 +6,8 @@ import {
 import type React from 'react';
 import { formatUnits } from 'viem';
 import ActiveSwitch from '@/components/subcomponents/ActiveSwitch';
-import Button from '@/components/subcomponents/Button';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
+import { WithdrawSavings } from '@/components/subcomponents/WithdrawSavings';
 import YieldSwitch from '@/components/subcomponents/YieldSwitch';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAutoHodl } from '@/context/AutoHodlContext';
@@ -106,10 +106,7 @@ export function Controls(): React.JSX.Element {
         </div>
 
         <div className='mt-4'>
-          {/* TODO: implement withdraws savings */}
-          <Button title='Withdraw Savings' className='w-full h-[40px]'>
-            <span>Withdraw Savings</span>
-          </Button>
+          <WithdrawSavings />
         </div>
       </CardContent>
     </Card>

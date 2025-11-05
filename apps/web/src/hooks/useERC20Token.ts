@@ -1,8 +1,9 @@
+import { useAppKitAccount } from '@reown/appkit/react';
 import { useMemo } from 'react';
 import { erc20Abi, formatUnits } from 'viem';
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { useAppKitAccount } from '@reown/appkit/react';
+import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { TokenDecimalMap } from '@/lib/constants';
+import { truncateToTwoDecimals } from '@/lib/math';
 
 type Address = `0x${string}`;
 
@@ -54,14 +55,16 @@ export function useErc20Allowance(params: {
 }
 
 export function useERC20Approve(params: {
-  token: Address | undefined;
+  token: Address;
   spender: Address | undefined;
-  amount: number; // e.g. 20n
-  decimals?: number; // e.g., 18
+  amount: number; // e.g. 2.02
   enabled?: boolean;
 }) {
   const { isConnected } = useAppKitAccount();
-  const decimals = params.decimals ?? 18;
+  const decimals = TokenDecimalMap[params.token];
+  if (!decimals) {
+    throw new Error(`useERC20Approve: Unsupported token: ${params.token}`);
+  }
   const amount = BigInt(params.amount * 10 ** decimals);
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.spender);
 
@@ -99,5 +102,98 @@ export function useERC20Approve(params: {
     resetWrite,
     enabled,
     amount: params.amount,
+  };
+}
+
+export type UseERC20BalanceOfReturn = {
+  balance: bigint | undefined;
+  balanceFormatted: number;
+  refetch: () => void;
+  isReady: boolean;
+  isLoading: boolean;
+  isFetched: boolean;
+  isFetching: boolean;
+};
+
+export function useERC20BalanceOf(params: { address: Address | undefined; token: Address }): UseERC20BalanceOfReturn {
+  const decimals = TokenDecimalMap[params.token];
+  if (!decimals) {
+    throw new Error(`useERC20BalanceOf: Unsupported token: ${params.token}`);
+  }
+
+  const { data, isFetched, isFetching, isLoading, refetch } = useReadContract({
+    abi: erc20Abi,
+    address: params.token,
+    functionName: 'balanceOf',
+    args: [params.address as Address],
+    query: {
+      enabled: !!params.address,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      refetchInterval: 15000,
+      staleTime: 0,
+    },
+  });
+
+  const balanceFormatted = data ? truncateToTwoDecimals(formatUnits(data, decimals)) : 0;
+
+  return {
+    balance: data,
+    balanceFormatted,
+    isReady: isFetched && !isLoading,
+    refetch,
+    isLoading,
+    isFetched,
+    isFetching,
+  };
+}
+
+export function useERC20Transfer(params: {
+  token: Address;
+  to: Address;
+  amount: number; // e.g. 1.2
+  enabled?: boolean;
+}) {
+  const { isConnected } = useAppKitAccount();
+  const decimals = TokenDecimalMap[params.token];
+  if (!decimals) {
+    throw new Error(`useERC20Transfer: Unsupported token: ${params.token}`);
+  }
+  const amount = BigInt(params.amount * 10 ** decimals);
+  const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.to);
+
+  const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
+
+  const transfer = () => {
+    if (!enabled) return;
+    writeContract({
+      address: params.token,
+      abi: erc20Abi,
+      functionName: 'transfer',
+      args: [params.to, amount],
+    });
+  };
+
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    data: receipt,
+    error: receiptError,
+  } = useWaitForTransactionReceipt({
+    hash,
+    query: { enabled: Boolean(hash) },
+  });
+
+  return {
+    transfer,
+    hash,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    receipt,
+    writeError,
+    receiptError,
+    resetWrite,
+    enabled,
   };
 }

@@ -8,7 +8,7 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
 // import { useAaveYieldBalance } from '@/hooks/useAaveYieldBalance';
 import { useSpareChange } from '@/hooks/useSpareChange';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import { S_USDC_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
 import { useAccount } from 'wagmi';
 
@@ -35,7 +35,7 @@ export function SavingsInfoCards(): React.JSX.Element {
 
   const { changeSaved, isReady: readyChange } = useSpareChange();
 
-  const { balanceFormatted: tokenBalance, isReady: readyTokenBalance } = useTokenBalance({
+  const { balanceFormatted: tokenBalance, isReady: readyTokenBalance } = useERC20BalanceOf({
     token: tokenConfig.token,
     address: tokenConfig.tokenBalanceAddr,
   });
