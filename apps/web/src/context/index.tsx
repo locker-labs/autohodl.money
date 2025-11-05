@@ -3,7 +3,7 @@
 import { wagmiAdapter, projectId, networks } from '@/config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { AutoHodlProvider } from '@/context/AutoHodlContext';
 
@@ -26,7 +26,13 @@ export const modal = createAppKit({
   metadata,
   themeMode: 'light',
   features: {
-    analytics: true, // Optional - defaults to your Cloud configuration
+    swaps: false,
+    onramp: false,
+    email: false,
+    socials: false,
+    history: true,
+    analytics: true,
+    allWallets: true,
   },
   themeVariables: {
     '--w3m-accent': '#000000',

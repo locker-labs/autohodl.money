@@ -48,8 +48,8 @@ export default function LandingPage() {
 
         {/* Mobile */}
         <div className='lg:hidden w-full max-w-[1440px] flex flex-col items-center justify-center gap-[60px]'>
-          <div>
-            <p className='mt-[80px] text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
+          <div className='mt-[80px]'>
+            <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
               Earn yield on your spare change, earn points while you shop, and more ways to HODL.
             </p>
@@ -66,7 +66,7 @@ export default function LandingPage() {
               </Button>
             </div>
           </div>
-          <div className='w-full flex items-center justify-center'>
+          <div className='w-fit flex items-center justify-center'>
             <img
               className='lg:max-w-[480px] aspect-auto'
               src={'/hero.landing.png'}
@@ -109,7 +109,7 @@ export default function LandingPage() {
             />
           </div>
         </div>
-        <div className='h-[120px]' />
+        <div className='w-full h-[120px]' />
       </section>
 
       {/* On-chain Savings Simplified */}
@@ -144,7 +144,7 @@ export default function LandingPage() {
         </div>
       </section>
       {/* Desktop */}
-      <section className='hidden p-[48px] bg-[#ffffff] h-screen lg:flex flex-col items-center justify-center'>
+      <section className='hidden p-[48px] bg-[#ffffff] lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
@@ -175,7 +175,7 @@ export default function LandingPage() {
       </section>
 
       {/* Launch Partner MetaMask Card */}
-      <section className='px-[24px] bg-[#f7feec] lg:h-[600px] flex items-center justify-center'>
+      <section className='px-[24px] bg-[#f7feec] flex items-center justify-center'>
         <div className={'mb-12 lg:mb-0 max-w-[1440px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='flex flex-col items-start justify-center'>
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
@@ -202,7 +202,7 @@ export default function LandingPage() {
       </section>
 
       {/* Recognized by */}
-      <section className='p-[48px] bg-[#ffffff] lg:h-[67vh] flex flex-col items-center justify-center'>
+      <section className='p-[48px] bg-[#ffffff] flex flex-col items-center justify-center'>
         <div className={'mb-[40px] lg:mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>Recognized by</p>
         </div>
