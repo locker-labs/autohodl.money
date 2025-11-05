@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS, AUTOHODL_ADDRESS, TokenDecimalMap } from '@/lib/constants';
+import { USDC_ADDRESS, AUTOHODL_ADDRESS } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
 import { getTransactionLink } from '@/lib/blockExplorer';
@@ -17,16 +17,15 @@ export default function USDCApprovalChecker() {
     refetch: refetchAllowance,
   } = useErc20Allowance({
     token: USDC_ADDRESS,
-    owner: address as `0x${string}` | undefined,
-    spender: AUTOHODL_ADDRESS as `0x${string}`,
+    owner: address,
+    spender: AUTOHODL_ADDRESS,
     enabled: isConnected,
   });
 
   const { approve, isPending, isConfirming, isConfirmed, writeError, hash } = useERC20Approve({
     token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS as `0x${string}`,
+    spender: AUTOHODL_ADDRESS,
     amount: autohodlAllowance,
-    decimals: TokenDecimalMap[USDC_ADDRESS],
     enabled: isConnected,
   });
 

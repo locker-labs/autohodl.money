@@ -48,8 +48,8 @@ export default function LandingPage() {
 
         {/* Mobile */}
         <div className='lg:hidden w-full max-w-[1440px] flex flex-col items-center justify-center gap-[60px]'>
-          <div>
-            <p className='mt-[80px] text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
+          <div className='mt-[80px]'>
+            <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
               Earn yield on your spare change, earn points while you shop, and more ways to HODL.
             </p>
@@ -66,7 +66,7 @@ export default function LandingPage() {
               </Button>
             </div>
           </div>
-          <div className='w-full flex items-center justify-center'>
+          <div className='w-fit flex items-center justify-center'>
             <img
               className='lg:max-w-[480px] aspect-auto'
               src={'/hero.landing.png'}
@@ -109,13 +109,13 @@ export default function LandingPage() {
             />
           </div>
         </div>
-        <div className='h-[120px]' />
+        <div className='w-full h-[120px]' />
       </section>
 
       {/* On-chain Savings Simplified */}
       {/* mobile */}
-      <section className='lg:hidden p-[48px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
-        <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+      <section className='lg:hidden p-[28px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
+        <div className={'mb-[40px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
@@ -144,7 +144,7 @@ export default function LandingPage() {
         </div>
       </section>
       {/* Desktop */}
-      <section className='hidden p-[48px] bg-[#ffffff] h-screen lg:flex flex-col items-center justify-center'>
+      <section className='hidden p-[48px] bg-[#ffffff] lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
@@ -175,7 +175,7 @@ export default function LandingPage() {
       </section>
 
       {/* Launch Partner MetaMask Card */}
-      <section className='px-[24px] bg-[#f7feec] lg:h-[600px] flex items-center justify-center'>
+      <section className='px-[24px] bg-[#f7feec] flex items-center justify-center'>
         <div className={'mb-12 lg:mb-0 max-w-[1440px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='flex flex-col items-start justify-center'>
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
@@ -202,7 +202,7 @@ export default function LandingPage() {
       </section>
 
       {/* Recognized by */}
-      <section className='p-[48px] bg-[#ffffff] lg:h-[67vh] flex flex-col items-center justify-center'>
+      <section className='p-[48px] bg-[#ffffff] flex flex-col items-center justify-center'>
         <div className={'mb-[40px] lg:mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>Recognized by</p>
         </div>
@@ -287,7 +287,7 @@ function BorderCard({
     >
       <div className='transition-transform duration-500 hover:scale-105 w-[300px] aspect-auto p-4 flex items-center justify-center'>
         <div className='h-[300px] aspect-auto p-4 flex items-center justify-center'>
-          <Image className='aspect-auto shrink-0' src={imgSrc} alt='img' width={800} height={800} />
+          <Image className='aspect-auto' src={imgSrc} alt='img' width={287} height={287} />
         </div>
       </div>
 
@@ -303,15 +303,13 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
   return (
     <Link href={href} target='_blank' rel='noopener noreferrer'>
       <div
-        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[8px] p-[16px] flex flex-col items-center justify-center ${className}`}
+        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[8px] p-[32px] flex flex-col items-center justify-center ${className}`}
       >
         <div className='group-hover:opacity-100 absolute top-4 right-4 group-hover:top-3 group-hover:right-3 opacity-0 transition-all duration-300'>
           <ArrowUpRight size={24} color='#78E76E' />
         </div>
 
-        <div className='h-[150px] p-4 flex items-center justify-center'>
-          <Image className='aspect-auto' src={imgSrc} alt='img' width={100} height={150} />
-        </div>
+        <Image className='aspect-square select-none' src={imgSrc} alt='img' width={100} height={100} />
       </div>
     </Link>
   );

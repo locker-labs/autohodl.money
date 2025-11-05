@@ -26,6 +26,7 @@ const YieldSwitch = () => {
             toYield: toYieldLocal,
             roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
             savingsAddress: config.savingAddress,
+            mode: config.mode,
           });
           setConfig((prev) => (prev ? { ...prev, toYield: toYieldLocal } : prev));
         } catch {
@@ -34,7 +35,7 @@ const YieldSwitch = () => {
       }
     }
     iife();
-  }, [toYieldLocal, config?.savingAddress, createConfig]);
+  }, [toYieldLocal]);
 
   return (
     <div className='flex items-center justify-between gap-2'>

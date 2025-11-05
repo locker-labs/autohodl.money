@@ -1,4 +1,4 @@
-import type { Address, Hex } from 'viem';
+import { type Address, decodeAbiParameters, type Hex } from 'viem';
 
 export type SavingsConfigArray = [
   Address, // savingAddress
@@ -16,9 +16,25 @@ export type SavingsConfig = {
   active: boolean;
   toYield: boolean;
   extraData: Hex;
+  mode: SavingsMode;
 };
 
+export enum SavingsMode {
+  MetamaskCard = 'metamask-card',
+  All = 'all',
+}
+
+export const extraDataParams = [{ type: 'string' }] as const;
+
 export function parseSavingsConfig(arr: SavingsConfigArray | Readonly<SavingsConfigArray>): SavingsConfig {
+  let mode: SavingsMode = SavingsMode.All;
+  if (arr[5] && arr[5] !== '0x') {
+    const decoded = decodeAbiParameters(extraDataParams, arr[5]);
+    if (decoded[0]) {
+      mode = decoded[0] as SavingsMode;
+    }
+  }
+
   return {
     savingAddress: arr[0],
     delegate: arr[1],
@@ -26,5 +42,6 @@ export function parseSavingsConfig(arr: SavingsConfigArray | Readonly<SavingsCon
     active: arr[3],
     toYield: arr[4],
     extraData: arr[5],
+    mode,
   };
 }
