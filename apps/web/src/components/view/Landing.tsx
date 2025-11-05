@@ -114,8 +114,8 @@ export default function LandingPage() {
 
       {/* On-chain Savings Simplified */}
       {/* mobile */}
-      <section className='lg:hidden p-[48px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
-        <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+      <section className='lg:hidden p-[28px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
+        <div className={'mb-[40px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
@@ -287,7 +287,7 @@ function BorderCard({
     >
       <div className='transition-transform duration-500 hover:scale-105 w-[300px] aspect-auto p-4 flex items-center justify-center'>
         <div className='h-[300px] aspect-auto p-4 flex items-center justify-center'>
-          <Image className='aspect-auto shrink-0' src={imgSrc} alt='img' width={800} height={800} />
+          <Image className='aspect-auto' src={imgSrc} alt='img' width={287} height={287} />
         </div>
       </div>
 
@@ -303,15 +303,13 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
   return (
     <Link href={href} target='_blank' rel='noopener noreferrer'>
       <div
-        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[8px] p-[16px] flex flex-col items-center justify-center ${className}`}
+        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[8px] p-[32px] flex flex-col items-center justify-center ${className}`}
       >
         <div className='group-hover:opacity-100 absolute top-4 right-4 group-hover:top-3 group-hover:right-3 opacity-0 transition-all duration-300'>
           <ArrowUpRight size={24} color='#78E76E' />
         </div>
 
-        <div className='h-[150px] p-4 flex items-center justify-center'>
-          <Image className='aspect-auto' src={imgSrc} alt='img' width={100} height={150} />
-        </div>
+        <Image className='aspect-square select-none' src={imgSrc} alt='img' width={100} height={100} />
       </div>
     </Link>
   );

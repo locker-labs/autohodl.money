@@ -92,8 +92,6 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
     address: address,
   });
 
-  console.log('AutoHodlContext render', { loading, config, accounts });
-
   return (
     <AutoHodlContext.Provider
       value={{
