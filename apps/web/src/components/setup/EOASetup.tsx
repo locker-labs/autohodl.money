@@ -21,7 +21,7 @@ const EOASetup: React.FC = () => {
           image='/Gear.png'
           imageWidth={274}
           imageHeight={336}
-          buttonTitle={'Continue without card'}
+          buttonTitle={'Continue without Card'}
           handleButtonClick={handleButtonClick}
         >
           {/* Link to get a MetaMask Card */}

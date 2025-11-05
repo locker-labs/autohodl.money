@@ -43,6 +43,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   /* Custom Brand Colors */
   --color-app-green: var(--brand-green);
+  --color-app-green-dark: var(--brand-green-dark);
 }
 
 :root {
@@ -80,6 +81,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   /* Custom App Colors */
   --brand-green: #78E76E;
+  --brand-green-dark: #1A7411;
 }
 
 .dark {

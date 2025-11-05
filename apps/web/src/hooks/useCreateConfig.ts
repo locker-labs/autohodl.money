@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
+import { encodeAbiParameters } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
 import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { viemPublicClient } from '@/lib/clients/client';
 import { useAutoHodl } from '@/context/AutoHodlContext';
+import { extraDataParams, type SavingsMode } from '@/types/autohodl';
 
 const defaultConfig = {
   active: true,
   toYield: false,
-  extraData: '0x' as Hex,
 };
 
 type CreateConfigParams = {
@@ -17,7 +18,7 @@ type CreateConfigParams = {
   toYield?: boolean;
   roundUp: number;
   savingsAddress: Address;
-  extraData?: Hex;
+  mode: SavingsMode;
 };
 
 type UseCreateConfigReturn = {
@@ -42,16 +43,17 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     savingsAddress,
     active = defaultConfig.active,
     toYield = defaultConfig.toYield,
-    extraData = defaultConfig.extraData,
+    mode,
   }: {
     active?: boolean;
     toYield?: boolean;
     roundUp: number;
     savingsAddress: Address;
-    extraData?: Hex;
+    mode: SavingsMode;
   }) => {
     if (!walletClient) throw new Error('WalletClient not initialized');
 
+    const extraData = encodeAbiParameters(extraDataParams, [mode]);
     const args = [
       USDC_ADDRESS,
       savingsAddress as Address,
@@ -77,19 +79,21 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     savingsAddress,
     active = defaultConfig.active,
     toYield = defaultConfig.toYield,
-    extraData = defaultConfig.extraData,
+    mode,
   }: {
     active?: boolean;
     toYield?: boolean;
     roundUp: number;
     savingsAddress: Address;
-    extraData?: Hex;
+    mode: SavingsMode;
   }) => {
     if (!isConnected || !address || !walletClient) return;
 
     setLoading(true);
     setError(null);
     try {
+      const extraData = encodeAbiParameters(extraDataParams, [mode]);
+
       // Ensure types for contract call
       const args = [
         USDC_ADDRESS,
