@@ -11,6 +11,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { SavingsMode } from '@/types/autohodl';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Props = {
   account: SupportedAccounts;
@@ -39,12 +41,14 @@ export default function SetSavingConfig({ account }: Props) {
       value: SavingsMode.MetamaskCard,
       disabled: !hasMetaMaskCard,
       imgSrc: '/mmc.webp',
+      info: 'Some info about MetaMask Card',
     },
     {
       label: hasMetaMaskCard ? 'All USDC transfers from wallet and MetaMask Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
+      info: `Some info about USDC transfers`,
       imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
     },
   ];
@@ -54,12 +58,14 @@ export default function SetSavingConfig({ account }: Props) {
       label: 'Earn yield',
       value: true,
       imgSrc: '/grow.svg',
+      info: 'The change you save will be deposited to Aave and automatically earn yield',
     },
     {
       label: 'Put into savings',
       value: false,
       disabled: false,
       imgSrc: '/save.png',
+      info: `The change you save will be deposited into an account of your choice but won't earn any yield`,
     },
   ];
 
@@ -210,10 +216,23 @@ export default function SetSavingConfig({ account }: Props) {
                       />
                     ) : null}
                   </div>
-                  {opt.label}
+                  <div className='flex items-center justify-center gap-2'>
+                    {opt.label}
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={16} className='h-4 w-4' />
+                      </TooltipTrigger>
+                      <TooltipContent>{opt.info}</TooltipContent>
+                    </Tooltip>
+                  </div>
                 </button>
               ))}
             </div>
+            {hasMetaMaskCard ? null : (
+              <div className='text-sm text-gray-700 max-w-md'>
+                Since you don't have a metamask card, round-ups will be enabled only on your USDC transfers.
+              </div>
+            )}
           </div>
 
           {/* Yield */}
@@ -249,7 +268,15 @@ export default function SetSavingConfig({ account }: Props) {
                       fetchPriority='high'
                     />
                   </div>
-                  {opt.label}
+                  <div className='flex items-center justify-center gap-2'>
+                    {opt.label}
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info size={16} className='h-4 w-4' />
+                      </TooltipTrigger>
+                      <TooltipContent>{opt.info}</TooltipContent>
+                    </Tooltip>
+                  </div>
                 </button>
               ))}
             </div>
