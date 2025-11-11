@@ -5,11 +5,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {ILockerRouter} from "../interfaces/ILockerRouter.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title LockerSYT
 /// @notice SYT (Spendable Yield Token) representing a share of a user's deposited assets in the LockerRouter.
 
-contract LockerSYT is IERC20 {
+contract LockerSYT is IERC20, ReentrancyGuard {
     // Metadata
     string public name;
     string public symbol;
@@ -54,7 +55,8 @@ contract LockerSYT is IERC20 {
     // Total underlying managed by the portfolio (Router aggregates adapters)
     function totalAssets() public view returns (uint256) {
         // Router is authoritative for NAV across adapters
-        return router.navAcrossAdapters(parentToken);
+        ILockerRouter.Allocation memory alloc = router.getDefaultAllocation(parentToken);
+        return router.navAcrossAdapters(alloc.adapters, parentToken);
     }
 
     // ERC20 balance reflects current claim in assets (rebasing-style view)
@@ -72,11 +74,11 @@ contract LockerSYT is IERC20 {
         return true;
     }
 
-    function transfer(address to, uint256 value) external returns (bool) {
+    function transfer(address to, uint256 value) external nonReentrant returns (bool) {
         return _routedTransfer(msg.sender, to, value);
     }
 
-    function transferFrom(address from, address to, uint256 value) external returns (bool) {
+    function transferFrom(address from, address to, uint256 value) external nonReentrant returns (bool) {
         uint256 allowed = allowance[from][msg.sender];
         if (allowed != type(uint256).max) {
             if (allowed < value) revert InsufficientAllowance();
@@ -130,10 +132,8 @@ contract LockerSYT is IERC20 {
     }
 
     function _burn(address from, uint256 amount) internal {
-        unchecked {
-            balanceOfSYT[from] = balanceOfSYT[from] - amount;
-            totalSupply = totalSupply - amount;
-        }
+        balanceOfSYT[from] = balanceOfSYT[from] - amount;
+        totalSupply = totalSupply - amount;
         emit Transfer(from, address(0), amount);
     }
 }

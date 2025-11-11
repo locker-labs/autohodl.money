@@ -89,7 +89,8 @@ interface ILockerRouter {
      *        GETTERS              *
      *=============================*/
 
-    function navAcrossAdapters(address asset) external view returns (uint256);
+    function navAcrossAdapters(address[] memory adapters, address asset) external view returns (uint256);
+    function getDefaultAllocation(address asset) external view returns (Allocation memory);
     // function sytFor(address asset) external view returns (address); // SYT ERC20 for asset
     // function pool() external view returns (address); // Instant Pool (multi-asset)
     // function treasury() external view returns (address); // protocol fee sink (if any)

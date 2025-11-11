@@ -166,7 +166,7 @@ contract RouterSetupTest is Test {
         assertEq(syt.balanceOfSYT(userA), depositAmount);
         assertEq(syt.balanceOf(userA), depositAmount + yieldAmount); // userA's balance should includes yield
         assertLt(syt.balanceOfSYT(userB), depositAmount); // userB's SYT balance should be less
-        assertEq(syt.balanceOf(userB), depositAmount - 1); // -1 for floor in math.
+        assertEq(syt.balanceOf(userB), depositAmount -1); 
 
         // Increase yield and check if the yield is distributed correctly
         yieldToken.mint(address(aaveAdapter), yieldAmount); // 10% original yield

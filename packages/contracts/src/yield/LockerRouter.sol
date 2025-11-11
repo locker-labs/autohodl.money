@@ -45,14 +45,18 @@ contract LockerRouter is ILockerRouter, Ownable {
         LockerSYT syt = LockerSYT(assetSYT[asset]);
         require(msg.sender == address(syt), "Invalid SYT");
         require(amount > 0, "ZERO_AMOUNT");
-        uint256 totalShares = syt.totalSupply();
-        uint256 totalAssets = navAcrossAdapters(asset);
-        require(totalShares > 0 && totalAssets > 0, "INVALID_STATE");
-
-        sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Floor);
-
-        require(LockerSYT(assetSYT[asset]).balanceOfSYT(from) >= sharesNeeded, "INSUFFICIENT_SHARES");
         Allocation memory alloc = defaultAllocation[asset];
+        uint256 totalShares = syt.totalSupply();
+        uint256 totalAssets = navAcrossAdapters(alloc.adapters, asset);
+        require(totalShares > 0 && totalAssets > 0, "INVALID_STATE");
+        uint256 userSYTBalance = syt.balanceOfSYT(from);
+        uint256 assetsMax = Math.mulDiv(userSYTBalance, totalAssets, totalShares, Math.Rounding.Floor);
+        if(amount > assetsMax) {
+            amount = assetsMax;
+        }
+        sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Ceil);
+        require(sharesNeeded > 0, "ZERO_SHARES");
+        require(userSYTBalance >= sharesNeeded, "INSUFFICIENT_SHARES");
         require(alloc.adapters.length != 0, "NO_ADAPTERS");
         uint256 toTransfer = _withdrawFromAdapters(alloc, asset, amount);
 
@@ -73,15 +77,14 @@ contract LockerRouter is ILockerRouter, Ownable {
         uint256 totalShares = syt.totalSupply();
 
         // totalAssets is the portfolio value across all adapters for this asset
-        uint256 totalAssets = navAcrossAdapters(_asset); // sums IVenueAdapter.adapterPositionValue(_asset)
+        uint256 totalAssets = navAcrossAdapters(allocations.adapters, _asset); // sums IVenueAdapter.adapterPositionValue(_asset)
         uint256 mintedShares;
         if (totalShares == 0 || totalAssets == 0) {
             mintedShares = _amount; // initial price = 1.0
         } else {
-            // shares = floor(_amount * totalShares / totalAssets)
             mintedShares = Math.mulDiv(_amount, totalShares, totalAssets, Math.Rounding.Floor);
-            require(mintedShares != 0, "ZERO_SHARES");
         }
+        require(mintedShares != 0, "ZERO_SHARES");
         uint256[] memory amounts = new uint256[](allocations.adapters.length);
         address[] memory adapters = allocations.adapters;
 
@@ -118,12 +121,15 @@ contract LockerRouter is ILockerRouter, Ownable {
         return toTransfer;
     }
 
-    function navAcrossAdapters(address asset) public view returns (uint256 total) {
+    function navAcrossAdapters(address[] memory adapters, address asset) public view returns (uint256 total) {
         // For v1, just use default allocation adapters
-        address[] memory adapters = assetAdapters[asset];
         for (uint256 i = 0; i < adapters.length; i++) {
             total += IVenueAdapter(adapters[i]).adapterPositionValue(asset);
         }
+    }
+
+    function getDefaultAllocation(address asset) external view returns (Allocation memory) {
+        return defaultAllocation[asset];
     }
 
     function setSupportedSYT(address asset, address syt) external onlyOwner {
@@ -174,4 +180,5 @@ contract LockerRouter is ILockerRouter, Ownable {
             emit DefaultAllocSet(assets[i]);
         }
     }
+
 }
