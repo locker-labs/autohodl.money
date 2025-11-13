@@ -10,12 +10,12 @@ export enum SupportedAccounts {
 }
 
 export const AutoHodlAddressMap: Record<number, Address> = {
-  59144: '0x0', // Linea
+  59144: '0x315648b80bB18A5521440cC406E01eFE203B231f', // Linea
   11155111: '0xD7262C19249A34Df21d7Ad509b4Ed19657d903D3', // Sepolia
 };
 
 export const MMCardDelegateAddressMap: Record<number, Address> = {
-  59144: '0x0', // Linea
+  59144: '0xBc9734d9952171283F2B8524b776a5204611456b', // Linea
   11155111: '0x7c334f35BF2B4a9e55f60CF3287c885598cF9A02', // Sepolia
 };
 
@@ -51,12 +51,12 @@ export const UsdcAddressMap: Record<number, Address> = {
 };
 
 export const AaveYieldTokenAddressMap: Record<number, Address> = {
-  59144: '0x', // Linea
+  59144: '0x374D7860c4f2f604De0191298dD393703Cce84f3', // Linea
   11155111: '0x6b8558764d3b7572136F17174Cb9aB1DDc7E1259', // aEthAAVE on Sepolia
 };
 
 export const SUsdcAddressMap: Record<number, Address> = {
-  59144: '0x0', // Linea
+  59144: '0x060c1cBE54a34deCE77f27ca9955427c0e295Fd4', // Linea
   11155111: '0x9480D1c619A92F5434204072bdFBb48f16915920', // sUSDC on Ethereum Sepolia
 };
 
@@ -94,7 +94,7 @@ export const AavePoolAddressMap: Record<number, Address> = {
 };
 
 export const AaveAdapterAddressMap: Record<number, Address> = {
-  59144: '0x0', // Linea
+  59144: '0x8f700F57A33C7FA8d00648CE2eF9005b69030b51', // Linea
   11155111: '0xF6B9F6610bdcBbBaf4e959D66Df6cB587eCe6C8A', // Sepolia
 };
 
