@@ -87,7 +87,7 @@ export default function SetSavingConfig({ account }: Props) {
   });
 
   const handleApprove = () => {
-    if (!savingsAddress || isAddress(savingsAddress) === false) {
+    if (!toYield && isAddress(savingsAddress) === false) {
       toastCustom('Please enter a valid savings address');
       return;
     }
@@ -103,7 +103,7 @@ export default function SetSavingConfig({ account }: Props) {
   } = useCreateConfig();
 
   const handleFinishSetup = () => {
-    if (!savingsAddress || isAddress(savingsAddress) === false) {
+    if (!toYield && isAddress(savingsAddress) === false) {
       toastCustom('Please enter a valid savings address');
       return;
     }
@@ -314,10 +314,10 @@ export default function SetSavingConfig({ account }: Props) {
           {/* Advanced Options */}
           <Accordion className='mt-2' type='single' collapsible>
             <AccordionItem value='item-1'>
-              <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg bg-app-green/10'>
+              <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>
                 Advanced Options
               </AccordionTrigger>
-              <AccordionContent className='mt-6 px-6 py-4 border border-gray-300 rounded-lg bg-app-green/10'>
+              <AccordionContent className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
                 {/* Savings limit input */}
                 <div className='flex flex-col gap-2'>
                   <label htmlFor={'savingsCap'} className='text-sm font-medium text-black'>
@@ -354,8 +354,8 @@ export default function SetSavingConfig({ account }: Props) {
           {isConfirmingAllowance ? 'Confirming...' : isPending ? 'Processing...' : 'Continue'}
         </Button>
       ) : isApprovalNeeded === false ? (
-        <Button className='rounded-lg w-full' title={'Finish Setup'} onAction={handleFinishSetup} disabled={disabled}>
-          {isConfirmingConfig ? 'Confirming...' : loading ? 'Setting up...' : 'Finish Setup'}
+        <Button className='rounded-lg w-full' title={'Start saving'} onAction={handleFinishSetup} disabled={disabled}>
+          {isConfirmingConfig ? 'Confirming...' : loading ? 'Setting up...' : 'Start saving'}
         </Button>
       ) : (
         <Button className='rounded-lg w-full' title={'Loading'} onAction={() => {}} disabled={true}>

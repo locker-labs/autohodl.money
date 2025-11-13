@@ -40,7 +40,7 @@ const ActiveSwitch = () => {
     <div className='flex items-center justify-between gap-2'>
       <div>
         <div className='flex items-center justify-start gap-2'>
-          <p className='text-lg'>Savings Status</p>
+          <p className='text-sm font-medium'>Enable Savings</p>
           {isPending && <LoaderSecondary />}
         </div>
         <p className='text-[#4D4A4A] text-sm'>{config?.active ? 'Active' : 'Paused'}</p>
