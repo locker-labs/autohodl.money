@@ -2,7 +2,7 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, TokenDecimalMap } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
 import { delegateSaving } from '@/lib/contract/server';
 import { viemPublicClient } from '@/lib/clients/server';
@@ -117,8 +117,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   }
 
   // Calculate amount for savings tx
-  // Assuming roundUp is BigInt(10**18) for $1
-  const roundUpAmount: bigint = (savingsConfig.roundUp / BigInt(10 ** 18)) * BigInt(10 ** TokenDecimalMap[token]);
+  const roundUpAmount: bigint = savingsConfig.roundUp;
   console.log('TRANSFER AMOUNT:', transferAmount);
   console.log('ROUNDUP AMOUNT:', roundUpAmount);
   const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpAmount).savingsAmount;
