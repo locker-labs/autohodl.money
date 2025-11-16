@@ -5,7 +5,7 @@ import { formatAmount } from '@/lib/math';
 import Button from '@/components/subcomponents/Button';
 import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
-import { S_USDC_ADDRESS } from '@/lib/constants';
+import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
 
 export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
@@ -20,8 +20,8 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
           type: 'ERC20',
           options: {
             address: S_USDC_ADDRESS,
-            symbol: 'sAAVE',
-            decimals: 18,
+            symbol: 'sUSDC',
+            decimals: TokenDecimalMap[S_USDC_ADDRESS],
           },
         },
       });
