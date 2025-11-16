@@ -121,6 +121,7 @@ export const TokenAddressMap: Record<number, Address> = {
 };
 
 export const TokenDecimalMap: Record<Address, number> = {
+  '0x060c1cBE54a34deCE77f27ca9955427c0e295Fd4': 6, // sUSDC Linea
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff': 6, // USDC Linea
   '0xFEce4462D57bD51A6A552365A011b95f0E16d9B7': 6, // USDC Linea Sepolia
   '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a': 18, // AAVE Sepolia
