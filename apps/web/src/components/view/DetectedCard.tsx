@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import Button from '@/components/subcomponents/Button';
 
 interface DetectedCardProps {
   title: string;
@@ -11,8 +10,6 @@ interface DetectedCardProps {
   children?: ReactNode;
   imageWidth?: number;
   imageHeight?: number;
-  buttonTitle: string;
-  handleButtonClick: () => void;
 }
 
 const DetectedCard: React.FC<DetectedCardProps> = ({
@@ -22,8 +19,6 @@ const DetectedCard: React.FC<DetectedCardProps> = ({
   children,
   imageWidth = 300,
   imageHeight = 200,
-  buttonTitle,
-  handleButtonClick,
 }) => {
   return (
     <div className='flex flex-col items-center gap-6'>
@@ -33,8 +28,6 @@ const DetectedCard: React.FC<DetectedCardProps> = ({
         <p className='text-center md:w-2/3 text-gray-600'>{description}</p>
         {children}
       </div>
-
-      <Button title={buttonTitle} onAction={handleButtonClick} />
     </div>
   );
 };

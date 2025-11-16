@@ -3,9 +3,7 @@ import { linea, sepolia } from '@reown/appkit/networks';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { secrets } from '@/lib/secrets';
 
-// Use sepolia for v0
-export const chain = secrets.env === '' ? linea : sepolia;
-// export const chain = secrets.env === 'production' || secrets.env === 'staging' ? linea : sepolia;
+export const chain = secrets.env === 'production' || secrets.env === 'staging' ? linea : sepolia;
 
 // Get projectId from https://dashboard.reown.com
 export const projectId = secrets.reownProjectId as string;
