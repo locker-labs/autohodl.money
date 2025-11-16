@@ -3,6 +3,8 @@ import SetSavingConfig from '@/components/subcomponents/SetSavingConfig';
 import { SupportedAccounts } from '@/lib/constants';
 import DetectedCard from '@/components/view/DetectedCard';
 import { paths } from '@/lib/paths';
+import Button from '@/components/subcomponents/Button';
+import { ExternalLink } from 'lucide-react';
 
 const EOASetup: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
@@ -21,17 +23,18 @@ const EOASetup: React.FC = () => {
           image='/Gear.png'
           imageWidth={274}
           imageHeight={336}
-          buttonTitle={'Continue without Card'}
-          handleButtonClick={handleButtonClick}
         >
           {/* Link to get a MetaMask Card */}
+          <Button className='text-[16px]' title={'Continue without Card'} onAction={handleButtonClick} />
           <a
             href={paths.GetMetaMaskCard}
             target='_blank'
-            className={`hover:underline decoration-black decoration-1 underline-offset-4
+            className={`flex items-center gap-1
+              hover:underline decoration-black decoration-1 underline-offset-4
                transition-all duration-300`}
           >
-            Get a MetaMask Card
+            <p>Get a card</p>
+            <ExternalLink size={16} />
           </a>
         </DetectedCard>
       )}

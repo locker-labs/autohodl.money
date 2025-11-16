@@ -44,8 +44,8 @@ const RoundupAmountSelector = () => {
 
   return (
     <div className='flex flex-col gap-1'>
-      <label htmlFor={String(roundUpLocal)} className='text-lg flex items-center gap-2'>
-        <span>Round-up Amount</span>
+      <label htmlFor={String(roundUpLocal)} className='text-sm font-medium text-black flex items-center gap-2'>
+        <span>Choose Round-up Amount:</span>
         <span className='text-sm text-gray-500 block'>
           {roundUpLocal !== Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS])) && (
             <LoaderSecondary />
