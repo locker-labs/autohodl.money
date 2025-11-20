@@ -15,7 +15,7 @@ export const AutoHodlAddressMap: Record<number, Address> = {
 };
 
 export const MMCardDelegateAddressMap: Record<number, Address> = {
-  59144: '0xBc9734d9952171283F2B8524b776a5204611456b', // Linea
+  59144: '0xB6848Bc4953870c796032fc860dbc8a14794C5B7', // Linea
   11155111: '0x7c334f35BF2B4a9e55f60CF3287c885598cF9A02', // Sepolia
 };
 
