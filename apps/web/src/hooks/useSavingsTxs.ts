@@ -5,7 +5,7 @@ import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 
 export interface ISavingsTx {
   id: string;
-  timestamp: string;
+  timestamp?: string;
   to: string;
   from: string;
   value: bigint;
@@ -69,7 +69,7 @@ export function useSavingsTxs() {
         setTxs(
           response.transfers.map((tx) => ({
             id: tx.uniqueId,
-            timestamp: tx.metadata.blockTimestamp,
+            timestamp: tx.metadata?.blockTimestamp,
             to: tx.to,
             from: tx.from,
             value: BigInt(tx.value * 10 ** TOKEN_DECIMALS),

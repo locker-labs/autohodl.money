@@ -46,7 +46,9 @@ export function RecentActivity(): React.JSX.Element {
                     </div>
 
                     <div>
-                      <p className='font-normal text-[#0f0f0f] text-base text-right'>{timeAgo(tx.timestamp)}</p>
+                      <p className='font-normal text-[#0f0f0f] text-base text-right'>
+                        {tx?.timestamp ? timeAgo(tx?.timestamp) : null}
+                      </p>
                       <p className='font-normal text-black text-base text-right'>
                         purchase - ${truncateToTwoDecimals(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}
                       </p>
