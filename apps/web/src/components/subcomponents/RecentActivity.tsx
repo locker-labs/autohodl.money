@@ -8,6 +8,7 @@ import { getTransactionLink } from '@/lib/blockExplorer';
 import { TOKEN_DECIMALS } from '@/lib/constants';
 import { truncateToTwoDecimals } from '@/lib/math';
 import { timeAgo } from '@/lib/time';
+import Image from 'next/image';
 
 export function RecentActivity(): React.JSX.Element {
   const { allTxs, loading, fetchNext, hasNext } = useSavingsTxs();
@@ -21,8 +22,26 @@ export function RecentActivity(): React.JSX.Element {
         </div>
 
         {allTxs.length === 0 ? (
-          <div className={'mt-[15px] w-full h-[582px] flex justify-center items-center'}>
-            {loading ? <Loader2 className={'animate-spin'} color={'#78E76E'} /> : <p>No recent transactions</p>}
+          <div className={'mt-[15px] min-h-[380px] w-full h-fit flex justify-center items-center'}>
+            {loading ? (
+              <Loader2 className={'animate-spin'} color={'#78E76E'} />
+            ) : (
+              <div>
+                <Image
+                  className='mx-auto max-w-[128px] max-h-[128px]'
+                  src={'/no-savings.png'}
+                  alt='No recent transactions'
+                  width={128}
+                  height={128}
+                  priority
+                  unoptimized
+                />
+                <p className='mt-3 text-center text-lg font-semibold'>No savings yet!</p>
+                <p className='mt-3 text-center'>
+                  Round up happen when you spend. Make a purchase with your card and start building your balance
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className='mt-[15px] overflow-y-auto max-h-[582px]'>
