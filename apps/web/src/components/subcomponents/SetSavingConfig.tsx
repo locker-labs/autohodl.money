@@ -44,7 +44,7 @@ export default function SetSavingConfig({ account }: Props) {
       info: 'Some info about MetaMask Card',
     },
     {
-      label: hasMetaMaskCard ? 'All USDC transfers from wallet and MetaMask Card' : 'All USDC transfers',
+      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
@@ -190,6 +190,7 @@ export default function SetSavingConfig({ account }: Props) {
                   disabled={opt.disabled}
                   className={`flex flex-col items-center gap-4
                     border rounded-lg px-4 py-4 text-center
+                    max-w-[250px]
               ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
               ${opt.value === mode ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold' : 'border-gray-300'}
               `}
@@ -216,7 +217,7 @@ export default function SetSavingConfig({ account }: Props) {
                       />
                     ) : null}
                   </div>
-                  <div className='flex items-center justify-center gap-2'>
+                  <div className='h-full flex items-center justify-center gap-2'>
                     {opt.label}
                     <Tooltip>
                       <TooltipTrigger>

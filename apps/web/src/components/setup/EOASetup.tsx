@@ -21,8 +21,6 @@ const EOASetup: React.FC = () => {
           description={`Auto HODL works whenever you spend with your MetaMask Card.
              Don’t worry  it only takes a few minutes to get one.`}
           image='/not-found.svg'
-          imageWidth={274}
-          imageHeight={336}
         >
           {/* Link to get a MetaMask Card */}
           <Button className='text-[16px]' title={'Continue without Card'} onAction={handleButtonClick} />
