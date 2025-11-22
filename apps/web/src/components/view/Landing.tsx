@@ -6,9 +6,31 @@ import Link from 'next/link';
 import Button from '@/components/subcomponents/Button';
 import { links, paths } from '@/lib/paths';
 import { ArrowUpRight } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { useRef } from 'react';
+
+const testimonials = [
+  {
+    text: `“AutoHodl has completely changed the way I manage my digital assets. The experience feels effortless, yet powerful. I’ve never felt more confident about my savings growing in the background.”`,
+    author: 'Marvin Arnold',
+    role: 'Blockchain Engineer, locker.money',
+  },
+  {
+    text: `“AutoHodl has completely changed the way I manage my digital assets.”`,
+    author: 'Manmeet Brar',
+    role: 'Blockchain Engineer, locker.money',
+  },
+  {
+    text: `“AutoHodl has completely changed the way I manage my digital assets. The experience feels effortless, yet powerful. I’ve never felt more confident about my savings growing in the background.”`,
+    author: 'Ashu Gupta',
+    role: 'Blockchain Engineer, locker.money',
+  },
+];
 
 export default function LandingPage() {
   const { open } = useAppKit();
+  const plugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
 
   // TODO: fix hero section header layout and remove bottom margin
   // TODO: add responsive design for mobile views
@@ -165,7 +187,7 @@ export default function LandingPage() {
       </section>
 
       {/* Launch Partner MetaMask Card */}
-      <section className='bg-[#f7feec] flex items-center justify-center'>
+      <section className='lg:px-12 bg-[#f7feec] flex items-center justify-center'>
         <div className={'mb-12 lg:mb-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
@@ -189,6 +211,62 @@ export default function LandingPage() {
             <Image src='/metamask-card4x.avif' alt='img' width={800} height={800} />
           </div>
         </div>
+      </section>
+
+      {/* Spendable Yield Tokens */}
+      <section className='lg:px-12 bg-white flex items-center justify-center'>
+        <div className={'mt-12 mb-12 lg:mb-0 lg:mt-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
+          <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
+            {/* <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p> */}
+            <p className='text-[40px] font-medium'>Spendable Yield Tokens</p>
+            <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
+              AutoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them. They work
+              like normal tokens but grow automatically in your wallet without staking, locking, or claiming.
+            </p>
+
+            <Button
+              type={'button'}
+              onAction={() => window.open(paths.LearnMoreSYT, '_blank')}
+              disabled={false}
+              aria-disabled={false}
+              className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
+              title={'Learn more'}
+            >
+              Learn more
+            </Button>
+          </div>
+          <div className='my-8 lg:my-0 transition-transform duration-500 hover:scale-103 lg:size-[800px] flex items-center justify-center max-w-[800px]'>
+            <Image src='/syt.png' alt='img' width={800} height={800} />
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className='py-[48px] px-[24px] lg:px-[48px] bg-[#f7feec] flex flex-col items-center justify-center'>
+        <div className={'mb-[12px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
+          <p className='text-[40px] font-medium mb-[12px] lg:mb-0'>Testimonials</p>
+        </div>
+        {/* Shadcn carousel */}
+        <Carousel
+          plugins={[plugin.current]}
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+          className='mt-4 lg:mt-0 w-full max-w-[1000px]'
+        >
+          <CarouselContent>
+            {testimonials.map((t, index) => (
+              <CarouselItem key={index}>
+                <div className='items-center justify-center p-0 lg:p-6'>
+                  <p className='text-[24px] lg:text-[32px] font-base'>{t.text}</p>
+                  <div className='mt-[24px] lg:mt-[47px]'>
+                    <p className='text-[24px] font-bold'>{t.author}</p>
+                    <p className='text-[20px] font-medium'>{t.role}</p>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </section>
 
       {/* Recognized by */}

@@ -1,5 +1,6 @@
 export const paths = {
   GetMetaMaskCard: 'https://metamask.io/en-GB/card',
+  LearnMoreSYT: 'https://metamask.io/en-GB/card',
   Arbitrum: 'https://arbitrum.io/',
   Base: 'https://www.base.org/',
   MetaMask: 'https://metamask.io/',
