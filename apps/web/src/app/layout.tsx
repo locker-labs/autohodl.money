@@ -25,6 +25,9 @@ export default async function RootLayout({
 
   return (
     <html lang='en'>
+      <head>
+        <meta name="apple-mobile-web-app-title" content="AutoHODL" />
+      </head>
       <body className={`${albertSans.variable} font-sans antialiased`}>
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
         <Toaster position='top-center' />
