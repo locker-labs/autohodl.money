@@ -133,7 +133,7 @@ export default function LandingPage() {
           </p>
           <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
             AutoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
-            passive yield.
+           yield.
           </p>
         </div>
 
@@ -193,7 +193,7 @@ export default function LandingPage() {
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
-              Save & earn yield on your MetaMask Card transfers. Auto HODL was the first place winner in the MetaMask Card Hackathon.
+              Save & earn yield on your MetaMask Card transfers. AutoHODL ranked #1 by MetaMask in Smart Agents & Liquidity Automation.
             </p>
 
             <Button
@@ -292,7 +292,7 @@ export default function LandingPage() {
               <span className='text-[#78E76E] font-bold'>Save forever.</span>
             </h1>
             <h4 className='mt-4 lg:mt-0 mb-[40px] text-[24px]'>
-              Join thousands of users who are building wealth with every purchase.
+              Join thousands of users who are building wealth with every time you spend.
             </h4>
             <Button
               type={'button'}
