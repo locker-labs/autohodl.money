@@ -12,20 +12,18 @@ const MetamaskCardSetup: React.FC = () => {
   };
 
   // TODO: calculate these values based on user's transaction history
-  const pastTxns = 23;
-  const possibleSavings = 100;
+  // description={`Based on your history, you could have saved $${possibleSavings} from ${pastTxns} purchases.`}
 
   return (
     <div className='flex flex-col items-center gap-8'>
       {currentStep === 1 && (
-        <div>
-          <DetectedCard
-            title='MetaMask Card Detected'
-            description={`Based on your history, you could have saved $${possibleSavings} from ${pastTxns} purchases.`}
-            image='/SavingGrowth.png'
-          />
-          <Button className='text-[16px]' title={'Continue without Card'} onAction={nextStep} />
-        </div>
+        <DetectedCard
+          title='MetaMask Card Detected'
+          description={`Continue to round up any time you spend USDC from your crypto card`}
+          image='/SavingGrowth.png'
+        >
+          <Button className='text-[16px]' title={'Continue with Card'} onAction={nextStep} />
+        </DetectedCard>
       )}
       {currentStep === 2 && <SetSavingConfig account={SupportedAccounts.MetaMask} />}
     </div>
