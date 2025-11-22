@@ -32,8 +32,8 @@ export default function LandingPage() {
         </Button>
       </div>
 
-      <section className='px-[24px] bg-[#f7feec] h-screen flex flex-col items-center lg:justify-center'>
-        <div className={'h-[120px] py-4 max-w-[1440px] w-full hidden lg:flex justify-between items-end'}>
+      <section className='px-[24px] lg:px-[96px] bg-[#f7feec] h-screen flex flex-col items-center lg:justify-center'>
+        <div className={'h-[120px] py-4 max-w-[1080px] w-full hidden lg:flex justify-between items-end'}>
           <Link href='/'>
             <Image
               className='w-[150px] lg:w-[200px]'
@@ -47,7 +47,7 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile */}
-        <div className='lg:hidden w-full max-w-[1440px] flex flex-col items-center justify-center gap-[60px]'>
+        <div className='lg:hidden w-full max-w-[1080px] flex flex-col items-center justify-center gap-[60px]'>
           <div className='mt-[80px]'>
             <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
@@ -66,19 +66,13 @@ export default function LandingPage() {
               </Button>
             </div>
           </div>
-          <div className='w-fit flex items-center justify-center'>
-            <img
-              className='lg:max-w-[480px] aspect-auto'
-              src={'/hero.landing.png'}
-              alt='hero'
-              width={600}
-              height={400}
-            />
+          <div className='max-w-[480px] w-fit flex items-center justify-center'>
+            <Image className='aspect-auto' src={'/hero.landing.png'} alt='hero' width={600} height={400} />
           </div>
         </div>
 
         {/* Desktop */}
-        <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1440px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
+        <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1080px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
           <div>
             <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[700px]'>
               Saves your spare change.
@@ -100,13 +94,9 @@ export default function LandingPage() {
             </Button>
           </div>
           <div className='w-full flex items-center justify-end'>
-            <Image
-              className='lg:max-w-[480px] aspect-auto'
-              src={'/hero.landing.png'}
-              alt='Welcome Image'
-              width={600}
-              height={400}
-            />
+            <div className='lg:max-w-[480px] '>
+              <Image className='aspect-auto' src={'/hero.landing.png'} alt='Welcome Image' width={600} height={400} />
+            </div>
           </div>
         </div>
         <div className='w-full h-[120px]' />
@@ -115,7 +105,7 @@ export default function LandingPage() {
       {/* On-chain Savings Simplified */}
       {/* mobile */}
       <section className='lg:hidden p-[28px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
-        <div className={'mb-[40px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+        <div className={'mb-[40px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
@@ -125,7 +115,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className='mb-4 max-w-[1440px] grid gap-[32px]'>
+        <div className='mb-4 max-w-[1080px] grid gap-[32px]'>
           <BorderCard
             imgSrc='/coins.png'
             title='Spend normally'
@@ -145,7 +135,7 @@ export default function LandingPage() {
       </section>
       {/* Desktop */}
       <section className='hidden p-[48px] bg-[#ffffff] lg:flex flex-col items-center justify-center'>
-        <div className={'mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+        <div className={'mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
@@ -155,7 +145,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className='max-w-[1440px] grid grid-cols-3 gap-[32px]'>
+        <div className='max-w-[1080px] grid grid-cols-3 gap-[32px]'>
           <BorderCard
             imgSrc='/coins.png'
             title='Spend normally'
@@ -175,9 +165,9 @@ export default function LandingPage() {
       </section>
 
       {/* Launch Partner MetaMask Card */}
-      <section className='px-[24px] bg-[#f7feec] flex items-center justify-center'>
-        <div className={'mb-12 lg:mb-0 max-w-[1440px] w-full grid lg:grid-cols-2 gap-[32px]'}>
-          <div className='flex flex-col items-start justify-center'>
+      <section className='bg-[#f7feec] flex items-center justify-center'>
+        <div className={'mb-12 lg:mb-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
+          <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
@@ -195,19 +185,19 @@ export default function LandingPage() {
               Start now
             </Button>
           </div>
-          <div className='my-8 lg:my-0 transition-transform duration-500 hover:rotate-[-8deg] lg:size-[800px] flex items-center justify-center'>
-            <Image src='/mmcards.png' alt='img' width={800} height={800} />
+          <div className='my-8 lg:my-0 transition-transform duration-500 hover:rotate-[13deg] lg:size-[800px] flex items-center justify-center'>
+            <Image src='/metamask-card4x.avif' alt='img' width={800} height={800} />
           </div>
         </div>
       </section>
 
       {/* Recognized by */}
       <section className='p-[48px] bg-[#ffffff] flex flex-col items-center justify-center'>
-        <div className={'mb-[40px] lg:mb-[82px] max-w-[1440px] w-full flex flex-col justify-center items-center'}>
+        <div className={'mb-[40px] lg:mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
           <p className='text-[40px] font-medium'>Recognized by</p>
         </div>
 
-        <div className='lg:mb-0 mb-4 max-w-[1440px] grid grid-cols-2 gap-[32px]'>
+        <div className='lg:mb-0 mb-4 max-w-[1080px] grid grid-cols-2 gap-[32px]'>
           <BorderCard2 href={paths.MetaMask} imgSrc='/MetaMask-icon-fox-with-margins.svg' />
           <BorderCard2 href={paths.Circle} imgSrc='/circle-icon.svg' />
           <BorderCard2 href={paths.Arbitrum} imgSrc='/0923_Arbitrum_Logos_Logomark_RGB.svg' />
@@ -217,7 +207,7 @@ export default function LandingPage() {
 
       {/* Setup once, Save forever */}
       <section className='px-[24px] bg-[#f7feec] lg:h-[420px] flex flex-col items-center justify-center'>
-        <div className='w-full max-w-[1440px] flex items-center justify-between gap-[60px]'>
+        <div className='w-full max-w-[1080px] flex items-center justify-between gap-[60px]'>
           <div className='mt-8 lg:mt-0 mb-12 lg:mb-0'>
             <h1 className='text-[42px] font-medium max-w-[600px]'>
               Setup once. <br className='sm:hidden' />
@@ -243,7 +233,7 @@ export default function LandingPage() {
       </section>
       <hr className='bg-[#D0D0D0] h-[2px] opacity-70' />
       <footer className='px-[24px] bg-[#f7feec] w-full flex items-center justify-center py-[40px]'>
-        <div className='max-w-[1440px] w-full flex items-start lg:items-center justify-between'>
+        <div className='max-w-[1080px] w-full flex items-start lg:items-center justify-between'>
           <button
             type='button'
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -285,8 +275,8 @@ function BorderCard({
     <div
       className={`border border-[#78E76E] rounded-[8px] p-[16px] flex flex-col items-center justify-center ${className}`}
     >
-      <div className='transition-transform duration-500 hover:scale-105 w-[300px] aspect-auto p-4 flex items-center justify-center'>
-        <div className='h-[300px] aspect-auto p-4 flex items-center justify-center'>
+      <div className='transition-transform duration-500 hover:scale-105 w-[200px] aspect-auto p-4 flex items-center justify-center'>
+        <div className='h-[200px] aspect-auto p-4 flex items-center justify-center'>
           <Image className='aspect-auto' src={imgSrc} alt='img' width={287} height={287} />
         </div>
       </div>
