@@ -16,7 +16,7 @@ const yieldOptions = [
     info: 'The change you save will be deposited to Aave and automatically earn yield',
   },
   {
-    label: 'Put into savings',
+    label: 'Idle savings',
     value: false,
     disabled: false,
     imgSrc: '/save.png',
