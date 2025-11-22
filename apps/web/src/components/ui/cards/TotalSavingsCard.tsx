@@ -50,11 +50,11 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
                 <p className='font-light text-sm'>{ticker}</p>
               </div>
             )}
-            <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Total Savings</p>
+            <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Available Savings</p>
           </div>
           <div>
             <Button title={'Add to Wallet'} onAction={handleAddToken}>
-              Add to Wallet
+              Import to Wallet
             </Button>
           </div>
         </div>
