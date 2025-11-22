@@ -81,7 +81,7 @@ const YieldSwitch = () => {
               `}
             key={String(opt.value)}
           >
-            <div className='max-h-[64px] min-h-[64px] h-[64px] flex items-center justify-center gap-2'>
+            <div className='max-w-[64px] max-h-[64px] flex items-center justify-center gap-2'>
               <Image
                 className='h-[64px] w-auto aspect-auto'
                 src={opt.imgSrc}

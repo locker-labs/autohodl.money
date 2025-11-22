@@ -9,6 +9,8 @@ import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
 
 export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
+  const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem('sUSDCAdded') === 'true';
+
   async function handleAddToken() {
     const client = await getWalletClient(config);
     if (!client) return;
@@ -26,7 +28,12 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
         },
       });
 
-      toastCustom(wasAdded ? 'sUSDC added!' : 'User rejected.');
+      if (wasAdded) {
+        localStorage.setItem('sUSDCAdded', 'true'); // Set the flag in localStorage
+        toastCustom('sUSDC added!');
+      } else {
+        toastCustom('User rejected.');
+      }
     } catch (err) {
       console.error(err);
     }
@@ -50,12 +57,14 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
                 <p className='font-light text-sm'>{ticker}</p>
               </div>
             )}
-            <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Total Savings</p>
+            <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Savings Balance</p>
           </div>
           <div>
-            <Button title={'Add to Wallet'} onAction={handleAddToken}>
-              Add to Wallet
-            </Button>
+            {!isTokenAdded && (
+              <Button title={'Add to Wallet'} onAction={handleAddToken}>
+                Add to Wallet
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

@@ -28,11 +28,11 @@ export function RecentActivity(): React.JSX.Element {
           <div className='mt-[15px] overflow-y-auto max-h-[582px]'>
             {allTxs.map((tx) => (
               <Link key={tx.id} href={getTransactionLink(tx.txHash)} target='_blank' className='no-underline'>
-                <div className='group border border-black/50 flex flex-col gap-5 mb-3 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'>
+                <div className='group border border-gray-300 flex flex-col gap-5 mb-3 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'>
                   <div className='flex items-center justify-between px-3 py-3.5'>
                     <div className='flex items-center gap-[9px]'>
                       <CircleArrowUp
-                        className='group-hover:rotate-45 transition-transform duration-300 min-size-fit'
+                        className='group-hover:rotate-45 transition-transform duration-300 ease-in min-size-fit'
                         strokeWidth={1.5}
                         size={38}
                         color='#1B8111'

@@ -115,7 +115,7 @@ const SavingsModeSelector = () => {
         ))}
       </div>
       {hasMetaMaskCard ? null : (
-        <div className='text-sm text-gray-700 max-w-md'>
+        <div className='text-sm text-gray-700'>
           Since you don't have a metamask card, round-ups will be enabled only on your USDC transfers.
         </div>
       )}
