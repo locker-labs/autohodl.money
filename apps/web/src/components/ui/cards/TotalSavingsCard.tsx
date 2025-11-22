@@ -1,4 +1,4 @@
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Info } from 'lucide-react';
 import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
@@ -7,6 +7,7 @@ import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
 import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
   const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem('sUSDCAdded') === 'true';
@@ -57,7 +58,15 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
                 <p className='font-light text-sm'>{ticker}</p>
               </div>
             )}
-            <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Savings Balance</p>
+            <div className='mt-2 flex items-center justify-start gap-2'>
+              <p className='text-black text-lg text-left sm:text-center md:text-left'>Savings Balance</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={16} className='h-4 w-4' />
+                </TooltipTrigger>
+                <TooltipContent>{'Some info about savings balance'}</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
           <div>
             {!isTokenAdded && (
