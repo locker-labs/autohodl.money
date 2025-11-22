@@ -73,7 +73,8 @@ export default function LandingPage() {
           <div className='mt-[80px]'>
             <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
-              Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop, and more ways to HODL.
+              Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
+              and more ways to HODL.
               <br />
               Every time you spend with a crypto card
             </p>
@@ -98,11 +99,10 @@ export default function LandingPage() {
         {/* Desktop */}
         <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1080px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
           <div>
-            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[700px]'>
-              Simple savings and investments.
-            </h1>
+            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[700px]'>Simple savings and investments.</h1>
             <h4 className='mt-[16px] text-[#4D4A4A] text-[20px] max-w-[500px]'>
-              Earn yield on your spare <span className='line-through'>change</span> crypto, invest while you spend, and more ways to HODL.
+              Earn yield on your spare <span className='line-through'>change</span> crypto, invest while you spend, and
+              more ways to HODL.
             </h4>
             <Button
               type={'button'}
@@ -133,7 +133,7 @@ export default function LandingPage() {
           </p>
           <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
             AutoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
-           yield.
+            yield.
           </p>
         </div>
 
@@ -193,7 +193,8 @@ export default function LandingPage() {
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
-              Save & earn yield on your MetaMask Card transfers. AutoHODL ranked #1 by MetaMask in Smart Agents & Liquidity Automation.
+              Save & earn yield on your MetaMask Card transfers. AutoHODL ranked #1 by MetaMask in Smart Agents &
+              Liquidity Automation.
             </p>
 
             <Button

@@ -71,7 +71,7 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
           <div>
             {!isTokenAdded && (
               <Button title={'Add to Wallet'} onAction={handleAddToken}>
-                Add to Wallet
+                Import to Wallet
               </Button>
             )}
           </div>

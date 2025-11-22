@@ -17,13 +17,21 @@ const EOASetup: React.FC = () => {
     <div className='flex flex-col items-center gap-8'>
       {currentStep === 1 && (
         <DetectedCard
+<<<<<<< HEAD
           title='Oh no, we didn’t find a MetaMask Card!'
           description={`Auto HODL works whenever you spend with your MetaMask Card.
              Don’t worry  it only takes a few minutes to get one.`}
           image='/not-found.svg'
+=======
+          title='Oh no, we didn’t find a crypto Card!'
+          description={`Continue without a card to round up any time you spend USDC from your wallet.`}
+          image='/Gear.png'
+          imageWidth={274}
+          imageHeight={336}
+>>>>>>> f5a70d3 (feat: SEO and additional copy)
         >
           {/* Link to get a MetaMask Card */}
-          <Button className='text-[16px]' title={'Continue without Card'} onAction={handleButtonClick} />
+          <Button className='text-[24px]' title={'Continue'} onAction={handleButtonClick} />
           <a
             href={paths.GetMetaMaskCard}
             target='_blank'

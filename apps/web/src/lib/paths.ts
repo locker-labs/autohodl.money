@@ -1,6 +1,6 @@
 export const paths = {
-  GetMetaMaskCard: 'https://metamask.io/en-GB/card',
-  LearnMoreSYT: 'https://metamask.io/en-GB/card',
+  LearnMoreSYT: 'https://metamask.io/card',
+  GetMetaMaskCard: 'https://metamask.io/card',
   Arbitrum: 'https://devfolio.co/projects/auto-hodl-e5dd',
   Base: 'https://devfolio.co/projects/auto-hodl-e5dd',
   MetaMask: 'https://x.com/MetaMaskDev/status/1950918298490527834',
