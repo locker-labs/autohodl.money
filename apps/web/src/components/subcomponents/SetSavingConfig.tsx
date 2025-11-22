@@ -61,7 +61,7 @@ export default function SetSavingConfig({ account }: Props) {
       info: 'The change you save will be deposited to Aave and automatically earn yield',
     },
     {
-      label: 'Put into savings',
+      label: 'Idle savings',
       value: false,
       disabled: false,
       imgSrc: '/save.png',
@@ -195,23 +195,23 @@ export default function SetSavingConfig({ account }: Props) {
               `}
                   key={String(opt.value)}
                 >
-                  <div className='max-h-[100px] min-h-[100px] h-[100px] flex items-center justify-center gap-2'>
+                  <div className='max-w-[64px] max-h-[64px] h-[64px] flex items-center justify-center gap-2'>
                     <Image
-                      className='h-[100px] w-auto aspect-auto'
+                      className='h-[64px] w-auto aspect-auto'
                       src={opt.imgSrc}
                       alt={'img'}
-                      width={100}
-                      height={100}
+                      width={64}
+                      height={64}
                       fetchPriority='high'
                     />
                     {opt.imgSrc2 ? <p>+</p> : null}
                     {opt.imgSrc2 ? (
                       <Image
-                        className='h-[100px] w-auto aspect-auto'
+                        className='h-[64px] w-auto aspect-auto'
                         src={opt.imgSrc2}
                         alt={'img'}
-                        width={100}
-                        height={100}
+                        width={64}
+                        height={64}
                         fetchPriority='high'
                       />
                     ) : null}
@@ -258,13 +258,13 @@ export default function SetSavingConfig({ account }: Props) {
               `}
                   key={String(opt.value)}
                 >
-                  <div className='max-h-[100px] min-h-[100px] h-[100px] flex items-center justify-center gap-2'>
+                  <div className='max-h-[64px] max-w-[64px] h-[64px] flex items-center justify-center gap-2'>
                     <Image
-                      className='h-[100px] w-auto aspect-auto'
+                      className='h-[64px] w-auto aspect-auto'
                       src={opt.imgSrc}
                       alt={'img'}
-                      width={100}
-                      height={100}
+                      width={64}
+                      height={64}
                       fetchPriority='high'
                     />
                   </div>

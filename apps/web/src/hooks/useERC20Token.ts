@@ -132,7 +132,7 @@ export function useERC20BalanceOf(params: {
     args: [params.address as Address],
     query: {
       enabled: params.enabled ?? !!params.address,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchInterval: 15000,
       staleTime: 0,

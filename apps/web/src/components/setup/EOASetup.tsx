@@ -20,7 +20,7 @@ const EOASetup: React.FC = () => {
           title='Oh no, we didn’t find a MetaMask Card!'
           description={`Auto HODL works whenever you spend with your MetaMask Card.
              Don’t worry  it only takes a few minutes to get one.`}
-          image='/Gear.png'
+          image='/not-found.svg'
           imageWidth={274}
           imageHeight={336}
         >

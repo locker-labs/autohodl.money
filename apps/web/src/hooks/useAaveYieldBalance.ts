@@ -43,7 +43,7 @@ export const useAaveYieldBalance = () => {
     chainId,
     query: {
       enabled: isConnected && !!userAddress,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchInterval: 15000,
     },
