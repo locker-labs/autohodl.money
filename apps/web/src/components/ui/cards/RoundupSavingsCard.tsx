@@ -17,10 +17,10 @@ export function RoundupSavingsCard({ loading, value }: { loading: boolean; value
               <div className='leading-none font-bold text-[#000000] text-2xl text-left sm:text-center md:text-left'>
                 <p>{formatAmount(value)}</p>
               </div>
-              <p className='font-light text-sm'>USDC</p>
+              <p className='font-light text-sm'>USD</p>
             </div>
           )}
-          <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Spare Change Saved</p>
+          <p className='mt-2 text-black text-lg text-left sm:text-center md:text-left'>Lifetime Savings</p>
         </div>
       </CardContent>
     </Card>
