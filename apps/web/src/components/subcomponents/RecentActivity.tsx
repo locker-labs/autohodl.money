@@ -38,7 +38,7 @@ export function RecentActivity(): React.JSX.Element {
                 />
                 <p className='mt-3 text-center text-lg font-semibold'>No savings yet!</p>
                 <p className='mt-3 text-center'>
-                  Round up happen when you spend. Make a purchase with your card and start building your balance
+                  Round ups happen when you spend. Make a purchase with your card and start building your balance.
                 </p>
               </div>
             )}
