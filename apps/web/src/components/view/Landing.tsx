@@ -293,7 +293,7 @@ export default function LandingPage() {
               <span className='text-[#78E76E] font-bold'>Save forever.</span>
             </h1>
             <h4 className='mt-4 lg:mt-0 mb-[40px] text-[24px]'>
-              Join thousands of users who are building wealth with every time you spend.
+              Join thousands of users who are building wealth every time you spend.
             </h4>
             <Button
               type={'button'}
