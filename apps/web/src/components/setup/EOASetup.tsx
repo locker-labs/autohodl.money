@@ -18,7 +18,7 @@ const EOASetup: React.FC = () => {
       {currentStep === 1 && (
         <DetectedCard
           title='MetaMask Card Not Found!'
-          description={`Don't worry you can still start saving without a card. `}
+          description={`Don't worry, you can still start saving without a card.`}
           image='/not-found.svg'
         >
           {/* Link to get a MetaMask Card */}
