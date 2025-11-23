@@ -75,8 +75,6 @@ export default function LandingPage() {
             <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
               Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
               and more ways to HODL.
-              <br />
-              Every time you spend with a crypto card
             </p>
             <div className='flex justify-center'>
               <Button
