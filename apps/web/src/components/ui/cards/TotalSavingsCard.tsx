@@ -59,12 +59,16 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
               </div>
             )}
             <div className='mt-2 flex items-center justify-start gap-2'>
-              <p className='text-black text-lg text-left sm:text-center md:text-left'>Savings Balance</p>
+              <p className='text-black text-lg text-left sm:text-center md:text-left'>Current Balance</p>
               <Tooltip>
                 <TooltipTrigger>
                   <Info size={16} className='h-4 w-4' />
                 </TooltipTrigger>
-                <TooltipContent>{'Some info about savings balance'}</TooltipContent>
+                <TooltipContent>
+                  {
+                    'You automatically earn yield from your sUSDC balance. When you send sUSDC to another wallet, it converts into USDC.'
+                  }
+                </TooltipContent>
               </Tooltip>
             </div>
           </div>

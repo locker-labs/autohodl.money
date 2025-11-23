@@ -51,7 +51,7 @@ export function APYCard({
                 <TooltipTrigger>
                   <Info size={16} className='h-4 w-4' />
                 </TooltipTrigger>
-                <TooltipContent>{'Some info about Current APY'}</TooltipContent>
+                <TooltipContent>{'Yield is based on the current APY of the Aave pool.'}</TooltipContent>
               </Tooltip>
             </div>
           )}

@@ -17,8 +17,8 @@ const EOASetup: React.FC = () => {
     <div className='flex flex-col items-center gap-8'>
       {currentStep === 1 && (
         <DetectedCard
-          title='Oh no, we didn’t find a crypto Ccrd!'
-          description={`Continue without a card to round up any time you spend USDC from your wallet.`}
+          title='MetaMask Card Not Found!'
+          description={`Don't worry you can still start saving without a card. `}
           image='/not-found.svg'
         >
           {/* Link to get a MetaMask Card */}

@@ -9,7 +9,7 @@ export const paths = {
 
 export const links = {
   telegram: 'https://t.me/c/2085062249/494', // potluck
-  twitter: 'https://x.com/locker_money',
+  twitter: 'https://x.com/AutoHODL',
   github: 'https://github.com/locker-labs/autohodl.money',
   contact: 'mailto:hello@autohodl.money',
 };
