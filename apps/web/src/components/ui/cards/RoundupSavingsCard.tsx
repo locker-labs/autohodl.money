@@ -27,7 +27,7 @@ export function RoundupSavingsCard({ loading, value }: { loading: boolean; value
               <TooltipTrigger>
                 <Info size={16} className='h-4 w-4' />
               </TooltipTrigger>
-              <TooltipContent>{'Some info about Lifetime Savings'}</TooltipContent>
+              <TooltipContent>{'Lifetime spare change saved. Does not include yield.'}</TooltipContent>
             </Tooltip>
           </div>
         </div>

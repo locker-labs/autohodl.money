@@ -41,14 +41,14 @@ export default function SetSavingConfig({ account }: Props) {
       value: SavingsMode.MetamaskCard,
       disabled: !hasMetaMaskCard,
       imgSrc: '/mmc.webp',
-      info: 'Some info about MetaMask Card',
+      info: 'Only save your spare change when you use your MetaMask Card.',
     },
     {
       label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
-      info: `Some info about USDC transfers`,
+      info: `Save your spare change, anytime you transfer USDC, regardless of its with the MetaMask Card or not.`,
       imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
     },
   ];
