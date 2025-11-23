@@ -23,14 +23,14 @@ const SavingsModeSelector = () => {
       value: SavingsMode.MetamaskCard,
       disabled: !hasMetaMaskCard,
       imgSrc: '/mmc.webp',
-      info: 'Some info about MetaMask Card',
+      info: 'Only save your spare change when you use your MetaMask Card.',
     },
     {
       label: hasMetaMaskCard ? 'All USDC transfers from wallet and MetaMask Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
-      info: `Some info about USDC transfers`,
+      info: `Save your spare change, anytime you transfer USDC, regardless of whether it's with the MetaMask Card.`,
       imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
     },
   ];
@@ -115,7 +115,7 @@ const SavingsModeSelector = () => {
         ))}
       </div>
       {hasMetaMaskCard ? null : (
-        <div className='text-sm text-gray-700 max-w-md'>
+        <div className='text-sm text-gray-700'>
           Since you don't have a metamask card, round-ups will be enabled only on your USDC transfers.
         </div>
       )}

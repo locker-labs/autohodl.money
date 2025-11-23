@@ -1,6 +1,6 @@
 import type React from 'react';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
-import { Controls } from '@/components/subcomponents/Controls';
+import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
 import { RecentActivity } from '@/components/subcomponents/RecentActivity';
 import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
@@ -14,9 +14,9 @@ const Dashboard = (): React.JSX.Element => {
   if (isMobile) {
     return (
       <Tabs className='w-full' defaultValue='dashboard'>
-        <TabsList className='w-full h-10 sticky top-[65px]'>
+        <TabsList className='pt-[2px] z-10 w-full h-11 sticky top-[65px] rounded-none'>
           <TabsTrigger value='dashboard'>Dashboard</TabsTrigger>
-          <TabsTrigger value='settings'>Settings</TabsTrigger>
+          <TabsTrigger value='controls'>Controls</TabsTrigger>
         </TabsList>
         <TabsContent value='dashboard' className='px-4 pt-3 pb-5'>
           <div className='w-full grid gap-5'>
@@ -35,13 +35,13 @@ const Dashboard = (): React.JSX.Element => {
             </div>
           </div>
         </TabsContent>
-        <TabsContent value='settings' className='px-4 pt-3 pb-5'>
+        <TabsContent value='controls' className='px-4 pt-3 pb-5'>
           <div className='w-full grid gap-5'>
             {/* Right */}
             <div className='w-full gap-5 grid lg:grid-cols-12'>
               {/* 5 - Controls Card */}
               <div className='w-full lg:col-span-6'>
-                <Controls />
+                <ControlsMobile />
               </div>
             </div>
           </div>

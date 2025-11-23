@@ -1,6 +1,7 @@
-import { TrendingUp } from 'lucide-react';
+import { Info, TrendingUp } from 'lucide-react';
 import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function APYCard({
   loading,
@@ -44,7 +45,15 @@ export function APYCard({
               </p>
             </div>
           ) : (
-            <p className='mt-2 text-lg text-left sm:text-center md:text-left text-black'>Current APY</p>
+            <div className='mt-2 flex items-center justify-start gap-2'>
+              <p className='text-black text-lg text-left sm:text-center md:text-left'>Current APY</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={16} className='h-4 w-4' />
+                </TooltipTrigger>
+                <TooltipContent>{'Yield is based on the current APY of the Aave pool.'}</TooltipContent>
+              </Tooltip>
+            </div>
           )}
         </div>
       </CardContent>

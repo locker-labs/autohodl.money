@@ -41,14 +41,14 @@ export default function SetSavingConfig({ account }: Props) {
       value: SavingsMode.MetamaskCard,
       disabled: !hasMetaMaskCard,
       imgSrc: '/mmc.webp',
-      info: 'Some info about MetaMask Card',
+      info: 'Only save your spare change when you use your MetaMask Card.',
     },
     {
-      label: hasMetaMaskCard ? 'All USDC transfers from wallet and MetaMask Card' : 'All USDC transfers',
+      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
-      info: `Some info about USDC transfers`,
+      info: `Save your spare change, anytime you transfer USDC, regardless of its with the MetaMask Card or not.`,
       imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
     },
   ];
@@ -61,7 +61,7 @@ export default function SetSavingConfig({ account }: Props) {
       info: 'The change you save will be deposited to Aave and automatically earn yield',
     },
     {
-      label: 'Put into savings',
+      label: 'Idle savings',
       value: false,
       disabled: false,
       imgSrc: '/save.png',
@@ -190,33 +190,34 @@ export default function SetSavingConfig({ account }: Props) {
                   disabled={opt.disabled}
                   className={`flex flex-col items-center gap-4
                     border rounded-lg px-4 py-4 text-center
+                    max-w-[250px]
               ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
               ${opt.value === mode ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold' : 'border-gray-300'}
               `}
                   key={String(opt.value)}
                 >
-                  <div className='max-h-[100px] min-h-[100px] h-[100px] flex items-center justify-center gap-2'>
+                  <div className='max-w-[64px] max-h-[64px] h-[64px] flex items-center justify-center gap-2'>
                     <Image
-                      className='h-[100px] w-auto aspect-auto'
+                      className='h-[64px] w-auto aspect-auto'
                       src={opt.imgSrc}
                       alt={'img'}
-                      width={100}
-                      height={100}
+                      width={64}
+                      height={64}
                       fetchPriority='high'
                     />
                     {opt.imgSrc2 ? <p>+</p> : null}
                     {opt.imgSrc2 ? (
                       <Image
-                        className='h-[100px] w-auto aspect-auto'
+                        className='h-[64px] w-auto aspect-auto'
                         src={opt.imgSrc2}
                         alt={'img'}
-                        width={100}
-                        height={100}
+                        width={64}
+                        height={64}
                         fetchPriority='high'
                       />
                     ) : null}
                   </div>
-                  <div className='flex items-center justify-center gap-2'>
+                  <div className='h-full flex items-center justify-center gap-2'>
                     {opt.label}
                     <Tooltip>
                       <TooltipTrigger>
@@ -258,13 +259,13 @@ export default function SetSavingConfig({ account }: Props) {
               `}
                   key={String(opt.value)}
                 >
-                  <div className='max-h-[100px] min-h-[100px] h-[100px] flex items-center justify-center gap-2'>
+                  <div className='max-h-[64px] max-w-[64px] h-[64px] flex items-center justify-center gap-2'>
                     <Image
-                      className='h-[100px] w-auto aspect-auto'
+                      className='h-[64px] w-auto aspect-auto'
                       src={opt.imgSrc}
                       alt={'img'}
-                      width={100}
-                      height={100}
+                      width={64}
+                      height={64}
                       fetchPriority='high'
                     />
                   </div>

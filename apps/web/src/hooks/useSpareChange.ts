@@ -19,7 +19,7 @@ export function useSpareChange() {
         maxCount: 100,
       }).then((res) => res.transfers),
     enabled: isConnected && !!fromAddress,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchInterval: 15000,
   });

@@ -81,7 +81,7 @@ export function useAaveAPY() {
     queryKey: ['aave-apy', chain.id],
     queryFn: fetchAaveAPY,
     enabled: true,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchInterval: 15000, // 15 seconds
   });
