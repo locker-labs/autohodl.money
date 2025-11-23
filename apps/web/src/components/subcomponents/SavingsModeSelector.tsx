@@ -30,7 +30,7 @@ const SavingsModeSelector = () => {
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
-      info: `Save your spare change, anytime you transfer USDC, regardless of its with the MetaMask Card or not.`,
+      info: `Save your spare change, anytime you transfer USDC, regardless of whether it's with the MetaMask Card or not.`,
       imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
     },
   ];
