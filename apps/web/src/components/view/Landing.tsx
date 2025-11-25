@@ -230,6 +230,7 @@ export default function LandingPage() {
               aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Learn more'}
+              btnStyle='secondary'
             >
               Learn more
             </Button>
