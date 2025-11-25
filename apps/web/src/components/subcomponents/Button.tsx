@@ -13,6 +13,7 @@ type Props = {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
+  btnStyle?: 'primary' | 'secondary';
 };
 
 export default function Button({
@@ -23,7 +24,16 @@ export default function Button({
   disabled = false,
   loading = false,
   className = '',
+  btnStyle = 'primary',
 }: Props) {
+  let classes = '';
+
+  if (btnStyle === 'primary') {
+    classes = 'bg-[#78E76E] active:bg-gray-200/10';
+  } else if (btnStyle === 'secondary') {
+    classes = 'border border-[#78E76E] active:bg-gray-200/10';
+  }
+
   return (
     <button
       type={type}
@@ -36,7 +46,7 @@ export default function Button({
         'cursor-pointer disabled:cursor-not-allowed',
         'inline-flex items-center justify-center gap-2 rounded-[12px]',
         'px-4 py-2 text-sm font-medium',
-        'bg-[#78E76E] active:bg-gray-200/10',
+        classes,
         'disabled:bg-gray-400/50',
         // 'hover:border-[#78E76E] hover:border-2 hover:bg-white',
         'text-black',

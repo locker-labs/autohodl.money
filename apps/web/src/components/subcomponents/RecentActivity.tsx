@@ -81,7 +81,9 @@ export function RecentActivity(): React.JSX.Element {
               <button
                 type='button'
                 title='Load more'
-                onClick={fetchNext}
+                onClick={() => {
+                  fetchNext();
+                }}
                 className='w-full py-2 px-2 flex items-center justify-center border border-black/50 gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'
               >
                 {loading ? (
