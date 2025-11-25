@@ -1,6 +1,7 @@
 import type React from 'react';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
 import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
+import { Footer } from '@/components/subcomponents/Footer';
 import { RecentActivity } from '@/components/subcomponents/RecentActivity';
 import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
@@ -52,14 +53,12 @@ const Dashboard = (): React.JSX.Element => {
 
   // Desktop View
   return (
-    <div className=' max-w-[1080px] w-full px-4 py-5 lg:px-0 grid gap-5'>
-      {/* Left side */}
+    <div className=' max-w-[1080px] w-full px-4 py-5 lg:py-0 grid gap-5'>
       <div className=''>
         {/* 1 - 2 - 3 */}
         <SavingsInfoCards />
       </div>
 
-      {/* Right */}
       <div className='w-full gap-5 grid lg:grid-cols-12'>
         {/* 4 - Recent Transactions Card */}
         <div className='w-full lg:col-span-6'>
