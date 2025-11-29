@@ -11,9 +11,9 @@ contract SetupUsdcSYT is Script {
     uint256 pk = vm.envUint("PRIVATE_KEY");
     address public lockerRouter = vm.envAddress("LOCKER_ROUTER");
     address public tokenAddress = vm.envAddress("TOKEN_ADDRESS");
-    string public name = "Spendable Yield Token: AAVE"; // Update for each token,
-    string public symbol = "sAAVE"; // Update for each token
-    uint8 public decimals = 18; // Update for each token
+    string public name = "Spendable Yield Token: USDC"; // Update for each token,
+    string public symbol = "sUSDC"; // Update for each token
+    uint8 public decimals = 6; // Update for each token
 
     function run() public {
         vm.startBroadcast(pk);

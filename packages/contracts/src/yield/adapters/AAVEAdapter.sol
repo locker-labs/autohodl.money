@@ -13,6 +13,11 @@ contract AAVEAdapter is IVenueAdapter {
     mapping(address => address) public aavePoolForAsset;
     mapping(address => address) public yieldTokens;
 
+    modifier routerOnly() {
+        require(msg.sender == lockerRouter, "Only LockerRouter can call");
+        _;
+    }
+
     constructor(address _lockerRouter, address[] memory assets, address[] memory pools, address[] memory yieldTokens_) {
         lockerRouter = _lockerRouter;
         require(assets.length == pools.length && assets.length == yieldTokens_.length, "Mismatched lengths");
@@ -27,12 +32,12 @@ contract AAVEAdapter is IVenueAdapter {
         return "AAVE";
     }
 
-    function deposit(address asset, uint256 amount) external {
+    function deposit(address asset, uint256 amount) external routerOnly {
         IPool(aavePoolForAsset[asset]).supply(asset, amount, address(this), 0);
         emit Deposited(amount);
     }
 
-    function requestRedeem(address asset, uint256 amount) external returns (uint256) {
+    function requestRedeem(address asset, uint256 amount) external routerOnly returns (uint256) {
         uint256 withdrawnAmount = IPool(aavePoolForAsset[asset]).withdraw(asset, amount, lockerRouter);
         emit RedeemRequested(withdrawnAmount);
         return withdrawnAmount;
