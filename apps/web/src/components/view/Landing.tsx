@@ -4,11 +4,12 @@ import { useAppKit } from '@reown/appkit/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Button from '@/components/subcomponents/Button';
-import { links, paths } from '@/lib/paths';
+import { paths } from '@/lib/paths';
 import { ArrowUpRight } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef } from 'react';
+import { Footer } from '@/components/subcomponents/Footer';
 
 const testimonials = [
   {
@@ -197,7 +198,7 @@ export default function LandingPage() {
 
             <Button
               type={'button'}
-              onAction={() => window.open(paths.GetMetaMaskCard, '_blank')}
+              onAction={() => open()}
               disabled={false}
               aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
@@ -230,6 +231,7 @@ export default function LandingPage() {
               aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Learn more'}
+              btnStyle='secondary'
             >
               Learn more
             </Button>
@@ -306,31 +308,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <hr className='bg-[#D0D0D0] h-[2px] opacity-70' />
-      <footer className='px-[24px] bg-[#f7feec] w-full flex items-center justify-center py-[40px]'>
-        <div className='max-w-[1080px] w-full flex items-start lg:items-center justify-between'>
-          <button
-            type='button'
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className='text-[16px] text-black cursor-pointer'
-          >
-            Auto<span className='font-bold'>HODL</span>
-          </button>
-          <div className='flex flex-col sm:flex-row items-start lg:items-center justify-center gap-[12px] lg:gap-[32px] text-[16px] text-[#4D4A4A]'>
-            <p className='sm:hidden text-sm font-bold'>Connect</p>
-            {[
-              { href: links.telegram, label: 'Telegram' },
-              { href: links.twitter, label: 'Twitter' },
-              { href: links.github, label: 'GitHub' },
-              { href: links.contact, label: 'Email' },
-            ].map((item, idx) => (
-              <ExternalLink href={item.href} key={`footer-link-${`${idx}`}`}>
-                <p className='text-sm lg:text-base'>{item.label}</p>
-              </ExternalLink>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <Footer innerClassName='bg-[#f7feec]' />
     </div>
   );
 }
@@ -376,14 +354,6 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
 
         <Image className='aspect-square select-none' src={imgSrc} alt='img' width={100} height={100} />
       </div>
-    </Link>
-  );
-}
-
-function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link href={href} target='_blank' className='hover:text-black transition-colors duration-300'>
-      {children}
     </Link>
   );
 }

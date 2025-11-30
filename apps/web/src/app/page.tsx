@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import type { SupportedAccounts } from '@/lib/constants';
 import { getSupportedAccounts } from '@/lib/userAccounts';
 import Loading from '@/app/loading';
+import { Footer } from '@/components/subcomponents/Footer';
 
 export default function Home() {
   const { isConnected, isConnecting, isReconnecting } = useAccount();
@@ -34,11 +35,14 @@ export default function Home() {
   if (!isConnected) {
     return <LandingPage />;
   }
+
   return (
-    <div className={'min-h-screen w-full flex flex-col items-center lg:gap-8 lg:p-8'}>
+    <div className={'min-h-screen w-full flex flex-col items-center justify-between lg:gap-8'}>
       <Header />
 
       {!config ? <UserOnboarding accounts={accounts} /> : <Dashboard />}
+
+      <Footer className='w-full' />
     </div>
   );
 }
