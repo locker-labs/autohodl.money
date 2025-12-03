@@ -2,6 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, TOKEN_DECIMALS } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
+import { computeRoundUpAndSavings } from '@/lib/helpers';
 
 export interface ISavingsTx {
   id: string;
@@ -80,19 +81,4 @@ export function useSavingsTxs() {
     hasNext: hasNextPage,
     fetchNext: fetchNextPage,
   };
-}
-
-export function computeRoundUpAndSavings(
-  transferAmount: bigint,
-  roundUpTo: bigint,
-): { roundUpAmount: bigint; savingsAmount: bigint } {
-  if (roundUpTo <= BigInt(0)) {
-    throw new Error('roundUpTo must be > 0');
-  }
-  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
-  const roundUpAmount = ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
-
-  const savingsAmount = roundUpAmount - transferAmount;
-
-  return { roundUpAmount, savingsAmount };
 }

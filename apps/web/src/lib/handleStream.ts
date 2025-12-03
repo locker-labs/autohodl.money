@@ -1,10 +1,9 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
-import type { Address } from 'viem';
-import { getAddress } from 'viem';
-import { SavingConfigSetEventSigHash, TokenToTransferStreamIdMap } from '@/lib/constants';
+import { SavingConfigSetEventSigHash } from '@/lib/constants';
 import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
-import { addAddressToEoaErc20TransferMoralisStream, verifySignature } from '@/lib/moralis';
+import { verifySignature } from '@/lib/moralis';
+import { handleSavingConfigSetEvent } from './handleSavingConfigSetEvent';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -35,34 +34,20 @@ export async function handleStream(body: string, signature: string, webhookSecre
     transferCount: payload.erc20Transfers.length,
   });
 
-  // Only process confirmed transactions
-  // TODO: Handle only confirmed transactions
+  // Only process unconfirmed transactions
+  // TODO: Handle only confirmed transactions for production
   if (payload.confirmed) {
     console.log('Skipping confirmed transaction.');
-    return NextResponse.json({ message: 'Unconfirmed transactions are ignored.' });
+    return NextResponse.json({ message: 'Confirmed transactions are ignored.' });
   }
 
+  /**
+   * Handle SavingConfigSet events, if any
+   */
   if (payload.logs.length) {
     const configSetLogs = payload.logs.filter((log) => log.topic0 === SavingConfigSetEventSigHash);
-    // if SavingConfigSet, then add user address to erc20 transfers stream
-
-    for (const configSetLog of configSetLogs) {
-      if (configSetLog?.topic1 && configSetLog.topic2) {
-        const user: Address = getAddress(`0x${configSetLog.topic1.slice(26)}`);
-        const token: Address = getAddress(`0x${configSetLog.topic2.slice(26)}`);
-        console.log(`New saving config set for user: ${user}, token: ${token}`);
-        const streamId: string | undefined = TokenToTransferStreamIdMap[token];
-        if (!streamId) {
-          console.error(`No stream ID configured for token: ${token}`);
-          // TODO: send alert to dev team
-        } else {
-          await addAddressToEoaErc20TransferMoralisStream(streamId, user);
-        }
-      }
-    }
-
     if (configSetLogs.length) {
-      return NextResponse.json({ message: 'Processed SavingConfigSet event' });
+      return await handleSavingConfigSetEvent(configSetLogs);
     }
   }
 
@@ -75,8 +60,17 @@ export async function handleStream(body: string, signature: string, webhookSecre
   let processedTransfers = 0;
 
   for (const transfer of payload.erc20Transfers) {
-    console.log(`Processing ERC20 transfer: ${transfer.transactionHash}`);
-    const txHash = await handleSavingsExecution(transfer);
+    console.log(`Processing ERC20 transfer with txHash: ${transfer.transactionHash}`);
+    let txHash: string | undefined;
+
+    try {
+      txHash = await handleSavingsExecution(transfer);
+    } catch (error) {
+      console.error(
+        `Error processing savings execution for transfer with txHash ${transfer.transactionHash}:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
 
     if (txHash) {
       processedTransfers++;
