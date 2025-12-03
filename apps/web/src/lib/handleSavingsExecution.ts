@@ -3,14 +3,17 @@ import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
 import { viemPublicClient } from '@/lib/clients/server';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
 import { computeRoundUpAndSavings, isAutoHodlSupportedToken } from '@/lib/helpers';
-import type { SavingsConfig } from '@/types/autohodl';
+import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 
-async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
+async function handleSavingsExecution(
+  erc20Transfer: IERC20Transfer,
+  { streamId }: { streamId: string; chainId: string },
+): Promise<Hex | undefined> {
   const { from: _from, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
   const transferAmount: bigint = BigInt(erc20Transfer.value);
   const token: Address = getAddress(contract);
@@ -49,6 +52,23 @@ async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<He
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
     // TODO: Notify dev team
     throw configError;
+  }
+
+  // check mode, and validate with streamId
+  if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${MoralisStreamId.MmcWithdrawal} for MetaMask Card mode.`,
+      'Aborting execution.',
+    );
+    return;
+  }
+
+  if (savingsConfig.mode === SavingsMode.All && streamId !== MoralisStreamId.EoaTransfer) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match EOA Transfer streamId ${MoralisStreamId.EoaTransfer} for All Transfers mode.`,
+      'Aborting execution.',
+    );
+    return;
   }
 
   // Check if config is set

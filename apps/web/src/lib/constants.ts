@@ -156,3 +156,8 @@ export const TokenToTransferStreamIdMap: Record<Address, string> = {
   // linea USDC
   '0x176211869cA2b568f2A7D4EE941E073a821EE1ff': secrets.MoralisStreamIdEoaTransfer,
 };
+
+export const MoralisStreamId = {
+  MmcWithdrawal: secrets.MoralisStreamIdMmcWithdrawal,
+  EoaTransfer: secrets.MoralisStreamIdEoaTransfer,
+};
