@@ -53,7 +53,8 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     console.log('CONFIG:', savingsConfig);
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
-    return;
+    // TODO: Notify dev team
+    throw configError;
   }
 
   // Check if config is set
@@ -95,7 +96,8 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
       `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}.`,
       'Aborting execution.',
     );
-    return;
+    // TODO: Notify dev team
+    throw new Error(`Delegate mismatch in savings config. Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}.`);
   }
 
   // Check approval amount for the autohodl contract from user's address
@@ -113,20 +115,21 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
       'Error fetching allowance:',
       allowanceError instanceof Error ? allowanceError.message : allowanceError,
     );
-    return;
+    // TODO: Notify dev team
+    throw allowanceError;
   }
 
   // Calculate amount for savings tx
-  const roundUpAmount: bigint = savingsConfig.roundUp;
+  const roundUpTo: bigint = savingsConfig.roundUp;
   console.log('TRANSFER AMOUNT:', transferAmount);
-  console.log('ROUNDUP AMOUNT:', roundUpAmount);
-  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpAmount).savingsAmount;
+  console.log('ROUNDUP TO:', roundUpTo);
+  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
   // Check if allowance is sufficient
   if (allowance < savingsAmount) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
-    // TODO: add a user notification when allowance is less
+    // TODO: notify user when allowance is insufficient
     return;
   }
 

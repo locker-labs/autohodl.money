@@ -149,6 +149,7 @@ export const AlchemyChainMap = {
 export const TransferEventSig = 'Transfer(address,address,uint256)';
 export const SavingConfigSetEventSigHash = '0x65ffc51d687a08ab0d99951353c570081e516436bbf9c43a74a3ac35987d8b7f';
 
+// Supported tokens to Moralis Stream ID map
 export const TokenToTransferStreamIdMap: Record<Address, string> = {
   // sepolia AAVE
   '0x88541670E55cC00bEEFD87eB59EDd1b7C511AC9a': secrets.MoralisStreamIdEoaTransfer,
