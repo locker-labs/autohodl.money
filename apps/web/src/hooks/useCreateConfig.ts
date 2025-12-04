@@ -8,14 +8,9 @@ import { viemPublicClient } from '@/lib/clients/client';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { extraDataParams, type SavingsMode } from '@/types/autohodl';
 
-const defaultConfig = {
-  active: true,
-  toYield: false,
-};
-
 type CreateConfigParams = {
-  active?: boolean;
-  toYield?: boolean;
+  active: boolean;
+  toYield: boolean;
   roundUp: number;
   savingsAddress: Address;
   mode: SavingsMode;
@@ -38,19 +33,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createConfig = async ({
-    roundUp,
-    savingsAddress,
-    active = defaultConfig.active,
-    toYield = defaultConfig.toYield,
-    mode,
-  }: {
-    active?: boolean;
-    toYield?: boolean;
-    roundUp: number;
-    savingsAddress: Address;
-    mode: SavingsMode;
-  }) => {
+  const createConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
     if (!walletClient) throw new Error('WalletClient not initialized');
 
     const extraData = encodeAbiParameters(extraDataParams, [mode]);
@@ -74,19 +57,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     return tx;
   };
 
-  const handleCreateConfig = async ({
-    roundUp,
-    savingsAddress,
-    active = defaultConfig.active,
-    toYield = defaultConfig.toYield,
-    mode,
-  }: {
-    active?: boolean;
-    toYield?: boolean;
-    roundUp: number;
-    savingsAddress: Address;
-    mode: SavingsMode;
-  }) => {
+  const handleCreateConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
     if (!isConnected || !address || !walletClient) return;
 
     setLoading(true);

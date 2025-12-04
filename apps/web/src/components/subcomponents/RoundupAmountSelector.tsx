@@ -30,6 +30,8 @@ const RoundupAmountSelector = () => {
             roundUp: roundUpLocal,
             savingsAddress: config.savingAddress,
             mode: config.mode,
+            active: config.active,
+            toYield: config.toYield,
           });
           setConfig((prev) =>
             prev ? { ...prev, roundUp: parseUnits(roundUpLocal.toString(), TokenDecimalMap[USDC_ADDRESS]) } : prev,

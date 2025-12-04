@@ -45,6 +45,7 @@ const YieldSwitch = () => {
             roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
             savingsAddress: config.savingAddress,
             mode: config.mode,
+            active: config.active,
           });
           setConfig((prev) => (prev ? { ...prev, toYield: toYieldLocal } : prev));
         } catch {
