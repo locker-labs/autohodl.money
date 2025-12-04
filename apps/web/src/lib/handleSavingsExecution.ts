@@ -39,7 +39,7 @@ async function handleSavingsExecution(
   // For now, we will support only USDC savings transfers.
   // Check token support
   if (!isAutoHodlSupportedToken(token)) {
-    console.warn(`Token not supported for savings execution: ${token}. Supported tokens: ${AUTOHODL_SUPPORTED_TOKENS}`);
+    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${AUTOHODL_SUPPORTED_TOKENS}`);
     return;
   }
 
@@ -52,6 +52,12 @@ async function handleSavingsExecution(
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
     // TODO: Notify dev team
     throw configError;
+  }
+
+  // Check if config is set
+  if (savingsConfig.delegate === zeroAddress) {
+    console.warn(`Savings config not found for user ${from} and token ${token}`, 'Aborting execution.');
+    return;
   }
 
   // check mode, and validate with streamId
@@ -71,15 +77,9 @@ async function handleSavingsExecution(
     return;
   }
 
-  // Check if config is set
-  if (savingsConfig.delegate === zeroAddress) {
-    console.warn(`Savings config not found for user ${from} and token ${token}.`, 'Aborting execution.');
-    return;
-  }
-
   // Check if config is active
   if (!savingsConfig.active) {
-    console.warn(`Savings config is not active for user ${from} and token ${token}.`, 'Aborting execution.');
+    console.warn(`Savings config is not active for user ${from} and token ${token}`, 'Aborting execution.');
     return;
   }
 
@@ -87,7 +87,7 @@ async function handleSavingsExecution(
   if (savingsConfig.toYield === true && getAddress(to) === getAddress(AUTOHODL_ADDRESS)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = true and to = AutoHodl for user ${from} and token ${token}.`,
+      `toYield = true and to = AutoHodl for user ${from} and token ${token}`,
       'Aborting execution.',
     );
     return;
@@ -97,7 +97,7 @@ async function handleSavingsExecution(
   if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = false and to = Savings address for user ${from} and token ${token}.`,
+      `toYield = false and to = Savings address for user ${from} and token ${token}`,
       'Aborting execution.',
     );
     return;
@@ -106,14 +106,14 @@ async function handleSavingsExecution(
   // Verify delegate
   if (getAddress(savingsConfig.delegate) !== getAddress(DELEGATE)) {
     console.warn(
-      `Delegate mismatch in savings config for user ${from} and token ${token}.`,
-      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}.`,
+      `Delegate mismatch in savings config for user ${from} and token ${token}`,
+      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
       'Aborting execution.',
     );
     // TODO: Notify dev team
     throw new Error(
-      `Delegate mismatch in savings config for user ${from} and token ${token}. ` +
-        `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}.`,
+      `Delegate mismatch in savings config for user ${from} and token ${token} ` +
+        `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
     );
   }
 
