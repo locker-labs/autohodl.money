@@ -2,6 +2,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, TOKEN_DECIMALS } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
+import { computeRoundUpAndSavings } from '@/lib/helpers';
+import { parseUnits } from 'viem';
 
 export interface ISavingsTx {
   id: string;
@@ -31,8 +33,6 @@ export function useSavingsTxs() {
         pageKey: pageParam,
       });
 
-      console.log({ response });
-
       return response;
     },
     getNextPageParam: (lastPage) => lastPage.pageKey,
@@ -51,10 +51,12 @@ export function useSavingsTxs() {
         timestamp: tx.metadata?.blockTimestamp,
         to: tx.to,
         from: tx.from,
-        value: BigInt(tx.value * 10 ** TOKEN_DECIMALS),
+        value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
         txHash: tx.hash,
-        purchaseValue: computeRoundUpAndSavings(BigInt(tx.value * 10 ** TOKEN_DECIMALS), BigInt(10 ** TOKEN_DECIMALS))
-          .savingsAmount,
+        purchaseValue: computeRoundUpAndSavings(
+          parseUnits(tx.value.toString(), TOKEN_DECIMALS),
+          parseUnits('1', TOKEN_DECIMALS),
+        ).savingsAmount,
       })),
     ) || [];
 
@@ -65,10 +67,12 @@ export function useSavingsTxs() {
       timestamp: tx.metadata?.blockTimestamp,
       to: tx.to,
       from: tx.from,
-      value: BigInt(tx.value * 10 ** TOKEN_DECIMALS),
+      value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
       txHash: tx.hash,
-      purchaseValue: computeRoundUpAndSavings(BigInt(tx.value * 10 ** TOKEN_DECIMALS), BigInt(10 ** TOKEN_DECIMALS))
-        .savingsAmount,
+      purchaseValue: computeRoundUpAndSavings(
+        parseUnits(tx.value.toString(), TOKEN_DECIMALS),
+        parseUnits('1', TOKEN_DECIMALS),
+      ).savingsAmount,
     })) || [];
 
   return {
@@ -80,19 +84,4 @@ export function useSavingsTxs() {
     hasNext: hasNextPage,
     fetchNext: fetchNextPage,
   };
-}
-
-export function computeRoundUpAndSavings(
-  transferAmount: bigint,
-  roundUpTo: bigint,
-): { roundUpAmount: bigint; savingsAmount: bigint } {
-  if (roundUpTo <= BigInt(0)) {
-    throw new Error('roundUpTo must be > 0');
-  }
-  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
-  const roundUpAmount = ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
-
-  const savingsAmount = roundUpAmount - transferAmount;
-
-  return { roundUpAmount, savingsAmount };
 }

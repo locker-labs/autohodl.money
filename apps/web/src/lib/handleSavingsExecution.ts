@@ -2,22 +2,25 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE } from '@/lib/constants';
+import { viemPublicClient } from '@/lib/clients/server';
+import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
 import { delegateSaving } from '@/lib/contract/server';
-import { viemPublicClient } from '@/lib/clients/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
-import type { SavingsConfig } from '@/types/autohodl';
+import { computeRoundUpAndSavings, isAutoHodlSupportedToken } from '@/lib/helpers';
+import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 
-export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
-  const { from: fromTransfer, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
+async function handleSavingsExecution(
+  erc20Transfer: IERC20Transfer,
+  { streamId }: { streamId: string; chainId: string },
+): Promise<Hex | undefined> {
+  const { from: _from, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
   const transferAmount: bigint = BigInt(erc20Transfer.value);
   const token: Address = getAddress(contract);
-  const from = fromTransfer as Address;
+  const from = _from as Address;
 
   // Since we dont have access to metamask card,
-  // we will hardcode the from address for savings transfers.
-  // TODO: remove hardcoded from address
+  // we can hardcode the `from` address for savings transfers.
   // NOTE: Uncomment below for testing metamask card savings transfers
 
   /**
@@ -30,41 +33,53 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   */
 
   // For debugging
-  console.debug(JSON.stringify({ from, fromTransfer, to, token, sourceTxHash, value: erc20Transfer.value, DELEGATE }));
+  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, DELEGATE }));
 
   // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
   // For now, we will support only USDC savings transfers.
-  let isTokenSupported = false;
-  for (const supportedToken of AUTOHODL_SUPPORTED_TOKENS) {
-    if (getAddress(supportedToken) === token) {
-      isTokenSupported = true;
-      break;
-    }
-  }
-  if (!isTokenSupported) {
-    console.warn('Token not supported for savings execution:', token);
+  // Check token support
+  if (!isAutoHodlSupportedToken(token)) {
+    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${AUTOHODL_SUPPORTED_TOKENS}`);
     return;
   }
 
-  // Fetch savings config for user and token (to verify delegate is set correctly)
+  // Fetch savings config
   let savingsConfig: SavingsConfig;
   try {
-    savingsConfig = await getSavingsConfig(viemPublicClient, from as Address, token);
+    savingsConfig = await getSavingsConfig(viemPublicClient, from, token);
     console.log('CONFIG:', savingsConfig);
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
-    return;
+    // TODO: Notify dev team
+    throw configError;
   }
 
   // Check if config is set
   if (savingsConfig.delegate === zeroAddress) {
-    console.warn(`Savings config is not set for user ${from} and token ${token}.`, 'Aborting execution.');
+    console.warn(`Savings config not found for user ${from} and token ${token}`, 'Aborting execution.');
+    return;
+  }
+
+  // check mode, and validate with streamId
+  if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${MoralisStreamId.MmcWithdrawal} for MetaMask Card mode.`,
+      'Aborting execution.',
+    );
+    return;
+  }
+
+  if (savingsConfig.mode === SavingsMode.All && streamId !== MoralisStreamId.EoaTransfer) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match EOA Transfer streamId ${MoralisStreamId.EoaTransfer} for All Transfers mode.`,
+      'Aborting execution.',
+    );
     return;
   }
 
   // Check if config is active
   if (!savingsConfig.active) {
-    console.warn(`Savings config is not active for user ${from} and token ${token}.`, 'Aborting execution.');
+    console.warn(`Savings config is not active for user ${from} and token ${token}`, 'Aborting execution.');
     return;
   }
 
@@ -72,7 +87,7 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   if (savingsConfig.toYield === true && getAddress(to) === getAddress(AUTOHODL_ADDRESS)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = true and to = AutoHodl for user ${from} and token ${token}.`,
+      `toYield = true and to = AutoHodl for user ${from} and token ${token}`,
       'Aborting execution.',
     );
     return;
@@ -82,20 +97,24 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = false and to = Savings address for user ${from} and token ${token}.`,
+      `toYield = false and to = Savings address for user ${from} and token ${token}`,
       'Aborting execution.',
     );
     return;
   }
 
-  // Check if delegate is set
+  // Verify delegate
   if (getAddress(savingsConfig.delegate) !== getAddress(DELEGATE)) {
     console.warn(
-      'Delegate mismatch in savings config.',
-      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}.`,
+      `Delegate mismatch in savings config for user ${from} and token ${token}`,
+      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
       'Aborting execution.',
     );
-    return;
+    // TODO: Notify dev team
+    throw new Error(
+      `Delegate mismatch in savings config for user ${from} and token ${token} ` +
+        `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
+    );
   }
 
   // Check approval amount for the autohodl contract from user's address
@@ -113,20 +132,21 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
       'Error fetching allowance:',
       allowanceError instanceof Error ? allowanceError.message : allowanceError,
     );
-    return;
+    // TODO: Notify dev team
+    throw allowanceError;
   }
 
   // Calculate amount for savings tx
-  const roundUpAmount: bigint = savingsConfig.roundUp;
+  const roundUpTo: bigint = savingsConfig.roundUp;
   console.log('TRANSFER AMOUNT:', transferAmount);
-  console.log('ROUNDUP AMOUNT:', roundUpAmount);
-  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpAmount).savingsAmount;
+  console.log('ROUNDUP TO:', roundUpTo);
+  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
   // Check if allowance is sufficient
   if (allowance < savingsAmount) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
-    // TODO: add a user notification when allowance is less
+    // TODO: notify user when allowance is insufficient
     return;
   }
 
@@ -149,17 +169,4 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   }
 }
 
-export function computeRoundUpAndSavings(
-  transferAmount: bigint,
-  roundUpTo: bigint,
-): { roundUpAmount: bigint; savingsAmount: bigint } {
-  if (roundUpTo <= BigInt(0)) {
-    throw new Error('roundUpTo must be > 0');
-  }
-  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
-  const roundUpAmount = ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
-
-  const savingsAmount = roundUpAmount - transferAmount;
-
-  return { roundUpAmount, savingsAmount };
-}
+export { handleSavingsExecution };

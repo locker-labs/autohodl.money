@@ -8,7 +8,6 @@ export async function getSavingsConfig(
   user: Address,
   token: Address,
 ): Promise<SavingsConfig> {
-  console.log('Fetching savings config for user:', user, 'and token:', token);
   const configArray: Readonly<SavingsConfigArray> = await viemPublicClient.readContract({
     address: AUTOHODL_ADDRESS,
     abi: AutoHodlAbi,

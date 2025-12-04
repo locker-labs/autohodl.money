@@ -26,6 +26,7 @@ const ActiveSwitch = () => {
             roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
             savingsAddress: config.savingAddress,
             mode: config.mode,
+            toYield: config.toYield,
           });
           setConfig((prev) => (prev ? { ...prev, active: activeLocal } : prev));
         } catch {

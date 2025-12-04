@@ -26,7 +26,7 @@ const SavingsModeSelector = () => {
       info: 'Only save your spare change when you use your MetaMask Card.',
     },
     {
-      label: hasMetaMaskCard ? 'All USDC transfers from wallet and MetaMask Card' : 'All USDC transfers',
+      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
       value: SavingsMode.All,
       disabled: false,
       imgSrc: '/USDCToken.svg',
@@ -46,6 +46,8 @@ const SavingsModeSelector = () => {
           await createConfig({
             roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
             savingsAddress: config.savingAddress,
+            active: config.active,
+            toYield: config.toYield,
             mode,
           });
           setConfig((prev) => (prev ? { ...prev, mode } : prev));
@@ -102,7 +104,7 @@ const SavingsModeSelector = () => {
                 />
               ) : null}
             </div>
-            <div className='flex items-center justify-center gap-2'>
+            <div className='h-full flex items-center justify-center gap-2'>
               {opt.label}
               <Tooltip>
                 <TooltipTrigger>

@@ -54,7 +54,7 @@ export function ControlsMobile(): React.JSX.Element {
 
   return (
     <div>
-      <Accordion type='single' defaultValue='account-details'>
+      <Accordion type='multiple' defaultValue={['account-details']}>
         <AccordionItem value='account-details' className='border-b-0'>
           <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>Account Details</AccordionTrigger>
           <AccordionContent className='mt-4 px-6 py-4 border border-gray-300 rounded-lg'>
