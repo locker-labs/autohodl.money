@@ -1,7 +1,6 @@
 import type React from 'react';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
 import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
-import { Footer } from '@/components/subcomponents/Footer';
 import { RecentActivity } from '@/components/subcomponents/RecentActivity';
 import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
@@ -14,7 +13,7 @@ const Dashboard = (): React.JSX.Element => {
 
   if (isMobile) {
     return (
-      <Tabs className='w-full' defaultValue='dashboard'>
+      <Tabs className='w-full min-h-screen' defaultValue='dashboard'>
         <TabsList className='pt-[2px] z-10 w-full h-11 sticky top-[65px] rounded-none'>
           <TabsTrigger value='dashboard'>Dashboard</TabsTrigger>
           <TabsTrigger value='controls'>Controls</TabsTrigger>
@@ -53,7 +52,7 @@ const Dashboard = (): React.JSX.Element => {
 
   // Desktop View
   return (
-    <div className=' max-w-[1080px] w-full px-4 py-5 lg:py-0 grid gap-5'>
+    <div className=' max-w-[1080px] w-full px-4 py-5 lg:py-5 grid gap-5'>
       <div className=''>
         {/* 1 - 2 - 3 */}
         <SavingsInfoCards />

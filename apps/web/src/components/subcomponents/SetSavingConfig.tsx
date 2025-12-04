@@ -14,17 +14,13 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-type Props = {
-  account: SupportedAccounts;
-};
-
 const savingOptions = [
   { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
   { label: '$10', value: 10, purchase: '$35', savings: '$5' },
   { label: '$100', value: 100, purchase: '$850', savings: '$50' },
 ];
 
-export default function SetSavingConfig({ account }: Props) {
+export default function SetSavingConfig() {
   const { address, accounts } = useAutoHodl();
   const [mode, setMode] = useState<SavingsMode>(SavingsMode.All);
   const [roundUp, setRoundUp] = useState(savingOptions[0].value);
@@ -131,6 +127,7 @@ export default function SetSavingConfig({ account }: Props) {
   useEffect(() => {
     if (isConfirmed) {
       setIsApprovalNeeded(false);
+      handleFinishSetup();
     }
   }, [isConfirmed]);
 
@@ -139,7 +136,7 @@ export default function SetSavingConfig({ account }: Props) {
   const disabled = !!savingsAddress && isAddress(savingsAddress) === false;
 
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center max-w-md'>
       <fieldset className='w-full py-6 disabled:opacity-60'>
         {title ? <legend className='px-1 text-xl font-bold text-center text-gray-700'>{title}</legend> : null}
 
@@ -231,7 +228,7 @@ export default function SetSavingConfig({ account }: Props) {
               ))}
             </div>
             {hasMetaMaskCard ? null : (
-              <div className='text-sm text-gray-700 max-w-md'>
+              <div className='text-sm text-gray-700'>
                 Since you don't have a metamask card, round-ups will be enabled only on your USDC transfers.
               </div>
             )}
