@@ -2,7 +2,7 @@ import useCreateConfig from '@/hooks/useCreateConfig';
 import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import { LoaderSecondary } from '@/components/ui/loader';
 
 const savingOptions = [
@@ -32,7 +32,7 @@ const RoundupAmountSelector = () => {
             mode: config.mode,
           });
           setConfig((prev) =>
-            prev ? { ...prev, roundUp: BigInt(roundUpLocal * 10 ** TokenDecimalMap[USDC_ADDRESS]) } : prev,
+            prev ? { ...prev, roundUp: parseUnits(roundUpLocal.toString(), TokenDecimalMap[USDC_ADDRESS]) } : prev,
           );
         } catch {
           setRoundUpLocal(roundUp);
