@@ -1,6 +1,6 @@
 'use server';
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { handleStream } from '@/lib/handleStream';
 import { secrets } from '@/lib/secrets';
 

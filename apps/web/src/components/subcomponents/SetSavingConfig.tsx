@@ -117,6 +117,7 @@ export default function SetSavingConfig({ account }: Props) {
       savingsAddress: toYield ? (address as Address) : (savingsAddress as Address),
       toYield,
       mode,
+      active: true,
     });
   };
 

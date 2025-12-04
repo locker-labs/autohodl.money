@@ -1,6 +1,6 @@
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useMemo } from 'react';
-import { erc20Abi, formatUnits } from 'viem';
+import { erc20Abi, formatUnits, parseUnits } from 'viem';
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { TokenDecimalMap } from '@/lib/constants';
 import { truncateToTwoDecimals } from '@/lib/math';
@@ -35,7 +35,7 @@ export function useErc20Allowance(params: {
 
   const allowance = data as bigint | undefined;
   const allowanceFormatted = useMemo(
-    () => Number(allowance !== undefined ? formatUnits(allowance, decimals) : undefined),
+    () => (allowance !== undefined ? Number(formatUnits(allowance, decimals)) : 0),
     [allowance, decimals],
   );
 
@@ -65,7 +65,7 @@ export function useERC20Approve(params: {
   if (!decimals) {
     throw new Error(`useERC20Approve: Unsupported token: ${params.token}`);
   }
-  const amount = BigInt(params.amount * 10 ** decimals);
+  const amount: bigint = parseUnits(params.amount.toString(), decimals);
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.spender);
 
   const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
@@ -101,7 +101,6 @@ export function useERC20Approve(params: {
     receiptError,
     resetWrite,
     enabled,
-    amount: params.amount,
   };
 }
 
@@ -163,7 +162,7 @@ export function useERC20Transfer(params: {
   if (!decimals) {
     throw new Error(`useERC20Transfer: Unsupported token: ${params.token}`);
   }
-  const amount = BigInt(params.amount * 10 ** decimals);
+  const amount: bigint = parseUnits(params.amount.toString(), decimals);
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.to);
 
   const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();

@@ -8,4 +8,5 @@ export const secrets = {
   savingsFrom: process.env.SAVINGS_FROM_ADDRESS || '',
   alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '',
   MoralisStreamIdEoaTransfer: process.env.MORALIS_STREAM_ID_EOA_TRANSFER || '',
+  MoralisStreamIdMmcWithdrawal: process.env.MORALIS_STREAM_ID_MMC_WITHDRAWAL || '',
 };
