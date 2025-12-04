@@ -1,7 +1,6 @@
 import type React from 'react';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
 import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
-import { Footer } from '@/components/subcomponents/Footer';
 import { RecentActivity } from '@/components/subcomponents/RecentActivity';
 import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
