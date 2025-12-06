@@ -188,6 +188,7 @@ export default function SetSavingConfig() {
                   disabled={opt.disabled}
                   className={`flex flex-col items-center gap-4
                     border rounded-lg px-4 py-4 text-center
+                    disabled:opacity-60
                     max-w-[250px]
               ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
               ${opt.value === mode ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold' : 'border-gray-300'}
