@@ -10,9 +10,13 @@ interface Erc20TransferParams {
   toBlock?: string;
   fromAddress?: string;
   toAddress?: string;
-  contractAddresses: string[];
-  maxCount?: number;
-  pageKey?: string;
+  excludeZeroValue?: boolean;
+  category?: ('external' | 'internal' | 'erc20' | 'erc721' | 'erc1155' | 'specialnft')[];
+  contractAddresses: string[]; // An array of contract addresses to filter for.
+  order?: 'asc' | 'desc';
+  withMetadata?: boolean; // Defaults to false
+  maxCount?: number; // Defaults to 0x3e8
+  pageKey?: string; // Defaults to 0x0
 }
 
 export interface Erc20Transfer {
@@ -49,6 +53,7 @@ export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<
     fromAddress,
     toAddress,
     contractAddresses,
+    order = 'desc',
     maxCount = 100,
     pageKey = '0x0',
   } = params;
@@ -67,6 +72,7 @@ export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<
         contractAddresses,
         withMetadata: true,
         excludeZeroValue: true,
+        order,
         maxCount: `0x${maxCount.toString(16)}`,
         pageKey,
       },

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useAccount } from 'wagmi';
-import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { truncateToTwoDecimals } from '@/lib/math';
 
@@ -15,8 +15,9 @@ export function useSpareChange() {
       fetchErc20Transfers({
         fromAddress,
         toAddress: AUTOHODL_ADDRESS,
-        contractAddresses: [USDC_ADDRESS],
-        maxCount: 100,
+        contractAddresses: AUTOHODL_SUPPORTED_TOKENS,
+        maxCount: 1000,
+        order: 'desc',
       }).then((res) => res.transfers),
     enabled: isConnected && !!fromAddress,
     refetchOnWindowFocus: true,
