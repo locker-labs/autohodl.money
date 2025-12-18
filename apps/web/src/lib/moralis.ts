@@ -1,6 +1,6 @@
 import type { Address } from 'viem';
 import Web3 from 'web3';
-import { AUTOHODL_ADDRESS, MM_CARD_ADDRESSES, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
+import { AUTOHODL_ADDRESS, MetaMaskCard, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
 import { secrets } from '@/lib/secrets';
 
 // Helper function to verify webhook signature
@@ -22,7 +22,7 @@ export function verifySignature(body: string, signature: string, secret: string)
 
 // Helper function to check if address is a MetaMask Card address
 export function isMetaMaskCardAddress(address: string): boolean {
-  return MM_CARD_ADDRESSES.some((cardAddress: string) => cardAddress.toLowerCase() === address.toLowerCase());
+  return Object.values(MetaMaskCard).some((cardAddress: string) => cardAddress.toLowerCase() === address.toLowerCase());
 }
 
 // Helper function to check if token is USDC

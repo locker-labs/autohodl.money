@@ -5,7 +5,7 @@ import { formatAmount } from '@/lib/math';
 import Button from '@/components/subcomponents/Button';
 import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
-import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
+import { SUSDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -22,9 +22,9 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
         params: {
           type: 'ERC20',
           options: {
-            address: S_USDC_ADDRESS,
+            address: SUSDC_ADDRESS,
             symbol: 'sUSDC',
-            decimals: TokenDecimalMap[S_USDC_ADDRESS],
+            decimals: TokenDecimalMap[SUSDC_ADDRESS],
           },
         },
       });

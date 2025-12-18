@@ -1,6 +1,6 @@
 'use client';
 
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import Header from '@/components/Header';
 import Dashboard from '@/components/view/Dashboard';
 import LandingPage from '@/components/view/Landing';
@@ -10,7 +10,7 @@ import Loading from '@/app/loading';
 import { Footer } from '@/components/subcomponents/Footer';
 
 export default function Home() {
-  const { isConnected, isConnecting, isReconnecting } = useAccount();
+  const { isConnected, isConnecting, isReconnecting } = useConnection();
   const { loading, config, accounts } = useAutoHodl();
 
   if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {

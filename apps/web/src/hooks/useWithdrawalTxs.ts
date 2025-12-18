@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
-import { SUsdcAddressMap, TOKEN_DECIMALS } from '@/lib/constants';
+import { SusdcAddressMap, TOKEN_DECIMALS } from '@/lib/constants';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits, zeroAddress } from 'viem';
 import { chain } from '@/config';
@@ -29,7 +29,7 @@ export function useWithdrawalTxs() {
 
       const response = await fetchErc20Transfers({
         fromAddress: address,
-        contractAddresses: [SUsdcAddressMap[chain.id]],
+        contractAddresses: [SusdcAddressMap[chain.id]],
         maxCount: 100,
         pageKey: pageParam,
       });

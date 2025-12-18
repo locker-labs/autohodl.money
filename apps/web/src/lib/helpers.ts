@@ -1,5 +1,11 @@
 import { type Address, getAddress } from 'viem';
-import { AUTOHODL_SUPPORTED_TOKENS } from '@/lib/constants';
+import {
+  AUTOHODL_SUPPORTED_TOKENS,
+  type TSusdcAddress,
+  type TUsdcAddress,
+  SUSDC_ADDRESS_SET,
+  USDC_ADDRESS_SET,
+} from '@/lib/constants';
 
 function computeRoundUpAndSavings(
   transferAmount: bigint,
@@ -27,4 +33,43 @@ function isAutoHodlSupportedToken(token: Address): boolean {
   return isTokenSupported;
 }
 
-export { computeRoundUpAndSavings, isAutoHodlSupportedToken };
+function isUsdcAddress(token: Address) {
+  return USDC_ADDRESS_SET.has(getAddress(token) as TUsdcAddress);
+}
+
+function getUsdcAddress(token: Address): TUsdcAddress | null {
+  const normalizedToken = getAddress(token);
+  for (const usdcAddress of USDC_ADDRESS_SET) {
+    if (getAddress(usdcAddress) === normalizedToken) {
+      return usdcAddress;
+    }
+  }
+
+  return null;
+
+  // throw new Error(`Token address ${token} is not a supported USDC address.`);
+}
+
+function getSusdcAddress(token: Address): TSusdcAddress {
+  const normalizedToken = getAddress(token);
+  for (const susdcAddress of SUSDC_ADDRESS_SET) {
+    if (getAddress(susdcAddress) === normalizedToken) {
+      return susdcAddress;
+    }
+  }
+
+  throw new Error(`Token address ${token} is not a supported SUSDC address.`);
+}
+
+function isSusdcAddress(token: Address) {
+  return SUSDC_ADDRESS_SET.has(getAddress(token) as TSusdcAddress);
+}
+
+export {
+  computeRoundUpAndSavings,
+  isAutoHodlSupportedToken,
+  isSusdcAddress,
+  isUsdcAddress,
+  getSusdcAddress,
+  getUsdcAddress,
+};

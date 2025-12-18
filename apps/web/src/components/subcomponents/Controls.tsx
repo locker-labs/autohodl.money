@@ -11,7 +11,7 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
 import { SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { CopyContentButton } from '../feature/CopyContentButton';
 import { PriceSkeleton } from './PriceSkeleton';
 import { useERC20BalanceOf } from '@/hooks/useERC20Token';
@@ -42,7 +42,7 @@ export function Controls(): React.JSX.Element {
 }
 
 export function ControlsMobile(): React.JSX.Element {
-  const { address: userAddress } = useAccount();
+  const { address: userAddress } = useConnection();
   const { accounts, config, token } = useAutoHodl();
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
   const hasMetaMaskCard: boolean = accounts.some((acc) => acc === SupportedAccounts.MetaMask);

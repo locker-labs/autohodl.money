@@ -1,11 +1,11 @@
-import { useAccount, useReadContract } from 'wagmi';
+import { useConnection, useReadContract } from 'wagmi';
 import { formatUnits } from 'viem';
 import { abi } from '@/abis/AaveUiPoolDataProvider';
 import {
   AAVE_POOL_ADDRESSES_PROVIDER,
   AAVE_UI_POOL_DATA_PROVIDER,
-  TOKEN_ADDRESS,
   TOKEN_DECIMALS,
+  USDC_ADDRESS,
 } from '@/lib/constants';
 import { chain } from '@/config';
 import { roundOff } from '@/lib/math';
@@ -26,7 +26,7 @@ export interface IUserReserveData {
 
 // uses env configured chain id
 export const useAaveYieldBalance = () => {
-  const { isConnected, address: userAddress } = useAccount();
+  const { isConnected, address: userAddress } = useConnection();
 
   const {
     data: raw,
@@ -54,7 +54,7 @@ export const useAaveYieldBalance = () => {
   if (raw) {
     const data = raw as IUserReserveData;
 
-    const tokenData = data[0].filter((reserve: TUserReserveDataObject) => reserve.underlyingAsset === TOKEN_ADDRESS);
+    const tokenData = data[0].filter((reserve: TUserReserveDataObject) => reserve.underlyingAsset === USDC_ADDRESS);
 
     const balance = tokenData[0].scaledATokenBalance;
 

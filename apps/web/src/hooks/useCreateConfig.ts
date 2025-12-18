@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useConnection, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
 import { encodeAbiParameters, parseUnits } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
 import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { viemPublicClient } from '@/lib/clients/client';
+import { viemPublicClient } from '@/lib/clients/viemPublicClient';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { extraDataParams, type SavingsMode } from '@/types/autohodl';
 
@@ -26,7 +26,7 @@ type UseCreateConfigReturn = {
 
 const useCreateConfig = (): UseCreateConfigReturn => {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useConnection();
   const { data: walletClient } = useWalletClient();
   const { setRefetchFlag } = useAutoHodl();
 

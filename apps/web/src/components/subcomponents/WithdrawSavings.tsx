@@ -6,13 +6,13 @@ import Button from '@/components/subcomponents/Button';
 import { toastCustom } from '@/components/ui/toast';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useERC20Transfer } from '@/hooks/useERC20Token';
-import { S_USDC_ADDRESS } from '@/lib/constants';
+import { SUSDC_ADDRESS } from '@/lib/constants';
 
 export const WithdrawSavings = (): React.JSX.Element => {
   const { address, sToken } = useAutoHodl();
 
   const { transfer, isPending, isConfirmed, isConfirming } = useERC20Transfer({
-    token: S_USDC_ADDRESS,
+    token: SUSDC_ADDRESS,
     to: address || zeroAddress,
     amount: sToken.balanceFormatted,
     enabled: !!address && sToken.isReady,

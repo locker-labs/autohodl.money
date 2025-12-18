@@ -2,13 +2,13 @@ import { useAppKitAccount } from '@reown/appkit/react';
 import { useMemo } from 'react';
 import { erc20Abi, formatUnits, parseUnits } from 'viem';
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { TokenDecimalMap } from '@/lib/constants';
+import { TokenDecimalMap, type TTokenAddress } from '@/lib/constants';
 import { roundOff } from '@/lib/math';
 
 type Address = `0x${string}`;
 
 export function useErc20Allowance(params: {
-  token: Address;
+  token: TTokenAddress;
   owner?: Address; // optional; defaults to AppKit-connected address
   spender: Address;
   enabled?: boolean;
@@ -55,7 +55,7 @@ export function useErc20Allowance(params: {
 }
 
 export function useERC20Approve(params: {
-  token: Address;
+  token: TTokenAddress;
   spender: Address | undefined;
   amount: number; // e.g. 2.02
   enabled?: boolean;
@@ -116,7 +116,7 @@ export type UseERC20BalanceOfReturn = {
 
 export function useERC20BalanceOf(params: {
   address: Address | undefined;
-  token: Address;
+  token: TTokenAddress;
   enabled?: boolean;
 }): UseERC20BalanceOfReturn {
   const decimals = TokenDecimalMap[params.token];
@@ -151,7 +151,7 @@ export function useERC20BalanceOf(params: {
 }
 
 export function useERC20Transfer(params: {
-  token: Address;
+  token: TTokenAddress;
   to: Address;
   amount: number; // e.g. 1.2
   enabled?: boolean;

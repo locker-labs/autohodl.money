@@ -1,5 +1,5 @@
 import type { Address } from 'viem';
-import { viemPublicClient } from '@/lib/clients/client';
+import { viemPublicClient } from '@/lib/clients/viemPublicClient';
 import { MetaMaskCard, SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/erc20/allowance';
 

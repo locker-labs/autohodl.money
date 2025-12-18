@@ -2,7 +2,7 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { viemPublicClient } from '@/lib/clients/server';
+import { viemPublicClient } from '@/lib/clients/viemPublicClient';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';

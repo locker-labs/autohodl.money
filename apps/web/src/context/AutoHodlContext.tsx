@@ -1,15 +1,15 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
-import { S_USDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { SUSDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
-import { viemPublicClient } from '@/lib/clients/client';
+import { viemPublicClient } from '@/lib/clients/viemPublicClient';
 import { type Address, zeroAddress } from 'viem';
 
 type AutoHodlContextType = {
@@ -42,7 +42,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [config, setConfig] = useState<SavingsConfig | null>(null);
   const [refetchFlag, setRefetchFlag] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useConnection();
 
   // Get Supported Accounts
   const { data: accounts, isLoading: loadingAccounts } = useQuery({
@@ -82,7 +82,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
   // Get sToken Balance
   const sToken = useERC20BalanceOf({
-    token: S_USDC_ADDRESS,
+    token: SUSDC_ADDRESS,
     address: address,
   });
 

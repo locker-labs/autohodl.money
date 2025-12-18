@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { linea, sepolia } from 'viem/chains';
 import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
 import { chain } from '@/config';
-import { viemPublicClient } from '@/lib/clients/client';
+import { viemPublicClient } from '@/lib/clients/viemPublicClient';
 
 // Simple Pool ABI for getting reserve data
 const simplePoolAbi = [

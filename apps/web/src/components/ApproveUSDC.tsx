@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { USDC_ADDRESS, AUTOHODL_ADDRESS } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
@@ -8,7 +8,7 @@ import { getTransactionLink } from '@/lib/blockExplorer';
 import ErrorDisplay from './ErrorDisplay';
 
 export default function USDCApprovalChecker() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useConnection();
   const [autohodlAllowance, setAutohodlAllowance] = useState<number>(20);
   const {
     allowance,

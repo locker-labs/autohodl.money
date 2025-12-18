@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import Button from './Button';
 import { Edit3, X } from 'lucide-react';
 
 const SavingsLimit = () => {
-  const { address: userAddress } = useAccount();
+  const { address: userAddress } = useConnection();
   const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view-only and edit modes
 

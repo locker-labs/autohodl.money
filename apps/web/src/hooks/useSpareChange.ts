@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { roundOff } from '@/lib/math';
 
 export function useSpareChange() {
-  const { address: fromAddress, isConnected } = useAccount();
+  const { address: fromAddress, isConnected } = useConnection();
 
   //   TODO: enable support for more than 100 transfers
   const { data, isLoading, error, isFetched, isFetching } = useQuery({

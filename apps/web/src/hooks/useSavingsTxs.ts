@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, TOKEN_DECIMALS } from '@/lib/constants';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits } from 'viem';
@@ -21,7 +21,7 @@ export interface ISavingsTx {
 }
 
 export function useSavingsTxs() {
-  const { address } = useAccount();
+  const { address } = useConnection();
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: [`savings-txs-${address}`],
