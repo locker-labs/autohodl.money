@@ -1,4 +1,4 @@
-import { CircleArrowUp, CircleChevronDown, Loader2 } from 'lucide-react';
+import { CircleArrowDown, CircleArrowRight, CircleArrowUp, CircleChevronDown, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { formatUnits } from 'viem';
@@ -9,12 +9,48 @@ import { TOKEN_DECIMALS } from '@/lib/constants';
 import { truncateToTwoDecimals } from '@/lib/math';
 import { timeAgo } from '@/lib/time';
 import Image from 'next/image';
+import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
+import { formatAddress } from '@/lib/string';
+import { EAutoHodlTxType } from '@/enums';
 
 export function RecentActivity(): React.JSX.Element {
-  const { allTxs, loading, fetchNext, hasNext } = useSavingsTxs();
+  const {
+    allTxs: allSavingsTxs,
+    loading: loadingSavings,
+    fetchNext: fetchNextSavings,
+    hasNext: hasNextSavings,
+  } = useSavingsTxs();
+
+  const {
+    allTxsFiltered: allWithdrawalTxs,
+    loading: loadingWithdrawals,
+    fetchNext: fetchNextWithdrawals,
+    hasNext: hasNextWithdrawals,
+  } = useWithdrawalTxs();
+
+  // logInfo('RecentActivity - hasNext sav, with:', hasNextSavings, hasNextWithdrawals);
+
+  const fetchNext = () => {
+    if (hasNextSavings) {
+      fetchNextSavings();
+    }
+
+    if (hasNextWithdrawals) {
+      fetchNextWithdrawals();
+    }
+  };
+
+  const hasNext = hasNextSavings || hasNextWithdrawals;
+
+  const loading = loadingWithdrawals || loadingSavings;
+
+  const allTxs = [...allSavingsTxs, ...allWithdrawalTxs].sort((a, b) => (a.blockNum < b.blockNum ? 1 : -1));
+
+  // logInfo('RecentActivity - allTxs:', allTxs);
 
   return (
-    <Card className='w-full m-0 py-5 pl-5 pr-5 h-full'>
+    // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
+    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-full group/container'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Recent Activity</h2>
@@ -44,54 +80,96 @@ export function RecentActivity(): React.JSX.Element {
             )}
           </div>
         ) : (
-          <div className='mt-[15px] overflow-y-auto max-h-[582px]'>
-            {allTxs.map((tx) => (
-              <Link key={tx.id} href={getTransactionLink(tx.txHash)} target='_blank' className='no-underline'>
-                <div className='group border border-gray-300 flex flex-col gap-5 mb-3 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'>
-                  <div className='flex items-center justify-between px-3 py-3.5'>
-                    <div className='flex items-center gap-[9px]'>
-                      <CircleArrowUp
-                        className='group-hover:rotate-45 transition-transform duration-300 ease-in min-size-fit'
-                        strokeWidth={1.5}
-                        size={38}
-                        color='#1B8111'
-                      />
+          <div
+            className={`mt-[15px] max-h-[582px] overflow-y-scroll scrollbar-thin
+              scrollbar-track-transparent scrollbar-thumb-transparent
+              scrollbar-thumb-rounded-full
+              scrollbar-hover:scrollbar-thumb-[#AAAAAA]
+              group-hover/container:scrollbar-thumb-[#BBBBBB] group-hover/container:scrollbar-track-transparent
+              `}
+          >
+            {allTxs.map((tx, idx) => {
+              const isWithdrawalTx = tx.type === EAutoHodlTxType.Withdrawal;
+              const isSelfWithdrawal = isWithdrawalTx && tx.to.toLowerCase() === tx.from.toLowerCase();
+              return (
+                <Link key={tx.id} href={getTransactionLink(tx.txHash)} target='_blank' className='no-underline'>
+                  <div
+                    className={`group/tx border border-gray-300 flex flex-col gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]
+                      ${allTxs.length - 1 === idx ? '' : 'mb-3'}
+                      mr-1.5
+                    `}
+                  >
+                    <div className='flex items-center justify-between px-3 py-3.5'>
+                      <div className='flex items-center gap-[9px]'>
+                        {isSelfWithdrawal ? (
+                          <CircleArrowDown
+                            className='group-hover/tx:-rotate-135 transition-transform duration-300 ease-in min-size-fit'
+                            strokeWidth={1.5}
+                            size={38}
+                            color='#6B7280'
+                          />
+                        ) : isWithdrawalTx ? (
+                          <CircleArrowRight
+                            className='-rotate-45 transition-transform duration-300 ease-in min-size-fit'
+                            strokeWidth={1.5}
+                            size={38}
+                            color='#F59E0B'
+                          />
+                        ) : (
+                          <CircleArrowUp
+                            className='group-hover/tx:rotate-45 transition-transform duration-300 ease-in min-size-fit'
+                            strokeWidth={1.5}
+                            size={38}
+                            color='#22C55E'
+                          />
+                        )}
+                        <div>
+                          <p className='font-semibold text-black text-base text-left'>
+                            ${truncateToTwoDecimals(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS))}
+                          </p>
+                          <p className='font-normal text-left'>
+                            {isSelfWithdrawal
+                              ? `Self withdrawal`
+                              : isWithdrawalTx
+                                ? `Sent to ${formatAddress(tx.to)}`
+                                : 'Deposited to aave'}
+                          </p>
+                        </div>
+                      </div>
+
                       <div>
-                        <p className='font-semibold text-black text-base text-left'>
-                          ${truncateToTwoDecimals(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS))}
+                        <p className='font-normal text-[#0f0f0f] text-base text-right'>
+                          {tx?.timestamp ? timeAgo(tx?.timestamp) : null}
                         </p>
-                        <p className='font-normal text-left'>Deposited to aave</p>
+                        <p className='font-normal text-[#0f0f0f] text-base text-right'>
+                          {isWithdrawalTx
+                            ? null
+                            : `purchase - ${truncateToTwoDecimals(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}`}
+                        </p>
                       </div>
                     </div>
-
-                    <div>
-                      <p className='font-normal text-[#0f0f0f] text-base text-right'>
-                        {tx?.timestamp ? timeAgo(tx?.timestamp) : null}
-                      </p>
-                      <p className='font-normal text-black text-base text-right'>
-                        purchase - ${truncateToTwoDecimals(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}
-                      </p>
-                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
 
             {hasNext && (
-              <button
-                type='button'
-                title='Load more'
-                onClick={() => {
-                  fetchNext();
-                }}
-                className='w-full py-2 px-2 flex items-center justify-center border border-black/50 gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5] transition-colors duration-300'
-              >
-                {loading ? (
-                  <Loader2 className={'animate-spin'} color='#78E76E' />
-                ) : (
-                  <CircleChevronDown strokeWidth={1.5} />
-                )}
-              </button>
+              <div className='pr-2'>
+                <button
+                  type='button'
+                  title='Load more'
+                  onClick={() => {
+                    fetchNext();
+                  }}
+                  className='w-full mt-3 py-2 px-2 flex items-center justify-center border border-gray-300 gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]'
+                >
+                  {loading ? (
+                    <Loader2 className={'animate-spin'} color='#78E76E' />
+                  ) : (
+                    <CircleChevronDown strokeWidth={1.5} color='#0f0f0f99' />
+                  )}
+                </button>
+              </div>
             )}
           </div>
         )}

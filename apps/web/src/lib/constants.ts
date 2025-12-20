@@ -161,3 +161,5 @@ export const MoralisStreamId = {
   MmcWithdrawal: secrets.MoralisStreamIdMmcWithdrawal,
   EoaTransfer: secrets.MoralisStreamIdEoaTransfer,
 };
+
+export const verboseLogs = secrets.VerboseLogs;

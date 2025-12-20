@@ -1,6 +1,6 @@
 import { createWalletClient, type Hex, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { chain } from '@/config';
+import { viemChain as chain } from '@/config';
 import { secrets } from '@/lib/secrets';
 
 export const account = privateKeyToAccount(secrets.privateKeyExecutor as Hex);

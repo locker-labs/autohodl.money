@@ -1,27 +1,26 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, TOKEN_DECIMALS } from '@/lib/constants';
+import { SUsdcAddressMap, TOKEN_DECIMALS } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
-import { computeRoundUpAndSavings } from '@/lib/helpers';
-import { type Hex, parseUnits } from 'viem';
+import { type Hex, parseUnits, zeroAddress } from 'viem';
+import { chain } from '@/config';
 
-export interface ISavingsTx {
+export interface IWithdrawalTx {
   id: string;
   timestamp?: string;
   to: string;
   from: string;
   value: bigint;
   txHash: string;
-  purchaseValue: bigint;
   blockNum: Hex;
-  type: 'savings';
+  type: 'withdrawal';
 }
 
-export function useSavingsTxs() {
+export function useWithdrawalTxs() {
   const { address } = useAccount();
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: [`savings-txs-${address}`],
+    queryKey: [`withdrawal-txs-${address}`],
     queryFn: async ({ pageParam }) => {
       if (!address) {
         return { transfers: [], pageKey: undefined };
@@ -29,17 +28,14 @@ export function useSavingsTxs() {
 
       const response = await fetchErc20Transfers({
         fromAddress: address,
-        toAddress: AUTOHODL_ADDRESS,
-        contractAddresses: AUTOHODL_SUPPORTED_TOKENS,
+        contractAddresses: [SUsdcAddressMap[chain.id]],
         maxCount: 100,
         pageKey: pageParam,
       });
 
       return response;
     },
-    getNextPageParam: (lastPage) => {
-      return lastPage.pageKey;
-    },
+    getNextPageParam: (lastPage) => lastPage.pageKey,
     initialPageParam: undefined as string | undefined,
     enabled: !!address,
     refetchOnWindowFocus: true,
@@ -48,7 +44,7 @@ export function useSavingsTxs() {
   });
 
   // Flatten all pages into a single array of transactions
-  const allTxs: ISavingsTx[] =
+  const allTxs: IWithdrawalTx[] =
     data?.pages.flatMap((page) =>
       page.transfers.map((tx) => ({
         id: tx.uniqueId,
@@ -57,17 +53,15 @@ export function useSavingsTxs() {
         from: tx.from,
         value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
         txHash: tx.hash,
-        purchaseValue: computeRoundUpAndSavings(
-          parseUnits(tx.value.toString(), TOKEN_DECIMALS),
-          parseUnits('1', TOKEN_DECIMALS),
-        ).savingsAmount,
         blockNum: tx.blockNum as Hex,
-        type: 'savings',
+        type: 'withdrawal' as const,
       })),
     ) || [];
 
+  const allTxsFiltered: IWithdrawalTx[] = allTxs.filter((tx) => tx.to !== zeroAddress);
+
   // Get only the most recent page's transactions
-  const txs: ISavingsTx[] =
+  const txs: IWithdrawalTx[] =
     data?.pages[data.pages.length - 1]?.transfers.map((tx) => ({
       id: tx.uniqueId,
       timestamp: tx.metadata?.blockTimestamp,
@@ -75,17 +69,17 @@ export function useSavingsTxs() {
       from: tx.from,
       value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
       txHash: tx.hash,
-      purchaseValue: computeRoundUpAndSavings(
-        parseUnits(tx.value.toString(), TOKEN_DECIMALS),
-        parseUnits('1', TOKEN_DECIMALS),
-      ).savingsAmount,
       blockNum: tx.blockNum as Hex,
-      type: 'savings',
+      type: 'withdrawal' as const,
     })) || [];
+
+  const txsFiltered: IWithdrawalTx[] = txs.filter((tx) => tx.to !== zeroAddress);
 
   return {
     allTxs, // All transactions from all pages
+    allTxsFiltered,
     txs, // Transactions from the most recent page only
+    txsFiltered,
     error: error instanceof Error ? error.message : null,
     loading: isLoading,
     loadingMore: isFetchingNextPage,

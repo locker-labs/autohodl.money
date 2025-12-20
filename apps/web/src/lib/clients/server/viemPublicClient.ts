@@ -1,5 +1,5 @@
 import { createPublicClient, http } from 'viem';
-import { chain } from '@/config';
+import { viemChain as chain } from '@/config';
 import { secrets } from '@/lib/secrets';
 
 export const viemPublicClient = createPublicClient({
