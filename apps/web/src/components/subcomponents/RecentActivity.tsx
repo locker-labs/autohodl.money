@@ -28,8 +28,6 @@ export function RecentActivity(): React.JSX.Element {
     hasNext: hasNextWithdrawals,
   } = useWithdrawalTxs();
 
-  // logInfo('RecentActivity - hasNext sav, with:', hasNextSavings, hasNextWithdrawals);
-
   const fetchNext = () => {
     if (hasNextSavings) {
       fetchNextSavings();
@@ -45,8 +43,6 @@ export function RecentActivity(): React.JSX.Element {
   const loading = loadingWithdrawals || loadingSavings;
 
   const allTxs = [...allSavingsTxs, ...allWithdrawalTxs].sort((a, b) => (a.blockNum < b.blockNum ? 1 : -1));
-
-  // logInfo('RecentActivity - allTxs:', allTxs);
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1

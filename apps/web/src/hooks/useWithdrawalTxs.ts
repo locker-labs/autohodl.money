@@ -1,9 +1,10 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { SUsdcAddressMap, TOKEN_DECIMALS } from '@/lib/constants';
-import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
+import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits, zeroAddress } from 'viem';
 import { chain } from '@/config';
+import { EAutoHodlTxType } from '@/enums';
 
 export interface IWithdrawalTx {
   id: string;
@@ -13,7 +14,7 @@ export interface IWithdrawalTx {
   value: bigint;
   txHash: string;
   blockNum: Hex;
-  type: 'withdrawal';
+  type: EAutoHodlTxType.Withdrawal;
 }
 
 export function useWithdrawalTxs() {
@@ -44,34 +45,12 @@ export function useWithdrawalTxs() {
   });
 
   // Flatten all pages into a single array of transactions
-  const allTxs: IWithdrawalTx[] =
-    data?.pages.flatMap((page) =>
-      page.transfers.map((tx) => ({
-        id: tx.uniqueId,
-        timestamp: tx.metadata?.blockTimestamp,
-        to: tx.to,
-        from: tx.from,
-        value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
-        txHash: tx.hash,
-        blockNum: tx.blockNum as Hex,
-        type: 'withdrawal' as const,
-      })),
-    ) || [];
+  const allTxs: IWithdrawalTx[] = data?.pages.flatMap((page) => page.transfers.map(withdrawalTxMapper)) || [];
 
   const allTxsFiltered: IWithdrawalTx[] = allTxs.filter((tx) => tx.to !== zeroAddress);
 
   // Get only the most recent page's transactions
-  const txs: IWithdrawalTx[] =
-    data?.pages[data.pages.length - 1]?.transfers.map((tx) => ({
-      id: tx.uniqueId,
-      timestamp: tx.metadata?.blockTimestamp,
-      to: tx.to,
-      from: tx.from,
-      value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
-      txHash: tx.hash,
-      blockNum: tx.blockNum as Hex,
-      type: 'withdrawal' as const,
-    })) || [];
+  const txs: IWithdrawalTx[] = data?.pages[data.pages.length - 1]?.transfers.map(withdrawalTxMapper) || [];
 
   const txsFiltered: IWithdrawalTx[] = txs.filter((tx) => tx.to !== zeroAddress);
 
@@ -85,5 +64,18 @@ export function useWithdrawalTxs() {
     loadingMore: isFetchingNextPage,
     hasNext: hasNextPage,
     fetchNext: fetchNextPage,
+  };
+}
+
+function withdrawalTxMapper(tx: Erc20Transfer) {
+  return {
+    id: tx.uniqueId,
+    timestamp: tx.metadata?.blockTimestamp,
+    to: tx.to,
+    from: tx.from,
+    value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
+    txHash: tx.hash,
+    blockNum: tx.blockNum as Hex,
+    type: EAutoHodlTxType.Withdrawal as const,
   };
 }
