@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { erc20Abi, formatUnits, parseUnits } from 'viem';
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { TokenDecimalMap } from '@/lib/constants';
-import { truncateToTwoDecimals } from '@/lib/math';
+import { roundOff } from '@/lib/math';
 
 type Address = `0x${string}`;
 
@@ -133,12 +133,11 @@ export function useERC20BalanceOf(params: {
       enabled: params.enabled ?? !!params.address,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 15000,
-      staleTime: 0,
+      refetchInterval: 5000,
     },
   });
 
-  const balanceFormatted = data ? truncateToTwoDecimals(formatUnits(data, decimals)) : 0;
+  const balanceFormatted = data ? roundOff(formatUnits(BigInt(data), decimals), 2) : 0;
 
   return {
     balance: data,

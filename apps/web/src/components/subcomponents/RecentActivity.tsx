@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSavingsTxs } from '@/hooks/useSavingsTxs';
 import { getTransactionLink } from '@/lib/blockExplorer';
 import { TOKEN_DECIMALS } from '@/lib/constants';
-import { truncateToTwoDecimals } from '@/lib/math';
+import { roundOff } from '@/lib/math';
 import { timeAgo } from '@/lib/time';
 import Image from 'next/image';
 import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
@@ -125,7 +125,7 @@ export function RecentActivity(): React.JSX.Element {
                         )}
                         <div>
                           <p className='font-semibold text-black text-base text-left'>
-                            ${truncateToTwoDecimals(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS))}
+                            ${roundOff(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS), 2)}
                           </p>
                           <p className='font-normal text-left'>
                             {isSelfWithdrawal
@@ -144,7 +144,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - ${truncateToTwoDecimals(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}`}
+                            : `purchase - ${roundOff(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS), 2)}`}
                         </p>
                       </div>
                     </div>
