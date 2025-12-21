@@ -2,6 +2,7 @@ import axios from 'axios';
 import { chain } from '@/config';
 import { AlchemyChainMap } from '@/lib/constants';
 import { secrets } from '@/lib/secrets';
+import type { Hex } from 'viem';
 
 const ALCHEMY_API_URL = `https://${AlchemyChainMap[chain.id]}.g.alchemy.com/v2/${secrets.alchemyApiKey}`;
 
@@ -20,7 +21,7 @@ interface Erc20TransferParams {
 }
 
 export interface Erc20Transfer {
-  blockNum: string;
+  blockNum: Hex;
   uniqueId: string;
   hash: string;
   from: string;

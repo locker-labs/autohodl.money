@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { type Address, getAddress } from 'viem';
 import { viemPublicClient } from '@/lib/clients/client';
 import { TokenToTransferStreamIdMap } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
+import { getSavingsConfig } from '@/lib/autohodl';
 import { addAddressToEoaErc20TransferMoralisStream } from '@/lib/moralis';
 import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 

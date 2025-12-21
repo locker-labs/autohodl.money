@@ -1,4 +1,4 @@
-import { CreditCard, Info } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
@@ -7,7 +7,7 @@ import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
 import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
 export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
   const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem('sUSDCAdded') === 'true';
@@ -60,16 +60,12 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
             )}
             <div className='mt-2 flex items-center justify-start gap-2'>
               <p className='text-black text-lg text-left sm:text-center md:text-left'>Current Balance</p>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info size={16} className='h-4 w-4' />
-                </TooltipTrigger>
-                <TooltipContent>
-                  {
-                    'You automatically earn yield from your sUSDC balance. When you send sUSDC to another wallet, it converts into USDC.'
-                  }
-                </TooltipContent>
-              </Tooltip>
+
+              <AdaptiveInfoTooltip
+                content={
+                  'You automatically earn yield from your sUSDC balance. When you send sUSDC to another wallet, it converts into USDC.'
+                }
+              />
             </div>
           </div>
           <div>

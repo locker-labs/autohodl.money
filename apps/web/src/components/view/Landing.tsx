@@ -13,19 +13,10 @@ import { Footer } from '@/components/subcomponents/Footer';
 
 const testimonials = [
   {
-    text: `“AutoHodl has completely changed the way I manage my digital assets. The experience feels effortless, yet powerful. I’ve never felt more confident about my savings growing in the background.”`,
-    author: 'Marvin Arnold',
-    role: 'Blockchain Engineer, locker.money',
-  },
-  {
-    text: `“AutoHodl has completely changed the way I manage my digital assets.”`,
-    author: 'Manmeet Brar',
-    role: 'Blockchain Engineer, locker.money',
-  },
-  {
-    text: `“AutoHodl has completely changed the way I manage my digital assets. The experience feels effortless, yet powerful. I’ve never felt more confident about my savings growing in the background.”`,
-    author: 'Ashu Gupta',
-    role: 'Blockchain Engineer, locker.money',
+    idx: 0,
+    text: `“This is what building on open infrastructure looks like. More of this, please!”`,
+    author: 'Alejandro Machado',
+    role: 'MetaMask',
   },
 ];
 
@@ -255,8 +246,8 @@ export default function LandingPage() {
           className='mt-4 lg:mt-0 w-full max-w-[1000px]'
         >
           <CarouselContent>
-            {testimonials.map((t, index) => (
-              <CarouselItem key={index}>
+            {testimonials.map((t) => (
+              <CarouselItem key={t.idx}>
                 <div className='items-center justify-center p-0 lg:p-6'>
                   <p className='text-[24px] lg:text-[32px] font-base'>{t.text}</p>
                   <div className='mt-[24px] lg:mt-[47px]'>
