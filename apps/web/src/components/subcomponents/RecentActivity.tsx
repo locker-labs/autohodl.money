@@ -140,7 +140,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - ${roundOff(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS), 2)}`}
+                            : `purchase - $${roundOff(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS), 2)}`}
                         </p>
                       </div>
                     </div>
