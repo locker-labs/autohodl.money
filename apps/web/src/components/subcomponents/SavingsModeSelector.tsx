@@ -1,4 +1,3 @@
-import { Info } from 'lucide-react';
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { SupportedAccounts, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
@@ -6,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { LoaderSecondary } from '@/components/ui/loader';
 import Image from 'next/image';
 import { SavingsMode } from '@/types/autohodl';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatUnits } from 'viem';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
 const SavingsModeSelector = () => {
   const [mode, setMode] = useState<SavingsMode>(SavingsMode.All);
@@ -107,12 +106,7 @@ const SavingsModeSelector = () => {
             </div>
             <div className='h-full flex items-center justify-center gap-2'>
               {opt.label}
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info size={16} className='h-4 w-4' />
-                </TooltipTrigger>
-                <TooltipContent>{opt.info}</TooltipContent>
-              </Tooltip>
+              <AdaptiveInfoTooltip content={opt.info} />
             </div>
           </button>
         ))}

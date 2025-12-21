@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { LoaderSecondary } from '@/components/ui/loader';
 import Image from 'next/image';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
 const yieldOptions = [
   {
@@ -94,12 +93,7 @@ const YieldSwitch = () => {
             </div>
             <div className='flex items-center justify-center gap-2'>
               {opt.label}
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info size={16} className='h-4 w-4' />
-                </TooltipTrigger>
-                <TooltipContent>{opt.info}</TooltipContent>
-              </Tooltip>
+              <AdaptiveInfoTooltip content={opt.info} />
             </div>
           </button>
         ))}

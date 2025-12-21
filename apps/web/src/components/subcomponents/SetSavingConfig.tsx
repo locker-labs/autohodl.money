@@ -11,8 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { SavingsMode } from '@/types/autohodl';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { Info } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
 const savingOptions = [
   { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
@@ -218,12 +217,7 @@ export default function SetSavingConfig() {
                   </div>
                   <div className='h-full flex items-center justify-center gap-2'>
                     {opt.label}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info size={16} className='h-4 w-4' />
-                      </TooltipTrigger>
-                      <TooltipContent>{opt.info}</TooltipContent>
-                    </Tooltip>
+                    <AdaptiveInfoTooltip content={opt.info} />
                   </div>
                 </button>
               ))}
@@ -270,12 +264,7 @@ export default function SetSavingConfig() {
                   </div>
                   <div className='flex items-center justify-center gap-2'>
                     {opt.label}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info size={16} className='h-4 w-4' />
-                      </TooltipTrigger>
-                      <TooltipContent>{opt.info}</TooltipContent>
-                    </Tooltip>
+                    <AdaptiveInfoTooltip content={opt.info} />
                   </div>
                 </button>
               ))}
