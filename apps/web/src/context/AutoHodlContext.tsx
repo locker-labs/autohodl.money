@@ -39,7 +39,7 @@ type Props = {
 };
 
 export const AutoHodlProvider: FC<Props> = ({ children }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState<SavingsConfig | null>(null);
   const [refetchFlag, setRefetchFlag] = useState(false);
   const { address, isConnected } = useAccount();
