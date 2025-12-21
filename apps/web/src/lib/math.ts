@@ -1,7 +1,8 @@
-export function truncateToTwoDecimals(value: string | number): number {
+export function roundOff(value: string | number, decimals = 0): number {
   const [whole, decimal] = String(value).split('.');
   if (!decimal) return Number(whole);
-  return Number(`${whole}.${decimal.slice(0, 2)}`);
+
+  return Math.round(Number(`${whole}.${decimal}`) * 10 ** decimals) / 10 ** decimals;
 }
 
 export function formatAmount(value: number, sign = '$'): string {

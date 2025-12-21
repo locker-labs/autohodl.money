@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
 import { S_USDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
+import { getSavingsConfig } from '@/lib/autohodl';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';

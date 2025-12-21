@@ -4,7 +4,7 @@ import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
 import { viemPublicClient } from '@/lib/clients/server';
 import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/contract/getSavingsConfig';
+import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
 import { computeRoundUpAndSavings, isAutoHodlSupportedToken } from '@/lib/helpers';

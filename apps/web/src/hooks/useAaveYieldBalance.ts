@@ -8,7 +8,7 @@ import {
   TOKEN_DECIMALS,
 } from '@/lib/constants';
 import { chain } from '@/config';
-import { truncateToTwoDecimals } from '@/lib/math';
+import { roundOff } from '@/lib/math';
 
 const chainId = chain.id;
 
@@ -45,7 +45,7 @@ export const useAaveYieldBalance = () => {
       enabled: isConnected && !!userAddress,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 15000,
+      refetchInterval: 5000,
     },
   });
 
@@ -58,7 +58,7 @@ export const useAaveYieldBalance = () => {
 
     const balance = tokenData[0].scaledATokenBalance;
 
-    balanceData = { balance, balanceFormatted: truncateToTwoDecimals(formatUnits(balance, TOKEN_DECIMALS)) };
+    balanceData = { balance, balanceFormatted: roundOff(formatUnits(balance, TOKEN_DECIMALS), 2) };
   }
 
   return {

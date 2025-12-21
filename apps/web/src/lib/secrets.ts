@@ -9,4 +9,5 @@ export const secrets = {
   alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '',
   MoralisStreamIdEoaTransfer: process.env.MORALIS_STREAM_ID_EOA_TRANSFER || '',
   MoralisStreamIdMmcWithdrawal: process.env.MORALIS_STREAM_ID_MMC_WITHDRAWAL || '',
+  VerboseLogs: process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' || false,
 };

@@ -148,6 +148,7 @@ export const AlchemyChainMap = {
 
 export const TransferEventSig = 'Transfer(address,address,uint256)';
 export const SavingConfigSetEventSigHash = '0x65ffc51d687a08ab0d99951353c570081e516436bbf9c43a74a3ac35987d8b7f';
+export const SavingDelegatedEventSigHash = '0x405126e05ad9b5ccd76214f859fe5de73a75910b25e4c4604aa0d4e6bac511f9';
 
 // Supported tokens to Moralis Stream ID map
 export const TokenToTransferStreamIdMap: Record<Address, string> = {
@@ -161,3 +162,8 @@ export const MoralisStreamId = {
   MmcWithdrawal: secrets.MoralisStreamIdMmcWithdrawal,
   EoaTransfer: secrets.MoralisStreamIdEoaTransfer,
 };
+
+export const verboseLogs = secrets.VerboseLogs;
+
+const ALCHEMY_API_URL = `https://${AlchemyChainMap[chain.id]}.g.alchemy.com/v2/${secrets.alchemyApiKey}`;
+export { ALCHEMY_API_URL };

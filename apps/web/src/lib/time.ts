@@ -23,3 +23,22 @@ export function timeAgo(dateString: string): string {
   if (months < 12) return `${months} month${months !== 1 ? 's' : ''} ago`;
   return `${years} year${years !== 1 ? 's' : ''} ago`;
 }
+
+export function timeAgoFromHex(hexTimestamp: string): string {
+  if (!hexTimestamp) return 'invalid date';
+
+  const seconds = Number.parseInt(hexTimestamp, 16);
+  if (Number.isNaN(seconds)) return 'invalid date';
+
+  const isoString = new Date(seconds * 1000).toISOString();
+  return timeAgo(isoString);
+}
+
+export function renderBlockTimestamp(hexTimestamp: string): string {
+  if (!hexTimestamp) return '';
+
+  const seconds = Number.parseInt(hexTimestamp, 16);
+  if (Number.isNaN(seconds)) return '';
+
+  return new Date(seconds * 1000).toLocaleString();
+}

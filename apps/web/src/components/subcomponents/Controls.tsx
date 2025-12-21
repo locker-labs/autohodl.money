@@ -9,7 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent } from '@/components/ui/card';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { USDC_ADDRESS } from '@/lib/constants';
+import { SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
 import { useAccount } from 'wagmi';
 import { CopyContentButton } from '../feature/CopyContentButton';
@@ -43,8 +43,27 @@ export function Controls(): React.JSX.Element {
 
 export function ControlsMobile(): React.JSX.Element {
   const { address: userAddress } = useAccount();
-  const { config, token } = useAutoHodl();
+  const { accounts, config, token } = useAutoHodl();
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
+  const hasMetaMaskCard: boolean = accounts.some((acc) => acc === SupportedAccounts.MetaMask);
+
+  const displayAccount = hasMetaMaskCard
+    ? {
+        Logo: (
+          <Image
+            src={'/MetaMask-icon-fox.svg'}
+            alt='metamask card'
+            width={24}
+            height={24}
+            className='min-w-6 min-h-6 max-h-6 max-w-6'
+          />
+        ),
+        title: 'MetaMask Card',
+      }
+    : {
+        Logo: <Lock className='min-w-5 min-h-5' size={20} />,
+        title: 'Connected Account',
+      };
 
   const savingsAddressToken = useERC20BalanceOf({
     token: USDC_ADDRESS,
@@ -64,10 +83,10 @@ export function ControlsMobile(): React.JSX.Element {
 
               <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
                 <div className='flex items-center justify-start gap-3'>
-                  <Lock className='min-w-5 min-h-5' size={20} />
+                  {displayAccount.Logo}
                   <div>
                     <div>
-                      <p className='text-[15px] whitespace-nowrap'>Connected Account</p>
+                      <p className='text-[15px] whitespace-nowrap'>{displayAccount.title}</p>
                       <CopyContentButton textToCopy={userAddress || ''} onCopyMessage='Address copied to clipboard'>
                         {formatAddress(userAddress)}
                       </CopyContentButton>
