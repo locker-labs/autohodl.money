@@ -1,8 +1,8 @@
-import { Wallet, Info } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
 export function RoundupSavingsCard({ loading, value }: { loading: boolean; value: number }) {
   return (
@@ -23,12 +23,7 @@ export function RoundupSavingsCard({ loading, value }: { loading: boolean; value
           )}
           <div className='mt-2 flex items-center justify-start gap-2'>
             <p className='text-black text-lg text-left sm:text-center md:text-left'>Lifetime Savings</p>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info size={16} className='h-4 w-4' />
-              </TooltipTrigger>
-              <TooltipContent>{'Lifetime spare change saved. Does not include yield.'}</TooltipContent>
-            </Tooltip>
+            <AdaptiveInfoTooltip content={'Lifetime spare change saved. Does not include yield.'} />
           </div>
         </div>
       </CardContent>
