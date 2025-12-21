@@ -5,6 +5,7 @@ import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Tr
 import { type Hex, parseUnits, zeroAddress } from 'viem';
 import { chain } from '@/config';
 import { EAutoHodlTxType } from '@/enums';
+import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
 
 export interface IWithdrawalTx {
   id: string;
@@ -33,6 +34,17 @@ export function useWithdrawalTxs() {
         maxCount: 100,
         pageKey: pageParam,
       });
+
+      const blockNumbers = response.transfers.map((tx) => tx.blockNum);
+      const blocks = await fetchBlockByNumberInBatch(blockNumbers);
+      const blockTimestamps = blocks.map((block) => block.timestamp);
+
+      response.transfers = response.transfers.map((tx, i) => ({
+        ...tx,
+        metadata: {
+          blockTimestamp: blockTimestamps[i],
+        },
+      }));
 
       return response;
     },

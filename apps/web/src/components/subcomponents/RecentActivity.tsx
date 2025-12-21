@@ -7,7 +7,7 @@ import { useSavingsTxs } from '@/hooks/useSavingsTxs';
 import { getTransactionLink } from '@/lib/blockExplorer';
 import { TOKEN_DECIMALS } from '@/lib/constants';
 import { roundOff } from '@/lib/math';
-import { timeAgo } from '@/lib/time';
+import { timeAgoFromHex } from '@/lib/time';
 import Image from 'next/image';
 import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
 import { formatAddress } from '@/lib/string';
@@ -135,7 +135,7 @@ export function RecentActivity(): React.JSX.Element {
 
                       <div>
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
-                          {tx?.timestamp ? timeAgo(tx?.timestamp) : null}
+                          {tx?.timestamp ? timeAgoFromHex(tx.timestamp) : null}
                         </p>
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx

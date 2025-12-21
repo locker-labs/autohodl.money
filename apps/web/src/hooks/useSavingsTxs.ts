@@ -6,6 +6,7 @@ import { type Hex, parseUnits } from 'viem';
 import { fetchSourceTxInfoInBatch } from '@/lib/data/fetchSourceTxInfoInBatch';
 import type { SourceTxInfo } from '@/types/autohodl';
 import { EAutoHodlTxType } from '@/enums';
+import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
 
 export interface ISavingsTx {
   id: string;
@@ -38,13 +39,23 @@ export function useSavingsTxs() {
         pageKey: pageParam,
       });
 
+      const blockNumbers = response.transfers.map((tx) => tx.blockNum);
+      const blocks = await fetchBlockByNumberInBatch(blockNumbers);
+      const blockTimestamps = blocks.map((block) => block.timestamp);
+
       const transactionHashes = response.transfers.map((tx) => tx.hash);
       const sourceTxInfoArray = await fetchSourceTxInfoInBatch(transactionHashes);
 
       const transfersWithSourceTxInfo: (Erc20Transfer & SourceTxInfo)[] = [];
 
       for (let i = 0; i < response.transfers.length; i++) {
-        transfersWithSourceTxInfo.push({ ...response.transfers[i], ...sourceTxInfoArray[i] });
+        transfersWithSourceTxInfo.push({
+          ...response.transfers[i],
+          ...sourceTxInfoArray[i],
+          metadata: {
+            blockTimestamp: blockTimestamps[i],
+          },
+        });
       }
 
       return {

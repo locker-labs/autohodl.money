@@ -26,3 +26,32 @@ export interface ITransactionReceipt {
   transactionIndex: Hex;
   type: Hex;
 }
+
+export interface IBlock {
+  baseFeePerGas: Hex;
+  blobGasUsed: Hex;
+  difficulty: Hex;
+  excessBlobGas: Hex;
+  extraData: Hex;
+  gasLimit: Hex;
+  gasUsed: Hex;
+  hash: Hex;
+  logsBloom: Hex;
+  miner: Hex;
+  mixHash: Hex;
+  nonce: Hex;
+  number: Hex;
+  parentBeaconBlockRoot: Hex;
+  parentHash: Hex;
+  receiptsRoot: Hex;
+  requestsHash: Hex;
+  sha3Uncles: Hex;
+  size: Hex;
+  stateRoot: Hex;
+  timestamp: Hex;
+  transactions: Hex[];
+  transactionsRoot: Hex;
+  uncles: unknown[];
+  withdrawals: unknown[];
+  withdrawalsRoot: Hex;
+}

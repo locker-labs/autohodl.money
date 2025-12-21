@@ -1,7 +1,7 @@
 export interface IJsonRpcRequest {
   jsonrpc: string;
   method: string;
-  params: string[];
+  params: (string | number | boolean)[];
   id: number;
 }
 
