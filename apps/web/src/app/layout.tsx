@@ -13,17 +13,17 @@ const albertSans = Albert_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://autohodl.money'),
   title: {
-    default: 'AutoHODL',
-    template: '%s | AutoHODL',
+    default: 'autoHODL',
+    template: '%s | autoHODL',
   },
   description: 'Save while you spend. Automatically round up your transactions and save the spare change.',
-  keywords: ['DeFi', 'Savings', 'Crypto', 'Roundups', 'AutoHODL', 'Ethereum', 'Linea', 'Sepolia', 'Invest', 'Yield'],
-  authors: [{ name: 'AutoHODL Team' }],
+  keywords: ['DeFi', 'Savings', 'Crypto', 'Roundups', 'autoHODL', 'Ethereum', 'Linea', 'Sepolia', 'Invest', 'Yield'],
+  authors: [{ name: 'autoHODL Team' }],
   openGraph: {
-    title: 'AutoHODL',
+    title: 'autoHODL',
     description: 'Save while you spend. Automatically round up your transactions and save the spare change.',
     url: 'https://autohodl.money',
-    siteName: 'AutoHODL',
+    siteName: 'autoHODL',
     locale: 'en_US',
     type: 'website',
     images: [
@@ -31,18 +31,18 @@ export const metadata: Metadata = {
         url: '/hero.landing.png',
         width: 1200,
         height: 630,
-        alt: 'AutoHODL Preview',
+        alt: 'autoHODL Preview',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AutoHODL',
+    title: 'autoHODL',
     description: 'Save while you spend. Automatically round up your transactions and save the spare change.',
     images: ['/hero.landing.png'],
   },
   appleWebApp: {
-    title: 'AutoHODL',
+    title: 'autoHODL',
   },
   icons: {
     icon: '/web-app-manifest-192x192.png',

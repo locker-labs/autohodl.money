@@ -52,7 +52,7 @@ export default function LandingPage() {
             <Image
               className='w-[150px] lg:w-[200px]'
               src='/AutoHODL.png'
-              alt='AutoHODL'
+              alt='autoHODL'
               width={200}
               height={100}
               priority
@@ -122,7 +122,7 @@ export default function LandingPage() {
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
           <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
-            AutoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
+            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
             yield.
           </p>
         </div>
@@ -152,7 +152,7 @@ export default function LandingPage() {
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
           </p>
           <p className='max-w-[600px] text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
-            AutoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
+            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
             passive yield.
           </p>
         </div>
@@ -161,12 +161,12 @@ export default function LandingPage() {
           <BorderCard
             imgSrc='/coins.png'
             title='Spend normally'
-            description='Use your MetaMask Card for daily purchases'
+            description='Use any wallet you already have for daily purchases'
           />
           <BorderCard
             imgSrc='/save.png'
             title='Auto round-up'
-            description='Spare change (eg $0.75 on $3.25 purchase) is deposited into Aave'
+            description='Payments are rounded up and your spare change is deposited into Aave'
           />
           <BorderCard
             imgSrc='/grow.svg'
@@ -183,7 +183,7 @@ export default function LandingPage() {
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
             <p className='text-[40px] font-medium'>MetaMask Card</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
-              Save & earn yield on your MetaMask Card transfers. AutoHODL ranked #1 by MetaMask in Smart Agents &
+              Save & earn yield on your MetaMask Card transfers. autoHODL ranked #1 by MetaMask in Smart Agents &
               Liquidity Automation.
             </p>
 
@@ -211,7 +211,7 @@ export default function LandingPage() {
             {/* <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p> */}
             <p className='text-[40px] font-medium'>Spendable Yield Tokens</p>
             <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
-              AutoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them. They work
+              autoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them. They work
               like normal tokens but grow automatically in your wallet without staking, locking, or claiming.
             </p>
 
@@ -235,9 +235,6 @@ export default function LandingPage() {
 
       {/* Testimonials */}
       <section className='py-[48px] px-[24px] lg:px-[48px] bg-[#f7feec] flex flex-col items-center justify-center'>
-        <div className={'mb-[12px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <p className='text-[40px] font-medium mb-[12px] lg:mb-0'>Testimonials</p>
-        </div>
         {/* Shadcn carousel */}
         <Carousel
           plugins={[plugin.current]}

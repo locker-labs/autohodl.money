@@ -19,7 +19,7 @@ export function Footer({ innerClassName = '', className }: { innerClassName?: st
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className='text-[16px] text-black cursor-pointer'
           >
-            Auto<span className='font-bold'>HODL</span>
+            auto<span className='font-bold'>HODL</span>
           </button>
           <div className='flex flex-col sm:flex-row items-start lg:items-center justify-center gap-[12px] lg:gap-[32px] text-[16px] text-[#4D4A4A]'>
             <p className='sm:hidden text-sm font-bold'>Connect</p>
