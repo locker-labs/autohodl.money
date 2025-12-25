@@ -4,7 +4,7 @@ import { walletClient } from '../../clients/server';
 import { AUTOHODL_ADDRESS } from '../../constants';
 
 /**
- * Executes a savings transaction on the autoHODL contract.
+ * Executes a savings transaction on the AutoHodl contract.
  * @param user The user address (must match connected wallet)
  * @param token The ERC20 token address
  * @param value The amount to transfer (in token's smallest unit, e.g. USDC 6 decimals)
