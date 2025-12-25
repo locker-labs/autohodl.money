@@ -46,7 +46,7 @@ export function RecentActivity(): React.JSX.Element {
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
-    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-full group/container'>
+    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-fit group/container'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Recent Activity</h2>
