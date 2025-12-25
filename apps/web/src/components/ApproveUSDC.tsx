@@ -73,7 +73,7 @@ export default function USDCApprovalChecker() {
 
         <div>
           <label className='block text-sm font-medium text-gray-700 mb-1'>
-            AutoHodl Allowance (USDC)
+            autoHODL Allowance (USDC)
             <input
               type='number'
               value={autohodlAllowance}
@@ -123,7 +123,7 @@ export default function USDCApprovalChecker() {
         {allowance !== undefined && !needsApproval && AUTOHODL_ADDRESS && (
           <div className='flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-md'>
             <CheckCircle className='w-5 h-5' />
-            <p className='font-medium'>AutoHodl can now save up to {autohodlAllowance} USDC</p>
+            <p className='font-medium'>autoHODL can now save up to {autohodlAllowance} USDC</p>
           </div>
         )}
 

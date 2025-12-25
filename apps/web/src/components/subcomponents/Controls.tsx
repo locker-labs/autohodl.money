@@ -17,6 +17,7 @@ import { PriceSkeleton } from './PriceSkeleton';
 import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
 import SavingsLimit from './SavingsLimit';
+import { formatAmount } from '@/lib/math';
 
 export function Controls(): React.JSX.Element {
   const title = `Controls`;
@@ -99,7 +100,7 @@ export function ControlsMobile(): React.JSX.Element {
                   {!token.isReady ? (
                     <PriceSkeleton />
                   ) : (
-                    <p className='whitespace-nowrap'>{token.balanceFormatted} USDC</p>
+                    <p className='whitespace-nowrap'>{formatAmount(token.balanceFormatted, '')} USDC</p>
                   )}
                 </div>
               </div>
@@ -148,7 +149,7 @@ export function ControlsMobile(): React.JSX.Element {
                     {!savingsAddressToken.isReady ? (
                       <PriceSkeleton />
                     ) : (
-                      <p className='whitespace-nowrap'>{savingsAddressToken.balanceFormatted} USDC</p>
+                      <p className='whitespace-nowrap'>{formatAmount(savingsAddressToken.balanceFormatted, '')} USDC</p>
                     )}
                   </div>
                 )}
