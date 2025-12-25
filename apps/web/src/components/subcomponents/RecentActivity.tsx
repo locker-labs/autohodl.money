@@ -54,11 +54,11 @@ export function RecentActivity(): React.JSX.Element {
         </div>
 
         {allTxs.length === 0 ? (
-          <div className={'mt-[15px] min-h-[380px] w-full h-fit flex justify-center items-center'}>
+          <div className={'mt-[15px] min-h-[530px] w-full h-fit flex justify-center items-center'}>
             {loading ? (
               <Loader2 className={'animate-spin'} color={'#78E76E'} />
             ) : (
-              <div>
+              <div className='pr-3.5'>
                 <Image
                   className='mx-auto max-w-[128px] max-h-[128px]'
                   src={'/no-savings.png'}
