@@ -42,7 +42,7 @@ export default function LandingPage() {
           className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
           title={'Connect Wallet'}
         >
-          Get Started
+          Get started
         </Button>
       </div>
 
@@ -77,7 +77,7 @@ export default function LandingPage() {
                 className={'mt-[16px] w-[144px] h-[44px] font-bold rounded-[8px]'}
                 title={'Connect Wallet'}
               >
-                Get Started
+                Get started
               </Button>
             </div>
           </div>
