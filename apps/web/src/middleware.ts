@@ -2,21 +2,27 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  const url = request.nextUrl;
   const twclid = request.nextUrl.searchParams.get('twclid');
-  const response = NextResponse.next();
 
-  if (twclid) {
-    console.log('Middleware - twclid:', twclid);
+  if (twclid && !request.cookies.get('x_attr_id')) {
+    // Remove twclid from URL
+    const cleanUrl = new URL(url.pathname, request.url);
+
+    const response = NextResponse.redirect(cleanUrl);
+
     response.cookies.set('x_attr_id', twclid, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: '/',
     });
-    console.log('Set x_attr_id cookie in middleware');
+
+    return response;
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
