@@ -1,7 +1,8 @@
 import type { Address } from 'viem';
 import Web3 from 'web3';
-import { AUTOHODL_ADDRESS, MM_CARD_ADDRESSES, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
+import { EChainId, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
 import { secrets } from '@/lib/secrets';
+import { getAutoHodlAddressByChain } from './helpers';
 
 // Helper function to verify webhook signature
 export function verifySignature(body: string, signature: string, secret: string): boolean {
@@ -18,11 +19,6 @@ export function verifySignature(body: string, signature: string, secret: string)
   const cleanSignature = signature.startsWith('0x') ? signature : `0x${signature}`;
 
   return generatedSignature === cleanSignature;
-}
-
-// Helper function to check if address is a MetaMask Card address
-export function isMetaMaskCardAddress(address: string): boolean {
-  return MM_CARD_ADDRESSES.some((cardAddress: string) => cardAddress.toLowerCase() === address.toLowerCase());
 }
 
 // Helper function to check if token is USDC
@@ -68,8 +64,17 @@ export async function addAddressToMoralisStream(streamId: string, address: strin
  * @param address - The address to monitor (triggerAddress)
  * @returns Promise<boolean> - Success status
  */
-export async function addAddressToEoaErc20TransferMoralisStream(streamId: string, address: Address): Promise<boolean> {
+export async function addAddressToEoaErc20TransferMoralisStream({
+  streamId,
+  address,
+  savingsChainId,
+}: {
+  streamId: string;
+  address: Address;
+  savingsChainId: EChainId;
+}): Promise<boolean> {
   const addressLowerCase = address.toLowerCase() as Address;
+
   try {
     // Import Moralis dynamically to avoid issues if not installed
     const Moralis = await import('moralis');
@@ -92,7 +97,7 @@ export async function addAddressToEoaErc20TransferMoralisStream(streamId: string
         filter: {
           and: [
             {
-              ne: ['to', AUTOHODL_ADDRESS.toLowerCase()],
+              ne: ['to', getAutoHodlAddressByChain(savingsChainId).toLowerCase()],
             },
             {
               in: ['from', [addressLowerCase]],

@@ -9,15 +9,16 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent } from '@/components/ui/card';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { SupportedAccounts } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
-import { useAccount } from 'wagmi';
-import { CopyContentButton } from '../feature/CopyContentButton';
-import { PriceSkeleton } from './PriceSkeleton';
+import { useConnection } from 'wagmi';
+import { CopyContentButton } from '@/components/feature/CopyContentButton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
 import SavingsLimit from './SavingsLimit';
 import { formatAmount } from '@/lib/math';
+import { getUsdcAddressByChain } from '@/lib/helpers';
 
 export function Controls(): React.JSX.Element {
   const title = `Controls`;
@@ -43,8 +44,8 @@ export function Controls(): React.JSX.Element {
 }
 
 export function ControlsMobile(): React.JSX.Element {
-  const { address: userAddress } = useAccount();
-  const { accounts, config, token } = useAutoHodl();
+  const { address: userAddress } = useConnection();
+  const { accounts, config, token, savingsChainId } = useAutoHodl();
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
   const hasMetaMaskCard: boolean = accounts.some((acc) => acc === SupportedAccounts.MetaMask);
 
@@ -67,7 +68,8 @@ export function ControlsMobile(): React.JSX.Element {
       };
 
   const savingsAddressToken = useERC20BalanceOf({
-    token: USDC_ADDRESS,
+    token: getUsdcAddressByChain(savingsChainId),
+    chainId: savingsChainId,
     address: config?.savingAddress,
     enabled: !!config?.savingAddress && !config?.toYield,
   });

@@ -5,15 +5,18 @@ import { formatUnits } from 'viem';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSavingsTxs } from '@/hooks/useSavingsTxs';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { TOKEN_DECIMALS } from '@/lib/constants';
 import { formatAmount } from '@/lib/math';
 import { timeAgoFromHex } from '@/lib/time';
 import Image from 'next/image';
 import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
 import { formatAddress } from '@/lib/string';
 import { EAutoHodlTxType } from '@/enums';
+import { getTokenDecimalsByAddress, getUsdcAddressByChain } from '@/lib/helpers';
+import { useAutoHodl } from '@/context/AutoHodlContext';
 
 export function RecentActivity(): React.JSX.Element {
+  const { savingsChainId } = useAutoHodl()
+
   const {
     allTxs: allSavingsTxs,
     loading: loadingSavings,
@@ -121,7 +124,7 @@ export function RecentActivity(): React.JSX.Element {
                         )}
                         <div>
                           <p className='font-semibold text-black text-base text-left'>
-                            {formatAmount(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS))}
+                            ${formatAmount(formatUnits(BigInt(tx.value ?? 0), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}
                           </p>
                           <p className='font-normal text-left'>
                             {isSelfWithdrawal
@@ -140,7 +143,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}`}
+                            : `purchase - $${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}`}
                         </p>
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { linea, base } from 'viem/chains';
+import { linea, base, arcTestnet } from 'viem/chains';
 import { wagmiAdapter, projectId, networks } from '@/config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
@@ -24,6 +24,7 @@ export const modal = createAppKit({
   chainImages: {
     [linea.id]: '/LineaLogomarkBlueBG.svg',
     [base.id]: '/Base_square_blue.svg',
+    [arcTestnet.id]: '/arc-logo.png',
   },
   adapters: [wagmiAdapter],
   projectId,

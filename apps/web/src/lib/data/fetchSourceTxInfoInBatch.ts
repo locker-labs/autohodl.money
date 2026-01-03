@@ -1,5 +1,5 @@
 import { decodeDelegateSavingData } from '@/lib/autohodl';
-import { SavingDelegatedEventSigHash } from '@/lib/constants';
+import { type EChainId, SavingDelegatedEventSigHash } from '@/lib/constants';
 import type { ITransactionReceipt } from '@/types/alchemy';
 import type { SourceTxInfo } from '@/types/autohodl';
 import { fetchTransactionReceiptsInBatch } from './fetchTransactionReceiptsInBatch';
@@ -16,8 +16,11 @@ import { fetchTransactionReceiptsInBatch } from './fetchTransactionReceiptsInBat
  * @returns A promise that resolves to an array of `SourceTxInfo` objects or `null` values.
  *          Each element corresponds to the respective transaction hash in the input array.
  */
-export async function fetchSourceTxInfoInBatch(transactionHashes: string[]): Promise<SourceTxInfo[]> {
-  const receipts: ITransactionReceipt[] = await fetchTransactionReceiptsInBatch(transactionHashes);
+export async function fetchSourceTxInfoInBatch(
+  transactionHashes: string[],
+  chainId: EChainId,
+): Promise<SourceTxInfo[]> {
+  const receipts: ITransactionReceipt[] = await fetchTransactionReceiptsInBatch(transactionHashes, chainId);
 
   return receipts.map((receipt: ITransactionReceipt) => {
     if (receipt) {

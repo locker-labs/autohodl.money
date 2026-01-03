@@ -1,5 +1,5 @@
 import { TrendingUp } from 'lucide-react';
-import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 

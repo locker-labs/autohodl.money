@@ -2,22 +2,37 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { viemPublicClient } from '@/lib/clients/server';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
+import { type EChainId, MoralisStreamId } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
-import { computeRoundUpAndSavings, isAutoHodlSupportedToken } from '@/lib/helpers';
+import {
+  computeRoundUpAndSavings,
+  isAutoHodlSupportedToken,
+  getAutoHodlAddressByChain,
+  getDelegateAddressByChain,
+  getAutoHodlSupportedTokens,
+  getViemPublicClientByChain,
+} from '@/lib/helpers';
 import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 
 async function handleSavingsExecution(
   erc20Transfer: IERC20Transfer,
-  { streamId }: { streamId: string; chainId: string },
+  { streamId, chainId }: { streamId: string; chainId: string },
 ): Promise<Hex | undefined> {
   const { from: _from, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
   const transferAmount: bigint = BigInt(erc20Transfer.value);
   const token: Address = getAddress(contract);
   const from = _from as Address;
+
+  const savingsChainId = Number(chainId) as EChainId;
+
+  const [delegate, autohodl, autohodlTokens, viemPublicClient] = [
+    getDelegateAddressByChain(savingsChainId),
+    getAutoHodlAddressByChain(savingsChainId),
+    getAutoHodlSupportedTokens(savingsChainId),
+    getViemPublicClientByChain(savingsChainId),
+  ];
 
   // Since we dont have access to metamask card,
   // we can hardcode the `from` address for savings transfers.
@@ -33,20 +48,20 @@ async function handleSavingsExecution(
   */
 
   // For debugging
-  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, DELEGATE }));
+  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, delegate }));
 
   // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
   // For now, we will support only USDC savings transfers.
   // Check token support
-  if (!isAutoHodlSupportedToken(token)) {
-    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${AUTOHODL_SUPPORTED_TOKENS}`);
+  if (!isAutoHodlSupportedToken(token, savingsChainId)) {
+    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${autohodlTokens}`);
     return;
   }
 
   // Fetch savings config
   let savingsConfig: SavingsConfig;
   try {
-    savingsConfig = await getSavingsConfig(viemPublicClient, from, token);
+    savingsConfig = await getSavingsConfig(viemPublicClient, from, token, savingsChainId);
     console.log('CONFIG:', savingsConfig);
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
@@ -84,7 +99,7 @@ async function handleSavingsExecution(
   }
 
   // If toYield = true, and to = AUTOHODL_ADDRESS, skip execution
-  if (savingsConfig.toYield === true && getAddress(to) === getAddress(AUTOHODL_ADDRESS)) {
+  if (savingsConfig.toYield === true && getAddress(to) === getAddress(autohodl)) {
     console.warn(
       'This is a savings tx.',
       `toYield = true and to = autoHODL for user ${from} and token ${token}`,
@@ -104,16 +119,16 @@ async function handleSavingsExecution(
   }
 
   // Verify delegate
-  if (getAddress(savingsConfig.delegate) !== getAddress(DELEGATE)) {
+  if (getAddress(savingsConfig.delegate) !== getAddress(delegate)) {
     console.warn(
       `Delegate mismatch in savings config for user ${from} and token ${token}`,
-      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
+      `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
       'Aborting execution.',
     );
     // TODO: Notify dev team
     throw new Error(
       `Delegate mismatch in savings config for user ${from} and token ${token} ` +
-        `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
+        `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
     );
   }
 
@@ -124,7 +139,7 @@ async function handleSavingsExecution(
       publicClient: viemPublicClient,
       tokenAddress: token,
       owner: from as Address,
-      spender: AUTOHODL_ADDRESS,
+      spender: autohodl,
     });
     console.log('ALLOWANCE:', allowance);
   } catch (allowanceError) {
@@ -157,6 +172,7 @@ async function handleSavingsExecution(
       asset: token,
       value: savingsAmount,
       data: { sourceTxHash: sourceTxHash as Hex, purchaseAmount: transferAmount },
+      chainId: savingsChainId,
     });
 
     console.log('SAVINGS TX:', getTransactionLink(txHash));

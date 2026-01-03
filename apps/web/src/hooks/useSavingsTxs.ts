@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, TOKEN_DECIMALS } from '@/lib/constants';
+import { useConnection } from 'wagmi';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits } from 'viem';
 import { fetchSourceTxInfoInBatch } from '@/lib/data/fetchSourceTxInfoInBatch';
 import type { SourceTxInfo } from '@/types/autohodl';
 import { EAutoHodlTxType } from '@/enums';
 import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
 
 export interface ISavingsTx {
   id: string;
@@ -22,29 +23,35 @@ export interface ISavingsTx {
 }
 
 export function useSavingsTxs() {
-  const { address } = useAccount();
+  const { address } = useConnection();
+  const { savingsChainId } = useAutoHodl();
+
+  const [autohodl, autohodlTokens] = [
+    getAutoHodlAddressByChain(savingsChainId),
+    getAutoHodlSupportedTokens(savingsChainId),
+  ];
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: [`savings-txs-${address}`],
     queryFn: async ({ pageParam }) => {
-      if (!address) {
+      if (!address || !savingsChainId) {
         return { transfers: [], pageKey: undefined };
       }
 
       const response = await fetchErc20Transfers({
         fromAddress: address,
-        toAddress: AUTOHODL_ADDRESS,
-        contractAddresses: AUTOHODL_SUPPORTED_TOKENS,
+        toAddress: autohodl,
+        contractAddresses: autohodlTokens,
         maxCount: 100,
         pageKey: pageParam,
       });
 
       const blockNumbers = response.transfers.map((tx) => tx.blockNum);
-      const blocks = await fetchBlockByNumberInBatch(blockNumbers);
+      const blocks = await fetchBlockByNumberInBatch(blockNumbers, savingsChainId);
       const blockTimestamps = blocks.map((block) => block.timestamp);
 
       const transactionHashes = response.transfers.map((tx) => tx.hash);
-      const sourceTxInfoArray = await fetchSourceTxInfoInBatch(transactionHashes);
+      const sourceTxInfoArray = await fetchSourceTxInfoInBatch(transactionHashes, savingsChainId);
 
       const transfersWithSourceTxInfo: (Erc20Transfer & SourceTxInfo)[] = [];
 
@@ -96,7 +103,7 @@ function savingsTxMapper(tx: Erc20Transfer & SourceTxInfo): ISavingsTx {
     timestamp: tx.metadata?.blockTimestamp,
     to: tx.to,
     from: tx.from,
-    value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
+    value: parseUnits(tx.value.toString(), Number(tx.rawContract.decimal)),
     txHash: tx.hash,
     sourceTxHash: tx.sourceTxHash,
     purchaseValue: tx.purchaseAmount,

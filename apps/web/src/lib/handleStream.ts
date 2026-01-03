@@ -1,6 +1,6 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
-import { SavingConfigSetEventSigHash } from '@/lib/constants';
+import { type EChainId, SavingConfigSetEventSigHash } from '@/lib/constants';
 import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
 import { verifySignature } from '@/lib/moralis';
 import { handleSavingConfigSetEvent } from './handleSavingConfigSetEvent';
@@ -47,7 +47,7 @@ export async function handleStream(body: string, signature: string, webhookSecre
   if (payload.logs.length) {
     const configSetLogs = payload.logs.filter((log) => log.topic0 === SavingConfigSetEventSigHash);
     if (configSetLogs.length) {
-      return await handleSavingConfigSetEvent(configSetLogs);
+      return await handleSavingConfigSetEvent(configSetLogs, Number(payload.chainId) as EChainId);
     }
   }
 

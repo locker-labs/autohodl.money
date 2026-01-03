@@ -1,5 +1,5 @@
 import useCreateConfig from '@/hooks/useCreateConfig';
-import { SupportedAccounts, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
+import { SupportedAccounts, TokenDecimalMap } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { LoaderSecondary } from '@/components/ui/loader';
@@ -7,38 +7,24 @@ import Image from 'next/image';
 import { SavingsMode } from '@/types/autohodl';
 import { formatUnits } from 'viem';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { getSavingsModes } from '@/config';
+import { getUsdcAddressByChain } from '@/lib/helpers';
 
 const SavingsModeSelector = () => {
   const [mode, setMode] = useState<SavingsMode>(SavingsMode.All);
-  const { config, setConfig, accounts } = useAutoHodl();
+  const { config, setConfig, accounts, savingsChainId } = useAutoHodl();
   //   TODO: add error toast
   const { createConfig } = useCreateConfig();
 
   const hasMetaMaskCard = accounts.includes(SupportedAccounts.MetaMask);
-
-  const savingsModes = [
-    {
-      label: 'MetaMask Card only',
-      value: SavingsMode.MetamaskCard,
-      disabled: !hasMetaMaskCard,
-      imgSrc: '/mmc.webp',
-      info: 'Only save your spare change when you use your MetaMask Card.',
-    },
-    {
-      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
-      value: SavingsMode.All,
-      disabled: false,
-      imgSrc: '/USDCToken.svg',
-      info: `Save your spare change, anytime you transfer USDC, regardless of whether it's with the MetaMask Card.`,
-      imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
-    },
-  ];
+  const savingsModes = getSavingsModes(hasMetaMaskCard);
 
   const isPending = mode !== config?.mode;
 
   useEffect(() => {
     async function iife() {
-      if (!config?.mode) return;
+      if (!config?.mode || !savingsChainId) return;
+      const USDC_ADDRESS = getUsdcAddressByChain(savingsChainId);
 
       if (mode !== config.mode) {
         try {
@@ -48,6 +34,7 @@ const SavingsModeSelector = () => {
             active: config.active,
             toYield: config.toYield,
             mode,
+            savingsChainId,
           });
           setConfig((prev) => (prev ? { ...prev, mode } : prev));
         } catch {

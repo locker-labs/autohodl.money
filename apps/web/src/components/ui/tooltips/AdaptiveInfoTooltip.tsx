@@ -4,7 +4,7 @@ import { AdaptiveTooltip } from './AdaptiveTooltip';
 const AdaptiveInfoTooltip = ({ content }: { content: React.ReactNode }) => {
   return (
     <AdaptiveTooltip content={content} triggerClassName='cursor-default'>
-      <Info size={16} className='h-4 w-4' />
+      <Info size={16} className='h-4 w-4 min-h-4 min-w-4' />
     </AdaptiveTooltip>
   );
 };

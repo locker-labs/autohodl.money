@@ -1,22 +1,21 @@
 'use client';
 
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
+import Loading from '@/app/loading';
 import Header from '@/components/Header';
+import { Footer } from '@/components/subcomponents/Footer';
 import Dashboard from '@/components/view/Dashboard';
 import LandingPage from '@/components/view/Landing';
 import UserOnboarding from '@/components/view/UserOnboarding';
 import { useAutoHodl } from '@/context/AutoHodlContext';
-import Loading from '@/app/loading';
-import { Footer } from '@/components/subcomponents/Footer';
 import { trackWalletConnected } from '@/hooks/trackWalletConnected';
 
 export default function Home() {
-  const { isConnected, isConnecting, isReconnecting } = useAccount();
-  const { loading, config, accounts } = useAutoHodl();
-
+  const { isConnected, isConnecting, isReconnecting } = useConnection();
+  const { loading, config } = useAutoHodl();
   trackWalletConnected();
 
-  if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {
+  if (loading || isConnecting || isReconnecting) {
     return <Loading />;
   }
 
