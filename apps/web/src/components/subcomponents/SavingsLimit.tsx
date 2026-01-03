@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
-import type { Address } from 'viem';
-import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import Button from './Button';
 import { Edit3, X } from 'lucide-react';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { getAutoHodlAddressByChain, getUsdcAddressByChain } from '@/lib/helpers';
 
 const SavingsLimit = () => {
-  const { address: userAddress } = useAccount();
+  const { address: userAddress } = useConnection();
+  const { savingsChainId } = useAutoHodl();
   const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view-only and edit modes
 
+  const [usdc, autohodl] = [getUsdcAddressByChain(savingsChainId), getAutoHodlAddressByChain(savingsChainId)];
+
   const { allowanceFormatted, isLoading: isLoadingAllowance } = useErc20Allowance({
-    owner: userAddress as Address,
-    token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS,
+    chainId: savingsChainId,
+    owner: userAddress,
+    token: usdc,
+    spender: autohodl,
   });
 
   useEffect(() => {
@@ -28,8 +32,9 @@ const SavingsLimit = () => {
     isPending,
     isConfirming: isConfirmingAllowance,
   } = useERC20Approve({
-    token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS,
+    chainId: savingsChainId,
+    token: usdc,
+    spender: autohodl,
     amount: savingsCap ?? 0,
   });
 

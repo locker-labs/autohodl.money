@@ -1,4 +1,3 @@
-import type React from 'react';
 import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
 import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
 import { RecentActivity } from '@/components/subcomponents/RecentActivity';
@@ -6,7 +5,7 @@ import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const Dashboard = (): React.JSX.Element => {
+const Dashboard = () => {
   const { isMobile, isLoading } = useIsMobile();
 
   if (isLoading) return <Loading />;

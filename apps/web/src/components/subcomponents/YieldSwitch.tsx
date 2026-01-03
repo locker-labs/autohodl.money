@@ -1,39 +1,26 @@
 import useCreateConfig from '@/hooks/useCreateConfig';
-import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
+import { TokenDecimalMap } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { LoaderSecondary } from '@/components/ui/loader';
 import Image from 'next/image';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
-
-const yieldOptions = [
-  {
-    label: 'Earn yield',
-    value: true,
-    imgSrc: '/grow.svg',
-    info: 'The change you save will be deposited to Aave and automatically earn yield',
-  },
-  {
-    label: 'Idle savings',
-    value: false,
-    disabled: false,
-    imgSrc: '/save.png',
-    info: `The change you save will be deposited into an account of your choice but won't earn any yield`,
-  },
-];
+import { yieldOptions } from '@/config';
+import { getUsdcAddressByChain } from '@/lib/helpers';
 
 const YieldSwitch = () => {
-  const { config, setConfig } = useAutoHodl();
+  const { config, setConfig, savingsChainId } = useAutoHodl();
   const { createConfig } = useCreateConfig();
   //   TODO: add error toast
 
   const [toYieldLocal, setToYieldLocal] = useState(config?.toYield ?? false);
   const isPending = toYieldLocal !== config?.toYield;
+  const USDC_ADDRESS = getUsdcAddressByChain(savingsChainId);
 
   useEffect(() => {
     async function iife() {
-      if (!config?.savingAddress) return;
+      if (!config?.savingAddress || !savingsChainId) return;
 
       const toYield = config.toYield;
 
@@ -45,6 +32,7 @@ const YieldSwitch = () => {
             savingsAddress: config.savingAddress,
             mode: config.mode,
             active: config.active,
+            savingsChainId,
           });
           setConfig((prev) => (prev ? { ...prev, toYield: toYieldLocal } : prev));
         } catch {

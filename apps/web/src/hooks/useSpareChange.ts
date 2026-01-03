@@ -1,12 +1,18 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { useAccount } from 'wagmi';
-import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS } from '@/lib/constants';
+import { useConnection } from 'wagmi';
+import { useAutoHodl } from '@/context/AutoHodlContext';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
+import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
 
 export function useSpareChange() {
-  const { address: fromAddress, isConnected } = useAccount();
+  const { address: fromAddress, isConnected } = useConnection();
+  const { savingsChainId } = useAutoHodl();
+  const autohodl = getAutoHodlAddressByChain(savingsChainId);
+  const autohodlTokens = getAutoHodlSupportedTokens(savingsChainId);
 
   //   TODO: enable support for more than 100 transfers
   const { data, isLoading, error, isFetched, isFetching } = useQuery({
@@ -14,8 +20,8 @@ export function useSpareChange() {
     queryFn: () =>
       fetchErc20Transfers({
         fromAddress,
-        toAddress: AUTOHODL_ADDRESS,
-        contractAddresses: AUTOHODL_SUPPORTED_TOKENS,
+        toAddress: autohodl,
+        contractAddresses: autohodlTokens,
         maxCount: 1000,
         order: 'desc',
       }).then((res) => res.transfers),

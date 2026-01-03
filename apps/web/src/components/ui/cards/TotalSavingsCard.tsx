@@ -1,20 +1,24 @@
 import { CreditCard } from 'lucide-react';
-import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
 import Button from '@/components/subcomponents/Button';
 import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
-import { S_USDC_ADDRESS, TokenDecimalMap } from '@/lib/constants';
 import { toastCustom } from '../toast';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { getSusdcAddressByChain, getTokenDecimalsByAddress } from '@/lib/helpers';
+import { useAutoHodl } from '@/context/AutoHodlContext';
 
 export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
   const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem('sUSDCAdded') === 'true';
+  const { savingsChainId } = useAutoHodl();
 
   async function handleAddToken() {
     const client = await getWalletClient(config);
     if (!client) return;
+
+    const SUSDC_ADDRESS = getSusdcAddressByChain(savingsChainId);
 
     try {
       const wasAdded = await client.request({
@@ -22,9 +26,9 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
         params: {
           type: 'ERC20',
           options: {
-            address: S_USDC_ADDRESS,
+            address: SUSDC_ADDRESS,
             symbol: 'sUSDC',
-            decimals: TokenDecimalMap[S_USDC_ADDRESS],
+            decimals: getTokenDecimalsByAddress(SUSDC_ADDRESS),
           },
         },
       });

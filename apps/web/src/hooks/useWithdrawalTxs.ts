@@ -1,9 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useAccount } from 'wagmi';
-import { SUsdcAddressMap, TOKEN_DECIMALS } from '@/lib/constants';
+import { useConnection } from 'wagmi';
+import { type EChainId, SusdcAddressMap } from '@/lib/constants';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits, zeroAddress } from 'viem';
-import { chain } from '@/config';
 import { EAutoHodlTxType } from '@/enums';
 import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
 
@@ -19,24 +18,25 @@ export interface IWithdrawalTx {
 }
 
 export function useWithdrawalTxs() {
-  const { address } = useAccount();
+  const { address, chain } = useConnection();
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: [`withdrawal-txs-${address}`],
     queryFn: async ({ pageParam }) => {
-      if (!address) {
+      if (!chain || !address) {
         return { transfers: [], pageKey: undefined };
       }
+      const chainId = chain.id as EChainId;
 
       const response = await fetchErc20Transfers({
         fromAddress: address,
-        contractAddresses: [SUsdcAddressMap[chain.id]],
+        contractAddresses: [SusdcAddressMap[chainId]],
         maxCount: 100,
         pageKey: pageParam,
       });
 
       const blockNumbers = response.transfers.map((tx) => tx.blockNum);
-      const blocks = await fetchBlockByNumberInBatch(blockNumbers);
+      const blocks = await fetchBlockByNumberInBatch(blockNumbers, chainId);
       const blockTimestamps = blocks.map((block) => block.timestamp);
 
       response.transfers = response.transfers.map((tx, i) => ({
@@ -85,7 +85,7 @@ function withdrawalTxMapper(tx: Erc20Transfer) {
     timestamp: tx.metadata?.blockTimestamp,
     to: tx.to,
     from: tx.from,
-    value: parseUnits(tx.value.toString(), TOKEN_DECIMALS),
+    value: parseUnits(tx.value.toString(), Number(tx.rawContract.decimal)),
     txHash: tx.hash,
     blockNum: tx.blockNum as Hex,
     type: EAutoHodlTxType.Withdrawal as const,

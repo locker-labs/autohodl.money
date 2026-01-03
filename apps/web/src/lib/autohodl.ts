@@ -8,7 +8,8 @@ import {
   type SourceTxInfo,
 } from '@/types/autohodl';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
-import { AUTOHODL_ADDRESS } from '@/lib/constants';
+import type { EChainId } from './constants';
+import { getAutoHodlAddressByChain } from './helpers';
 
 export function decodeDelegateSavingData(data: Hex): SourceTxInfo {
   const params = [{ type: 'uint256' }, { type: 'uint256' }, { type: 'bytes32' }, { type: 'uint256' }];
@@ -44,9 +45,10 @@ export async function getSavingsConfig(
   viemPublicClient: PublicClient,
   user: Address,
   token: Address,
+  chainId: EChainId,
 ): Promise<SavingsConfig> {
   const configArray: Readonly<SavingsConfigArray> = await viemPublicClient.readContract({
-    address: AUTOHODL_ADDRESS,
+    address: getAutoHodlAddressByChain(chainId),
     abi: AutoHodlAbi,
     functionName: 'savings',
     args: [user, token],

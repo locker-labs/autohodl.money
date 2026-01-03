@@ -1,5 +1,5 @@
 import { Wallet } from 'lucide-react';
-import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';

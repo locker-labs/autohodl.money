@@ -1,13 +1,15 @@
-import useCreateConfig from '@/hooks/useCreateConfig';
-import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { Switch } from '@/components/ui/switch';
-import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { LoaderSecondary } from '@/components/ui/loader';
+import { Switch } from '@/components/ui/switch';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import useCreateConfig from '@/hooks/useCreateConfig';
+import { TokenDecimalMap } from '@/lib/constants';
+import { getUsdcAddressByChain } from '@/lib/helpers';
+
 
 const ActiveSwitch = () => {
-  const { config, setConfig } = useAutoHodl();
+  const { config, setConfig, savingsChainId } = useAutoHodl();
   const { createConfig } = useCreateConfig();
   //   TODO: add error toast
   const [activeLocal, setActiveLocal] = useState(config?.active ?? false);
@@ -15,7 +17,8 @@ const ActiveSwitch = () => {
 
   useEffect(() => {
     async function iife() {
-      if (!config?.savingAddress) return;
+      if (!config?.savingAddress || !savingsChainId) return;
+      const usdc = getUsdcAddressByChain(savingsChainId);
 
       const active = config.active;
 
@@ -23,10 +26,11 @@ const ActiveSwitch = () => {
         try {
           await createConfig({
             active: activeLocal,
-            roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS])),
+            roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[usdc])),
             savingsAddress: config.savingAddress,
             mode: config.mode,
             toYield: config.toYield,
+            savingsChainId,
           });
           setConfig((prev) => (prev ? { ...prev, active: activeLocal } : prev));
         } catch {

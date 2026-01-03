@@ -1,31 +1,31 @@
-import { useAppKitAccount } from '@reown/appkit/react';
 import { useMemo } from 'react';
-import { erc20Abi, formatUnits, parseUnits } from 'viem';
+import { erc20Abi, formatUnits, parseUnits, type Address } from 'viem';
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { TokenDecimalMap } from '@/lib/constants';
+import { type EChainId, TokenDecimalMap, type TTokenAddress } from '@/lib/constants';
 import { roundOff } from '@/lib/math';
-
-type Address = `0x${string}`;
+import { useAppKitAccount } from '@reown/appkit/react';
 
 export function useErc20Allowance(params: {
-  token: Address;
-  owner?: Address; // optional; defaults to AppKit-connected address
+  token: TTokenAddress;
+  chainId: EChainId | null;
+  owner: Address | undefined;
   spender: Address;
   enabled?: boolean;
 }) {
-  const { address: appkitAddress, isConnected } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
 
-  const owner = (params.owner ?? appkitAddress) as Address | undefined;
+  const owner = params.owner;
   const decimals = TokenDecimalMap[params.token];
   if (!decimals) {
     throw new Error(`useErc20Allowance: Unsupported token: ${params.token}`);
   }
-  const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && owner && params.spender);
+  const enabled = params.enabled ?? Boolean(isConnected && params.token && owner && params.spender && params.chainId);
 
   const { data, error, isLoading, isFetching, isSuccess, status, refetch } = useReadContract({
     address: params.token as Address,
     abi: erc20Abi,
     functionName: 'allowance',
+    chainId: params.chainId ?? undefined,
     args: owner && params.spender ? [owner, params.spender] : undefined,
     query: {
       enabled,
@@ -55,7 +55,8 @@ export function useErc20Allowance(params: {
 }
 
 export function useERC20Approve(params: {
-  token: Address;
+  token: TTokenAddress;
+  chainId: EChainId | null;
   spender: Address | undefined;
   amount: number; // e.g. 2.02
   enabled?: boolean;
@@ -66,17 +67,18 @@ export function useERC20Approve(params: {
     throw new Error(`useERC20Approve: Unsupported token: ${params.token}`);
   }
   const amount: bigint = parseUnits(params.amount.toString(), decimals);
-  const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.spender);
+  const enabled = params.enabled ?? Boolean(isConnected && params.token && params.spender && params.chainId);
 
-  const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
+  const { mutate, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
 
   const approve = () => {
     if (!enabled) return;
-    writeContract({
+    mutate({
       address: params.token as Address,
       abi: erc20Abi,
       functionName: 'approve',
       args: [params.spender as Address, amount],
+      chainId: params.chainId ?? undefined,
     });
   };
 
@@ -116,7 +118,8 @@ export type UseERC20BalanceOfReturn = {
 
 export function useERC20BalanceOf(params: {
   address: Address | undefined;
-  token: Address;
+  token: TTokenAddress;
+  chainId: EChainId | null;
   enabled?: boolean;
 }): UseERC20BalanceOfReturn {
   const decimals = TokenDecimalMap[params.token];
@@ -129,8 +132,9 @@ export function useERC20BalanceOf(params: {
     address: params.token,
     functionName: 'balanceOf',
     args: [params.address as Address],
+    chainId: params.chainId ?? undefined,
     query: {
-      enabled: params.enabled ?? !!params.address,
+      enabled: params.enabled ?? Boolean(params.address && params.chainId),
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchInterval: 5000,
@@ -151,7 +155,8 @@ export function useERC20BalanceOf(params: {
 }
 
 export function useERC20Transfer(params: {
-  token: Address;
+  token: TTokenAddress;
+  chainId: EChainId | null;
   to: Address;
   amount: number; // e.g. 1.2
   enabled?: boolean;
@@ -164,15 +169,16 @@ export function useERC20Transfer(params: {
   const amount: bigint = parseUnits(params.amount.toString(), decimals);
   const enabled = Boolean(params.enabled ?? true) && Boolean(isConnected && params.token && params.to);
 
-  const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
+  const { mutate, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
 
   const transfer = () => {
     if (!enabled) return;
-    writeContract({
+    mutate({
       address: params.token,
       abi: erc20Abi,
       functionName: 'transfer',
       args: [params.to, amount],
+      chainId: params.chainId ?? undefined,
     });
   };
 
