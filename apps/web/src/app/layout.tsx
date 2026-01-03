@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Albert_Sans } from 'next/font/google';
-import { headers } from 'next/headers'; // added
+import { headers } from 'next/headers';
 import { Toaster } from 'sonner';
 import ContextProvider from '@/context';
 import './globals.css';
