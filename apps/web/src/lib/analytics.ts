@@ -15,9 +15,9 @@ export function trackEvent(event: string, properties: Record<string, string | nu
       },
     };
     rudderanalytics.track(params);
-    console.log('Event tracked successfully with params:', params);
+    console.log(`${event} event tracked:`, params);
   } catch (error) {
-    console.error('Failed to track event:', error);
+    console.error(`${event} event tracking failed:`, error);
   }
 }
 
