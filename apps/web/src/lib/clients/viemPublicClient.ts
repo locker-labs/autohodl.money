@@ -1,10 +1,9 @@
 import { createPublicClient, http, type PublicClient } from 'viem';
-import { AlchemyApiUrlMap, EChainId } from '@/lib/constants';
-import { getViemChain } from '@/lib/helpers';
+import { AlchemyApiUrlMap, EChainId, ViemChainMap } from '@/lib/constants';
 
 function createPublicClientForChain(chainId: EChainId) {
   const alchemyUrl = AlchemyApiUrlMap[chainId];
-  const chain = getViemChain(chainId);
+  const chain = ViemChainMap[chainId];
 
   return createPublicClient({
     chain,
