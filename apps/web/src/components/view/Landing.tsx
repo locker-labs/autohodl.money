@@ -40,13 +40,13 @@ export default function LandingPage() {
           disabled={false}
           aria-disabled={false}
           className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
-          title={'Connect Wallet'}
+          title={'Connect wallet'}
         >
           Get started
         </Button>
       </div>
 
-      <section className='px-[24px] lg:px-[96px] bg-[#f7feec] h-screen flex flex-col items-center lg:justify-center'>
+      <section className='px-[24px] lg:px-[96px] bg-[#f7feec] min-h-screen lg:h-screen flex flex-col items-center lg:justify-center'>
         <div className={'h-[120px] py-4 max-w-[1080px] w-full hidden lg:flex justify-between items-end'}>
           <Link href='/'>
             <Image
@@ -61,28 +61,26 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile */}
-        <div className='lg:hidden w-full max-w-[1080px] flex flex-col items-center justify-center gap-[60px]'>
-          <div className='mt-[80px]'>
-            <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
-            <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
-              Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
-              and more ways to HODL.
-            </p>
-            <div className='flex justify-center'>
-              <Button
-                type={'button'}
-                onAction={() => open()}
-                disabled={false}
-                aria-disabled={false}
-                className={'mt-[16px] w-[144px] h-[44px] font-bold rounded-[8px]'}
-                title={'Connect Wallet'}
-              >
-                Get started
-              </Button>
-            </div>
+        <div className='mt-[40px] lg:hidden w-full max-w-[1080px]'>
+          <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
+          <p className='mt-[16px] text-center text-[#4D4A4A] text-[20px] w-full'>
+            Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
+            and more ways to HODL.
+          </p>
+          <div className='mt-[16px] flex justify-center'>
+            <Button
+              type={'button'}
+              onAction={() => open()}
+              disabled={false}
+              aria-disabled={false}
+              className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
+              title={'Connect wallet'}
+            >
+              Get started
+            </Button>
           </div>
-          <div className='max-w-[480px] w-fit flex items-center justify-center'>
-            <Image className='aspect-auto' src={'/hero.landing.png'} alt='hero' width={600} height={400} />
+          <div className='mx-auto mt-[60px] max-w-[480px] w-fit flex items-center justify-center'>
+            <Image className='aspect-auto' src={'/hero.landing.png'} alt='hero' width={400} height={400} />
           </div>
         </div>
 
@@ -100,7 +98,7 @@ export default function LandingPage() {
               disabled={false}
               aria-disabled={false}
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
-              title={'Connect Wallet'}
+              title={'Connect wallet'}
             >
               Get started
             </Button>
@@ -111,7 +109,9 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        <div className='w-full h-[120px]' />
+
+        {/* show only on desktop */}
+        <div className='hidden lg:block w-full h-[120px]' />
       </section>
 
       {/* On-chain Savings Simplified */}
