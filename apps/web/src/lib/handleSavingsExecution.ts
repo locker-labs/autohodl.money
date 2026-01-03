@@ -87,7 +87,7 @@ async function handleSavingsExecution(
   if (savingsConfig.toYield === true && getAddress(to) === getAddress(AUTOHODL_ADDRESS)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = true and to = AutoHodl for user ${from} and token ${token}`,
+      `toYield = true and to = autoHODL for user ${from} and token ${token}`,
       'Aborting execution.',
     );
     return;
