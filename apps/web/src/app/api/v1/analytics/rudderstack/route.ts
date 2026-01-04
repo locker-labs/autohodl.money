@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import { trackEvent } from '@/lib/analytics';
+import { trackEvent, type TTrackEventProperties } from '@/lib/analytics';
 import { EAnalyticsEvent } from '@/types/analytics';
 
 export async function POST(request: NextRequest) {
@@ -32,32 +32,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing eventType in body' }, { status: 400 });
     }
 
-    const trackingProperties: Record<string, string | number> = {
-      twclid: twclid,
+    if (!body.walletAddress) {
+      console.error('No walletAddress provided in body');
+      return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
+    }
+
+    const trackingProperties: TTrackEventProperties = {
+      twclid,
+      walletAddress: body.walletAddress,
+      userAgent: request.headers.get('user-agent') ?? undefined,
+      ip: request.headers.get('x-forwarded-for') ?? undefined,
     };
 
     switch (eventType) {
       case EAnalyticsEvent.WalletConnected:
-        if (!body.walletAddress) {
-          console.error('No walletAddress provided for Wallet Connected event');
-          return NextResponse.json({ error: 'Missing walletAddress for Wallet Connected event' }, { status: 400 });
-        }
-        trackingProperties.walletAddress = body.walletAddress;
         break;
       case EAnalyticsEvent.AllowanceSet:
-        if (!body.walletAddress || !body.allowance) {
-          console.error('Missing parameters for Allowance Set event');
-          return NextResponse.json({ error: 'Missing parameters for Allowance Set event' }, { status: 400 });
+        if (!body.allowance) {
+          console.error('Missing allowance in body');
+          return NextResponse.json({ error: 'Missing allowance in body' }, { status: 400 });
         }
-        trackingProperties.walletAddress = body.walletAddress;
         trackingProperties.allowance = body.allowance;
         break;
       case EAnalyticsEvent.ConfigSet:
-        if (!body.walletAddress || !body.transactionHash) {
-          console.error('Missing parameters for Config Set event');
-          return NextResponse.json({ error: 'Missing parameters for Config Set event' }, { status: 400 });
+        if (!body.transactionHash) {
+          console.error('Missing transactionHash in body');
+          return NextResponse.json({ error: 'Missing transactionHash in body' }, { status: 400 });
         }
-        trackingProperties.walletAddress = body.walletAddress;
         trackingProperties.transactionHash = body.transactionHash;
         break;
       default:
