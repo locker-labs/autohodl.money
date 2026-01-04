@@ -18,7 +18,7 @@ import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
 import SavingsLimit from './SavingsLimit';
 import { formatAmount } from '@/lib/math';
-import { getUsdcAddressByChain } from '@/lib/helpers';
+import { getUsdcAddressByChain, getViemChain, getViemChainImage } from '@/lib/helpers';
 
 export function Controls(): React.JSX.Element {
   const title = `Controls`;
@@ -157,6 +157,31 @@ export function ControlsMobile(): React.JSX.Element {
                 )}
               </div>
             </div>
+
+            {/* Savings Chain */}
+            {savingsChainId && (
+              (() => {
+                const chain = getViemChain(savingsChainId);
+                if(!chain) return null;
+                return <div className='mt-4 mb-1'>
+                <div>
+                  <p className='text-sm font-medium'>Savings Chain</p>
+                </div>
+                <div className='mt-2 w-full h-10 border border-gray-300 rounded-lg flex items-center justify-start gap-3 px-3'>
+                  <div className='flex items-center justify-start gap-3'>
+                    <Image
+                      src={getViemChainImage(savingsChainId)}
+                      alt={chain.name}
+                      width={20}
+                      height={20}
+                      className='min-w-5 min-h-5 max-h-5 max-w-5'
+                    />
+                    <p className='text-[15px]'>{chain.name}</p>
+                  </div>
+                </div>
+              </div>
+              })()
+            )}
           </AccordionContent>
         </AccordionItem>
 

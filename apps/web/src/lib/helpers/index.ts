@@ -17,6 +17,7 @@ import {
   AaveUiPoolDataProviderMap,
   AavePoolAddressesProviderMap,
   ViemChainMap,
+  ViemChainImageMap,
 } from '@/lib/constants';
 
 function computeRoundUpAndSavings(
@@ -117,6 +118,11 @@ function getViemChain(chainId: EChainId): Chain {
   return ViemChainMap[chainId];
 }
 
+function getViemChainImage(chainId: EChainId | null): string {
+  if (!chainId) throw new Error('Missing chainId');
+  return ViemChainImageMap[chainId];
+}
+
 function getSavingsChainAddresses(chainId: EChainId | null) {
   if (!chainId) throw new Error('Missing chainId');
   return {
@@ -179,4 +185,5 @@ export {
   getAavePoolAddressesProviderByChain,
   getViemPublicClientByChain,
   getViemChain,
+  getViemChainImage,
 };

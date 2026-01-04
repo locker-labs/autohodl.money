@@ -1,12 +1,12 @@
 'use client';
 
-import { linea, base, arcTestnet } from 'viem/chains';
 import { wagmiAdapter, projectId, networks } from '@/config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import type { ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { AutoHodlProvider } from '@/context/AutoHodlContext';
+import { ViemChainImageMap } from '@/lib/constants';
 
 // Set up queryClient
 const queryClient = new QueryClient();
@@ -21,11 +21,7 @@ const metadata = {
 
 // Create the modal
 export const modal = createAppKit({
-  chainImages: {
-    [linea.id]: '/LineaLogomarkBlueBG.svg',
-    [base.id]: '/Base_square_blue.svg',
-    [arcTestnet.id]: '/arc-logo.png',
-  },
+  chainImages: ViemChainImageMap,
   adapters: [wagmiAdapter],
   projectId,
   networks,

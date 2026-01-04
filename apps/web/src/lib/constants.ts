@@ -1,6 +1,6 @@
 import type { Address, Chain } from 'viem';
 import { arcTestnet, linea, sepolia } from 'viem/chains';
-import { secrets } from './secrets';
+import { secrets } from '@/lib/secrets';
 import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
 
 /**
@@ -24,6 +24,12 @@ const ViemChainMap: Record<EChainId, Chain> = {
   [EChainId.ArcTestnet]: arcTestnet,
   [EChainId.Linea]: linea,
   [EChainId.Sepolia]: sepolia,
+};
+
+const ViemChainImageMap: Record<EChainId, string> = {
+  [EChainId.Linea]: '/LineaLogomarkBlueBG.svg',
+  [EChainId.Sepolia]: '/ethereum-eth.svg',
+  [EChainId.ArcTestnet]: '/arc-logo.png',
 };
 
 /**
@@ -247,6 +253,7 @@ export {
   AaveApyConfig,
   mockDefaultChainId,
   AutoHodlSupportedTokenMap,
+  ViemChainImageMap,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };
