@@ -37,7 +37,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
     }
 
-    const trackingProperties: TTrackEventProperties = { twclid, walletAddress: body.walletAddress };
+    const trackingProperties: TTrackEventProperties = {
+      twclid,
+      walletAddress: body.walletAddress,
+      userAgent: request.headers.get('user-agent') ?? undefined,
+      ip: request.headers.get('x-forwarded-for') ?? undefined,
+    };
 
     switch (eventType) {
       case EAnalyticsEvent.WalletConnected:

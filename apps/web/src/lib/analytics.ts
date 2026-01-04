@@ -10,6 +10,8 @@ export type TTrackEventProperties = {
   walletAddress: string;
   allowance?: number;
   transactionHash?: string;
+  ip?: string;
+  userAgent?: string;
 };
 
 export function trackEvent(event: string, properties: TTrackEventProperties) {
@@ -19,6 +21,8 @@ export function trackEvent(event: string, properties: TTrackEventProperties) {
       userId: properties.walletAddress,
       properties: {
         twclid: properties.twclid,
+        ip_address: properties.ip,
+        user_agent: properties.userAgent,
         conversionId: `${event.split(' ').join('_').toLowerCase()}:${properties.walletAddress}`,
         description: properties.allowance
           ? `allowance:${properties.allowance}`
