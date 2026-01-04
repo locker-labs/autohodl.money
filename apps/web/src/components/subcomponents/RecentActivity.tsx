@@ -15,7 +15,7 @@ import { getTokenDecimalsByAddress, getUsdcAddressByChain } from '@/lib/helpers'
 import { useAutoHodl } from '@/context/AutoHodlContext';
 
 export function RecentActivity(): React.JSX.Element {
-  const { savingsChainId } = useAutoHodl()
+  const { savingsChainId } = useAutoHodl();
 
   const {
     allTxs: allSavingsTxs,
@@ -56,7 +56,7 @@ export function RecentActivity(): React.JSX.Element {
           <p className='font-normal text-[#6b6b6b] text-base'>Your latest round-up savings</p>
         </div>
 
-        {allTxs.length === 0 ? (
+        {loading || allTxs.length === 0 ? (
           <div className={'mt-[15px] min-h-[530px] w-full h-fit flex justify-center items-center'}>
             {loading ? (
               <Loader2 className={'animate-spin'} color={'#78E76E'} />
@@ -85,13 +85,18 @@ export function RecentActivity(): React.JSX.Element {
               scrollbar-thumb-rounded-full
               scrollbar-hover:scrollbar-thumb-[#AAAAAA]
               group-hover/container:scrollbar-thumb-[#BBBBBB] group-hover/container:scrollbar-track-transparent
-              `}
+              p-[2px]`}
           >
             {allTxs.map((tx, idx) => {
               const isWithdrawalTx = tx.type === EAutoHodlTxType.Withdrawal;
               const isSelfWithdrawal = isWithdrawalTx && tx.to.toLowerCase() === tx.from.toLowerCase();
               return (
-                <Link key={tx.id} href={getTransactionLink(tx.txHash, savingsChainId)} target='_blank' className='no-underline'>
+                <Link
+                  key={tx.id}
+                  href={getTransactionLink(tx.txHash, savingsChainId)}
+                  target='_blank'
+                  className='no-underline rounded-[14px] transition-all ease-out duration-150'
+                >
                   <div
                     className={`group/tx border border-gray-300 flex flex-col gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]
                       ${allTxs.length - 1 === idx ? '' : 'mb-3'}
@@ -124,7 +129,12 @@ export function RecentActivity(): React.JSX.Element {
                         )}
                         <div>
                           <p className='font-semibold text-black text-base text-left'>
-                            ${formatAmount(formatUnits(BigInt(tx.value ?? 0), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}
+                            {formatAmount(
+                              formatUnits(
+                                BigInt(tx.value ?? 0),
+                                getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId)),
+                              ),
+                            )}
                           </p>
                           <p className='font-normal text-left'>
                             {isSelfWithdrawal
@@ -143,7 +153,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - $${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}`}
+                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}`}
                         </p>
                       </div>
                     </div>

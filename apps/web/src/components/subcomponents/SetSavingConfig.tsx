@@ -32,7 +32,7 @@ export default function SetSavingConfig() {
   const savingsChainId = chain?.id as EChainId;
   const accounts = accountsMap?.get(savingsChainId) || [];
 
-  const [autohodl, usdc] = [getAutoHodlAddressByChain(savingsChainId), getUsdcAddressByChain(savingsChainId)]
+  const [autohodl, usdc] = [getAutoHodlAddressByChain(savingsChainId), getUsdcAddressByChain(savingsChainId)];
 
   const hasMetaMaskCard = accounts.includes(SupportedAccounts.MetaMask);
   const savingsModes = getSavingsModes(hasMetaMaskCard);

@@ -1,8 +1,7 @@
 import type { Address } from 'viem';
 import Web3 from 'web3';
-import { EChainId, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
+import { AutoHodlAddressMap, type EChainId, TransferEventSig, USDC_ADDRESSES } from '@/lib/constants';
 import { secrets } from '@/lib/secrets';
-import { getAutoHodlAddressByChain } from './helpers';
 
 // Helper function to verify webhook signature
 export function verifySignature(body: string, signature: string, secret: string): boolean {
@@ -97,7 +96,7 @@ export async function addAddressToEoaErc20TransferMoralisStream({
         filter: {
           and: [
             {
-              ne: ['to', getAutoHodlAddressByChain(savingsChainId).toLowerCase()],
+              ne: ['to', AutoHodlAddressMap[savingsChainId].toLowerCase()],
             },
             {
               in: ['from', [addressLowerCase]],
