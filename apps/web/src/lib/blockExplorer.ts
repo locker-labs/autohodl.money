@@ -1,19 +1,24 @@
-import { chain } from '@/config';
+import { EChainId } from './constants';
 
-const chainId = chain.id;
-
-const chainIdToBlockExplorer: Record<number, string> = {
-  59144: 'https://lineascan.build',
-  11155111: 'https://sepolia.etherscan.io',
-  8453: 'https://basescan.org',
-  84532: 'https://sepolia.basescan.org',
-  42161: 'https://arbiscan.io',
+const chainIdToBlockExplorer: Record<EChainId, string> = {
+  [EChainId.Linea]: 'https://lineascan.build',
+  [EChainId.Sepolia]: 'https://sepolia.etherscan.io',
+  [EChainId.ArcTestnet]: 'https://testnet.arcscan.app',
+  // 8453: 'https://basescan.org',
+  // 84532: 'https://sepolia.basescan.org',
+  // 42161: 'https://arbiscan.io',
 };
 
-export const getTransactionLink = (txHash: string): string => {
+export const getTransactionLink = (txHash: string, chainId: EChainId | null): string => {
+  if (!chainId) {
+    throw new Error('Chain ID is required');
+  }
   return `${chainIdToBlockExplorer[chainId]}/tx/${txHash}`;
 };
 
-export const getAddressLink = (address: string): string => {
+export const getAddressLink = (address: string, chainId: EChainId | null): string => {
+  if (!chainId) {
+    throw new Error('Chain ID is required');
+  }
   return `${chainIdToBlockExplorer[chainId]}/address/${address}`;
 };

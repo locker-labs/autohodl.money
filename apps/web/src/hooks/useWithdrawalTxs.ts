@@ -1,10 +1,11 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useConnection } from 'wagmi';
-import { type EChainId, SusdcAddressMap } from '@/lib/constants';
+import { SusdcAddressMap } from '@/lib/constants';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits, zeroAddress } from 'viem';
 import { EAutoHodlTxType } from '@/enums';
 import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
+import { useAutoHodl } from '@/context/AutoHodlContext';
 
 export interface IWithdrawalTx {
   id: string;
@@ -18,22 +19,25 @@ export interface IWithdrawalTx {
 }
 
 export function useWithdrawalTxs() {
-  const { address, chain } = useConnection();
+  const { address } = useConnection();
+  const { savingsChainId: chainId } = useAutoHodl();
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: [`withdrawal-txs-${address}`],
     queryFn: async ({ pageParam }) => {
-      if (!chain || !address) {
+      if (!chainId || !address) {
         return { transfers: [], pageKey: undefined };
       }
-      const chainId = chain.id as EChainId;
 
-      const response = await fetchErc20Transfers({
-        fromAddress: address,
-        contractAddresses: [SusdcAddressMap[chainId]],
-        maxCount: 100,
-        pageKey: pageParam,
-      });
+      const response = await fetchErc20Transfers(
+        {
+          fromAddress: address,
+          contractAddresses: [SusdcAddressMap[chainId]],
+          maxCount: 100,
+          pageKey: pageParam,
+        },
+        chainId,
+      );
 
       const blockNumbers = response.transfers.map((tx) => tx.blockNum);
       const blocks = await fetchBlockByNumberInBatch(blockNumbers, chainId);

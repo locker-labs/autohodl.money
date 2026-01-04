@@ -91,7 +91,7 @@ export function RecentActivity(): React.JSX.Element {
               const isWithdrawalTx = tx.type === EAutoHodlTxType.Withdrawal;
               const isSelfWithdrawal = isWithdrawalTx && tx.to.toLowerCase() === tx.from.toLowerCase();
               return (
-                <Link key={tx.id} href={getTransactionLink(tx.txHash)} target='_blank' className='no-underline'>
+                <Link key={tx.id} href={getTransactionLink(tx.txHash, savingsChainId)} target='_blank' className='no-underline'>
                   <div
                     className={`group/tx border border-gray-300 flex flex-col gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]
                       ${allTxs.length - 1 === idx ? '' : 'mb-3'}

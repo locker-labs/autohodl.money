@@ -38,13 +38,16 @@ export function useSavingsTxs() {
         return { transfers: [], pageKey: undefined };
       }
 
-      const response = await fetchErc20Transfers({
-        fromAddress: address,
-        toAddress: autohodl,
-        contractAddresses: autohodlTokens,
-        maxCount: 100,
-        pageKey: pageParam,
-      });
+      const response = await fetchErc20Transfers(
+        {
+          fromAddress: address,
+          toAddress: autohodl,
+          contractAddresses: autohodlTokens,
+          maxCount: 100,
+          pageKey: pageParam,
+        },
+        savingsChainId,
+      );
 
       const blockNumbers = response.transfers.map((tx) => tx.blockNum);
       const blocks = await fetchBlockByNumberInBatch(blockNumbers, savingsChainId);

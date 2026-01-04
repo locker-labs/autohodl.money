@@ -1,5 +1,5 @@
 import type { Address } from 'viem';
-import { viemChains } from '@/config';
+import { chains } from '@/config';
 import { type EChainId, MetaMaskCardAddressMap, SupportedAccounts } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/erc20/allowance';
 import { getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
@@ -18,7 +18,7 @@ async function getSupportedAccounts(address: Address | undefined): Promise<Map<E
   // For MetaMask Card
   // Check if the address has given erc20 approval to the Card contract
 
-  for (const chain of viemChains) {
+  for (const chain of chains) {
     const chainId = chain.id as unknown as EChainId;
     accountsMap.set(chainId, defaultAccounts);
 

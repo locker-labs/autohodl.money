@@ -10,7 +10,7 @@ import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
 import { type Address, zeroAddress } from 'viem';
-import { viemChains } from '@/config';
+import { chains } from '@/config';
 import { getSusdcAddressByChain, getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
 
 type AutoHodlContextType = {
@@ -53,7 +53,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const switchChainFn = useSwitchChain();
 
   async function switchChain(chainId: EChainId) {
-    const chainToSwitch = viemChains.find((c) => c.id === chainId);
+    const chainToSwitch = chains.find((c) => c.id === chainId);
     if (chainToSwitch) {
       await switchChainFn.mutateAsync({ chainId: chainToSwitch.id });
     } else {
@@ -81,8 +81,8 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
-        for (const viemChain of viemChains) {
-          const chainId = viemChain.id as EChainId;
+        for (const chain of chains) {
+          const chainId = chain.id as EChainId;
           const config = await getSavingsConfig(
             getViemPublicClientByChain(chainId),
             address,

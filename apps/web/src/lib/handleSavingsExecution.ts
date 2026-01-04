@@ -175,7 +175,7 @@ async function handleSavingsExecution(
       chainId: savingsChainId,
     });
 
-    console.log('SAVINGS TX:', getTransactionLink(txHash));
+    console.log('SAVINGS TX:', getTransactionLink(txHash, savingsChainId));
     return txHash;
   } catch (executionError) {
     console.error(

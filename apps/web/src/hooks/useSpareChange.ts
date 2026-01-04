@@ -17,14 +17,20 @@ export function useSpareChange() {
   //   TODO: enable support for more than 100 transfers
   const { data, isLoading, error, isFetched, isFetching } = useQuery({
     queryKey: [`spareChangeErc20Transfers-${fromAddress}`],
-    queryFn: () =>
-      fetchErc20Transfers({
-        fromAddress,
-        toAddress: autohodl,
-        contractAddresses: autohodlTokens,
-        maxCount: 1000,
-        order: 'desc',
-      }).then((res) => res.transfers),
+    queryFn: async () => {
+      if (!savingsChainId) throw new Error('savingsChainId is not defined');
+
+      return fetchErc20Transfers(
+        {
+          fromAddress,
+          toAddress: autohodl,
+          contractAddresses: autohodlTokens,
+          maxCount: 1000,
+          order: 'desc',
+        },
+        savingsChainId,
+      ).then((res) => res.transfers);
+    },
     enabled: isConnected && !!fromAddress,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,

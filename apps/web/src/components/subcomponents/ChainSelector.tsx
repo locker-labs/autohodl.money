@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { viemChains } from '@/config';
+import { chains } from '@/config';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import type { EChainId } from '@/lib/constants';
 
@@ -17,7 +17,7 @@ const ChainSelector = ({ defaultChainId }: { defaultChainId: EChainId }) => {
     <Select
       value={String(defaultChainId ?? '')}
       onValueChange={async (value) => {
-        const chain = viemChains.find((c) => String(c.id) === String(value));
+        const chain = chains.find((c) => String(c.id) === String(value));
         if (chain) {
           await switchChain(chain.id);
         } else {
@@ -30,7 +30,7 @@ const ChainSelector = ({ defaultChainId }: { defaultChainId: EChainId }) => {
         <SelectValue placeholder='Please select' />
       </SelectTrigger>
       <SelectContent>
-        {viemChains.map((chain) => (
+        {chains.map((chain) => (
           <SelectItem key={chain.id} value={String(chain.id)}>
             {chain.name}
           </SelectItem>

@@ -26,8 +26,8 @@ File: `src/config/index.ts`
 
 1.  Import the chain definition from `@reown/appkit/networks` (for AppKit) and `viem/chains` (for Viem).
     - If the chain is not available in AppKit, define it manually using `defineChain`.
-2.  Add the chain to the `chains` array (AppKit networks).
-3.  Add the chain to the `viemChains` array.
+2.  Add the chain to the `networks` array (AppKit networks).
+3.  Add the chain to the `chains` array.
 
 ## 3. Init Viem Public Client
 File: `src/lib/clients/viemPublicClient.ts`

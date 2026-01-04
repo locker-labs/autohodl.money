@@ -1,10 +1,7 @@
 import axios from 'axios';
-import { chain } from '@/config';
-import { AlchemyChainMap } from '@/lib/constants';
-import { secrets } from '@/lib/secrets';
 import type { Hex } from 'viem';
-
-const ALCHEMY_API_URL = `https://${AlchemyChainMap[chain.id]}.g.alchemy.com/v2/${secrets.alchemyApiKey}`;
+import type { EChainId } from '@/lib/constants';
+import { getAlchemyApiUrlByChain } from '@/lib/helpers';
 
 interface Erc20TransferParams {
   fromBlock?: string;
@@ -47,7 +44,10 @@ export interface Erc20TransferResponse {
   pageKey?: string;
 }
 
-export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<Erc20TransferResponse> {
+export async function fetchErc20Transfers(
+  params: Erc20TransferParams,
+  chainId: EChainId,
+): Promise<Erc20TransferResponse> {
   const {
     fromBlock = '0x0',
     toBlock = 'latest',
@@ -81,11 +81,15 @@ export async function fetchErc20Transfers(params: Erc20TransferParams): Promise<
   };
 
   try {
-    const response = await axios.post<{ result: Erc20TransferResponse }>(ALCHEMY_API_URL, requestBody, {
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await axios.post<{ result: Erc20TransferResponse }>(
+      getAlchemyApiUrlByChain(chainId),
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     const { result } = response.data;
     if (result) {

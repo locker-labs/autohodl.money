@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { erc20Abi, formatUnits } from 'viem';
-import { viemChains } from '@/config';
+import { chains } from '@/config';
 import { type EChainId, TokenDecimalMap } from '@/lib/constants';
 import { getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
@@ -25,7 +25,7 @@ export function useTokenBalances() {
       }
 
       await Promise.all(
-        viemChains.map(async (chain) => {
+        chains.map(async (chain) => {
           const chainId = chain.id as EChainId;
           const usdcAddress = getUsdcAddressByChain(chainId);
 
