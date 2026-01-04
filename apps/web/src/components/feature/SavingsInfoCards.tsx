@@ -1,12 +1,12 @@
 import { formatUnits } from 'viem';
 import {
   APYCard,
-  RoundupSavingsCard,
+  LifetimeSavingsCard,
   TotalSavingsCard,
 } from '@/components/ui/cards';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { useSpareChange } from '@/hooks/useSpareChange';
+import { useLifetimeSavings } from '@/hooks/useLifetimeSavings';
 import { useSTokenBalances } from '@/hooks/useSTokenBalances';
 import { getSusdcAddressByChain, getTokenDecimalsByAddress } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
@@ -16,7 +16,7 @@ export function SavingsInfoCards(): React.JSX.Element {
 
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
 
-  const { changeSaved, isReady: readyChange } = useSpareChange();
+  const { changeSaved, isReady: readyChange } = useLifetimeSavings();
 
   const { data: sTokenBalances, isLoading: loadingSTokenBalances, isFetched: fetchedSTokenBalances } = useSTokenBalances();
   const readySTokenBalances = fetchedSTokenBalances && !loadingSTokenBalances;
@@ -29,7 +29,7 @@ export function SavingsInfoCards(): React.JSX.Element {
   return (
     <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5'>
       <TotalSavingsCard loading={!readySTokenBalances} value={tokenBalance} ticker={'sUSDC'} />
-      <RoundupSavingsCard loading={!readyChange} value={changeSaved} />
+      <LifetimeSavingsCard loading={!readyChange} value={changeSaved} />
       <APYCard loading={apyLoading} value={apy} showWarning={!!config && !config.toYield} />
     </div>
   );

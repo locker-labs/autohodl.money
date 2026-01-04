@@ -1,3 +1,4 @@
+// Lifetime spare change saved
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
@@ -8,15 +9,14 @@ import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
 
-export function useSpareChange() {
+export function useLifetimeSavings() {
   const { address: fromAddress, isConnected } = useConnection();
   const { savingsChainId } = useAutoHodl();
   const autohodl = getAutoHodlAddressByChain(savingsChainId);
   const autohodlTokens = getAutoHodlSupportedTokens(savingsChainId);
 
-  //   TODO: enable support for more than 100 transfers
   const { data, isLoading, error, isFetched, isFetching } = useQuery({
-    queryKey: [`spareChangeErc20Transfers-${fromAddress}`],
+    queryKey: [`lifetimeSavingsErc20Transfers-${fromAddress}`],
     queryFn: async () => {
       if (!savingsChainId) throw new Error('savingsChainId is not defined');
 

@@ -1,4 +1,4 @@
 export * from './APYCard';
-export * from './RoundupSavingsCard';
+export * from './LifetimeSavingsCard';
 export * from './TotalSavingsCard';
 export * from './YieldCard';

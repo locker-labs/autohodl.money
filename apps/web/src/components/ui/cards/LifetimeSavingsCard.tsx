@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { formatAmount } from '@/lib/math';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 
-export function RoundupSavingsCard({ loading, value }: { loading: boolean; value: number }) {
+export function LifetimeSavingsCard({ loading, value }: { loading: boolean; value: number }) {
   return (
     <Card className='flex items-center justify-start rounded-xl border border-app-green'>
       <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
