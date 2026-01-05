@@ -1,18 +1,32 @@
 import { CreditCard } from 'lucide-react';
 import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatAmount } from '@/lib/math';
+import { formatAmount, roundOff } from '@/lib/math';
 import Button from '@/components/subcomponents/Button';
 import { getWalletClient } from '@wagmi/core';
 import { config } from '@/config';
-import { toastCustom } from '../toast';
+import { toastCustom } from '@/components/ui/toast';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
 import { getSusdcAddressByChain, getTokenDecimalsByAddress } from '@/lib/helpers';
 import { useAutoHodl } from '@/context/AutoHodlContext';
+import { useSTokenBalances } from '@/hooks/useSTokenBalances';
+import { formatUnits } from 'viem';
+import { useMemo } from 'react';
+const ticker='sUSDC';
+const keyLs = `${ticker}Added`;
+const valueLs = 'true';
 
-export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean; value: number; ticker: string }) {
-  const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem('sUSDCAdded') === 'true';
+export function TotalSavingsCard() {
   const { savingsChainId } = useAutoHodl();
+  const { data: sTokenBalances, isReady } = useSTokenBalances();
+
+  const tokenBalance = useMemo(() => {
+    let sum = 0;
+    for (const [cid, val] of sTokenBalances?.entries() || []) {
+      sum += Number(formatUnits(val.balance, getTokenDecimalsByAddress(getSusdcAddressByChain(cid))));
+    }
+    return roundOff(sum, 2);
+  }, [sTokenBalances]);
 
   async function handleAddToken() {
     const client = await getWalletClient(config);
@@ -27,15 +41,15 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
           type: 'ERC20',
           options: {
             address: SUSDC_ADDRESS,
-            symbol: 'sUSDC',
+            symbol: ticker,
             decimals: getTokenDecimalsByAddress(SUSDC_ADDRESS),
           },
         },
       });
 
       if (wasAdded) {
-        localStorage.setItem('sUSDCAdded', 'true'); // Set the flag in localStorage
-        toastCustom('sUSDC added!');
+        localStorage.setItem(keyLs, valueLs);
+        toastCustom(`${ticker} added!`);
       } else {
         toastCustom('User rejected.');
       }
@@ -43,6 +57,8 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
       console.error(err);
     }
   }
+
+  const isTokenAdded = typeof window !== 'undefined' && localStorage.getItem(keyLs) === valueLs;
 
   return (
     <Card className='flex items-center justify-start rounded-xl border border-app-green'>
@@ -52,12 +68,12 @@ export function TotalSavingsCard({ loading, value, ticker }: { loading: boolean;
 
         <div className='w-full flex sm:flex-col items-center sm:items-start justify-between gap-3'>
           <div>
-            {loading ? (
+            {!isReady ? (
               <PriceSkeleton />
             ) : (
               <div className='flex items-end gap-1'>
                 <div className='leading-none font-bold text-[#000000] text-2xl text-left sm:text-center md:text-left'>
-                  <p>{formatAmount(value)}</p>
+                  <p>{formatAmount(tokenBalance)}</p>
                 </div>
                 <p className='font-light text-sm'>{ticker}</p>
               </div>

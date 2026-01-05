@@ -1,9 +1,7 @@
-import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
-import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
-import { RecentActivity } from '@/components/subcomponents/RecentActivity';
-import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
+import { Controls, ControlsMobile, RecentActivity, SavingsInfoCards } from '@/components/dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import useIsMobile from '@/hooks/useIsMobile';
 
 const Dashboard = () => {
   const { isMobile, isLoading } = useIsMobile();

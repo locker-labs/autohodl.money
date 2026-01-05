@@ -15,7 +15,7 @@ export type STokenBalancesMap = Map<EChainId, STokenBalance>;
 
 export function useSTokenBalances() {
   const { address } = useConnection();
-  return useQuery({
+  const { data, isLoading, error, isFetched, isFetching } = useQuery({
     queryKey: ['sToken-balances', address],
     queryFn: async () => {
       const balances: STokenBalancesMap = new Map();
@@ -71,4 +71,6 @@ export function useSTokenBalances() {
     },
     enabled: !!address,
   });
+
+  return { data, isLoading, error, isFetched, isFetching, isReady: isFetched && !isLoading };
 }

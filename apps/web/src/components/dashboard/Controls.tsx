@@ -16,7 +16,7 @@ import { CopyContentButton } from '@/components/feature/CopyContentButton';
 import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
-import SavingsLimit from './SavingsLimit';
+import SavingsLimit from '@/components/subcomponents/SavingsLimit';
 import { formatAmount } from '@/lib/math';
 import { getUsdcAddressByChain, getViemChain, getViemChainImage } from '@/lib/helpers';
 

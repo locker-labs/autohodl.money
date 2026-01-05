@@ -2,16 +2,15 @@ import { TrendingUp } from 'lucide-react';
 import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { useAaveAPY } from '@/hooks/useAaveAPY';
 
-export function APYCard({
-  loading,
-  value,
-  showWarning = false,
-}: {
-  loading: boolean;
-  value: string | undefined;
-  showWarning?: boolean;
-}) {
+export function APYCard() {
+  const { config } = useAutoHodl();
+  const { data: apy, isLoading: loading } = useAaveAPY();
+
+  const showWarning = (!!config && !config.toYield) || false;
+
   return (
     <Card
       className={`flex items-center justify-start rounded-xl border 
@@ -31,7 +30,7 @@ export function APYCard({
             <div
               className={`leading-none font-bold ${showWarning ? 'text-red-500' : 'text-[#78E76E]'} text-2xl text-left sm:text-center md:text-left`}
             >
-              {loading ? <PriceSkeleton /> : <p>{value ? `${value}%` : '-'}</p>}
+              {loading ? <PriceSkeleton /> : <p>{apy ? `${apy}%` : '-'}</p>}
             </div>
           </div>
 
