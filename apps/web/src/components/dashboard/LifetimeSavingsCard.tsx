@@ -7,7 +7,6 @@ import { formatAmount, roundOff } from '@/lib/math';
 
 export function LifetimeSavingsCard() {
   const { data: savingsMap, isReady } = useLifetimeSavings();
-  console.log('lifetimeSavingsMap', savingsMap?.entries());
 
   const total = savingsMap
     ? roundOff(

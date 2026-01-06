@@ -16,8 +16,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing tracking cookie' }, { status: 400 });
     }
 
-    console.log('twclid from cookie:', twclid);
-
     // Get the raw body as json
     if (request.headers.get('content-type') !== 'application/json') {
       console.error('Invalid content-type, expected application/json');
