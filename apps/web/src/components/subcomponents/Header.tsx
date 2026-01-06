@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ConnectButton } from '@/components/ConnectButton';
+import { ConnectButton } from '@/components/feature/ConnectButton';
 
 export default function Header({ className }: { className?: string }) {
   return (

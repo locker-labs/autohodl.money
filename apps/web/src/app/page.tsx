@@ -2,7 +2,7 @@
 
 import { useConnection } from 'wagmi';
 import Loading from '@/app/loading';
-import Header from '@/components/Header';
+import Header from '@/components/subcomponents/Header';
 import { Footer } from '@/components/subcomponents/Footer';
 import Dashboard from '@/components/view/Dashboard';
 import LandingPage from '@/components/view/Landing';
