@@ -93,6 +93,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
           if (found) {
             setConfig(config);
             setSavingsChainId(chainId);
+            switchChain(chainId);
             break;
           }
           setConfig(null);
