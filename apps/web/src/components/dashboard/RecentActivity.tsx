@@ -1,4 +1,4 @@
-import { CircleArrowDown, CircleArrowRight, CircleArrowUp, CircleChevronDown, Loader2 } from 'lucide-react';
+import { CircleArrowDown, CircleArrowRight, CircleArrowUp, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { formatUnits } from 'viem';
@@ -12,40 +12,20 @@ import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
 import { formatAddress } from '@/lib/string';
 import { EAutoHodlTxType } from '@/enums';
 import { getTokenDecimalsByAddress, getUsdcAddressByChain } from '@/lib/helpers';
-import { useAutoHodl } from '@/context/AutoHodlContext';
+import { sortByTimestampDesc } from '@/lib/helpers/sort';
+import { useMemo } from 'react';
 
 export function RecentActivity(): React.JSX.Element {
-  const { savingsChainId } = useAutoHodl();
+  const { allTxs: allSavingsTxs, loading: loadingSavings } = useSavingsTxs();
 
-  const {
-    allTxs: allSavingsTxs,
-    loading: loadingSavings,
-    fetchNext: fetchNextSavings,
-    hasNext: hasNextSavings,
-  } = useSavingsTxs();
-
-  const {
-    allTxsFiltered: allWithdrawalTxs,
-    loading: loadingWithdrawals,
-    fetchNext: fetchNextWithdrawals,
-    hasNext: hasNextWithdrawals,
-  } = useWithdrawalTxs();
-
-  const fetchNext = () => {
-    if (hasNextSavings) {
-      fetchNextSavings();
-    }
-
-    if (hasNextWithdrawals) {
-      fetchNextWithdrawals();
-    }
-  };
-
-  const hasNext = hasNextSavings || hasNextWithdrawals;
+  const { allTxsFiltered: allWithdrawalTxs, loading: loadingWithdrawals } = useWithdrawalTxs();
 
   const loading = loadingWithdrawals || loadingSavings;
 
-  const allTxs = [...allSavingsTxs, ...allWithdrawalTxs].sort((a, b) => (a.blockNum < b.blockNum ? 1 : -1));
+  const allTxs = useMemo(
+    () => [...allSavingsTxs, ...allWithdrawalTxs].sort(sortByTimestampDesc),
+    [allSavingsTxs, allWithdrawalTxs],
+  );
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
@@ -93,7 +73,7 @@ export function RecentActivity(): React.JSX.Element {
               return (
                 <Link
                   key={tx.id}
-                  href={getTransactionLink(tx.txHash, savingsChainId)}
+                  href={getTransactionLink(tx.txHash, tx.chainId)}
                   target='_blank'
                   className='no-underline rounded-[14px] transition-all ease-out duration-150'
                 >
@@ -132,7 +112,7 @@ export function RecentActivity(): React.JSX.Element {
                             {formatAmount(
                               formatUnits(
                                 BigInt(tx.value ?? 0),
-                                getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId)),
+                                getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
                               ),
                             )}
                           </p>
@@ -153,7 +133,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(savingsChainId))))}`}
+                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId))))}`}
                         </p>
                       </div>
                     </div>
@@ -161,25 +141,6 @@ export function RecentActivity(): React.JSX.Element {
                 </Link>
               );
             })}
-
-            {hasNext && (
-              <div className='pr-2'>
-                <button
-                  type='button'
-                  title='Load more'
-                  onClick={() => {
-                    fetchNext();
-                  }}
-                  className='w-full mt-3 py-2 px-2 flex items-center justify-center border border-gray-300 gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]'
-                >
-                  {loading ? (
-                    <Loader2 className={'animate-spin'} color='#78E76E' />
-                  ) : (
-                    <CircleChevronDown strokeWidth={1.5} color='#0f0f0f99' />
-                  )}
-                </button>
-              </div>
-            )}
           </div>
         )}
       </CardContent>
