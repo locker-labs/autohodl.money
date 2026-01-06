@@ -29,7 +29,7 @@ export function RecentActivity(): React.JSX.Element {
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
-    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-fit group/container'>
+    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-[600px] max-h-[600px] min-h-[600px] group/container'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Recent Activity</h2>
@@ -37,7 +37,7 @@ export function RecentActivity(): React.JSX.Element {
         </div>
 
         {loading || allTxs.length === 0 ? (
-          <div className={'mt-[15px] min-h-[530px] w-full h-fit flex justify-center items-center'}>
+          <div className={'mt-[15px] w-full h-[480px] flex justify-center items-center'}>
             {loading ? (
               <Loader2 className={'animate-spin'} color={'#78E76E'} />
             ) : (
@@ -60,12 +60,15 @@ export function RecentActivity(): React.JSX.Element {
           </div>
         ) : (
           <div
-            className={`mt-[15px] max-h-[582px] overflow-y-scroll scrollbar-thin
+            className={`mt-[15px] max-h-[582px]
+              overflow-y-scroll scrollbar-thin
               scrollbar-track-transparent scrollbar-thumb-transparent
               scrollbar-thumb-rounded-full
               scrollbar-hover:scrollbar-thumb-[#AAAAAA]
-              group-hover/container:scrollbar-thumb-[#BBBBBB] group-hover/container:scrollbar-track-transparent
-              p-[2px]`}
+              group-hover/container:scrollbar-thumb-[#BBBBBB]
+              group-hover/container:scrollbar-track-transparent
+              p-[2px]
+              `}
           >
             {allTxs.map((tx, idx) => {
               const isWithdrawalTx = tx.type === EAutoHodlTxType.Withdrawal;
