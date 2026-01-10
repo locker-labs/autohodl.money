@@ -60,7 +60,7 @@ export function RecentActivity(): React.JSX.Element {
           </div>
         ) : (
           <div
-            className={`mt-[15px] max-h-[582px]
+            className={`mt-[15px] max-h-[508px]
               overflow-y-scroll scrollbar-thin
               scrollbar-track-transparent scrollbar-thumb-transparent
               scrollbar-thumb-rounded-full
@@ -82,7 +82,7 @@ export function RecentActivity(): React.JSX.Element {
                 >
                   <div
                     className={`group/tx border border-gray-300 flex flex-col gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]
-                      ${allTxs.length - 1 === idx ? '' : 'mb-3'}
+                      ${allTxs.length - 1 === idx ? 'mb-5' : 'mb-3'}
                       mr-1.5
                     `}
                   >
