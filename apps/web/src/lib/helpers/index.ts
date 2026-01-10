@@ -18,7 +18,9 @@ import {
   AavePoolAddressesProviderMap,
   ViemChainMap,
   ViemChainImageMap,
+  SUPPORTED_TOKENS,
 } from '@/lib/constants';
+import { chains } from '@/config';
 
 function computeRoundUpAndSavings(
   transferAmount: bigint,
@@ -35,7 +37,18 @@ function computeRoundUpAndSavings(
   return { roundUpAmount, savingsAmount };
 }
 
-function isAutoHodlSupportedToken(token: Address, chainId: EChainId): boolean {
+function isAutoHodlSupportedToken(token: Address): boolean {
+  let isTokenSupported = false;
+  for (const supportedToken of SUPPORTED_TOKENS) {
+    if (getAddress(supportedToken) === getAddress(token)) {
+      isTokenSupported = true;
+      break;
+    }
+  }
+  return isTokenSupported;
+}
+
+function isAutoHodlSupportedTokenByChain(token: Address, chainId: EChainId): boolean {
   const autohodlTokens = getAutoHodlSupportedTokens(chainId);
 
   let isTokenSupported = false;
@@ -74,6 +87,16 @@ function getSusdcAddress(token: Address): TSusdcAddress {
   }
 
   throw new Error(`Token address ${token} is not a supported SUSDC address.`);
+}
+
+function isValidSourceChain(chainId: number): boolean {
+  for (let idx = 0; idx < chains.length; idx++) {
+    if (chains[idx].id === chainId) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function isSusdcAddress(token: Address) {
@@ -186,4 +209,6 @@ export {
   getViemPublicClientByChain,
   getViemChain,
   getViemChainImage,
+  isValidSourceChain,
+  isAutoHodlSupportedTokenByChain,
 };

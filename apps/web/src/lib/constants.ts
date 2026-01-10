@@ -100,6 +100,8 @@ type TUsdcAddress = (typeof UsdcAddressMap)[keyof typeof UsdcAddressMap];
 const USDC_ADDRESSES: TUsdcAddress[] = Object.values(UsdcAddressMap);
 const USDC_ADDRESS_SET = new Set<TUsdcAddress>(Object.values(UsdcAddressMap));
 
+const SUPPORTED_TOKENS = [...USDC_ADDRESSES];
+
 /**
  * SUSDC
  */
@@ -264,6 +266,7 @@ export {
   SUSDC_ADDRESS_SET,
   SavingConfigSetEventSigHash,
   SavingDelegatedEventSigHash,
+  SUPPORTED_TOKENS,
   SupportedAccounts,
   SusdcAddressMap,
   ViemChainMap,

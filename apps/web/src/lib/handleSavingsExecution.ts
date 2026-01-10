@@ -2,7 +2,7 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { type EChainId, MoralisStreamId } from '@/lib/constants';
+import { type EChainId, MoralisStreamId, ViemChainNameMap } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
@@ -13,8 +13,11 @@ import {
   getDelegateAddressByChain,
   getAutoHodlSupportedTokens,
   getViemPublicClientByChain,
+  isValidSourceChain,
+  isAutoHodlSupportedTokenByChain,
 } from '@/lib/helpers';
 import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
+import { chains } from '@/config';
 
 async function handleSavingsExecution(
   erc20Transfer: IERC20Transfer,
@@ -24,16 +27,6 @@ async function handleSavingsExecution(
   const transferAmount: bigint = BigInt(erc20Transfer.value);
   const token: Address = getAddress(contract);
   const from = _from as Address;
-
-  const sourceChainId = Number(chainId) as EChainId;
-  const savingsChainId = Number(chainId) as EChainId;
-
-  const [delegate, autohodl, autohodlTokens, viemPublicClient] = [
-    getDelegateAddressByChain(savingsChainId),
-    getAutoHodlAddressByChain(savingsChainId),
-    getAutoHodlSupportedTokens(savingsChainId),
-    getViemPublicClientByChain(savingsChainId),
-  ];
 
   // Since we dont have access to metamask card,
   // we can hardcode the `from` address for savings transfers.
@@ -48,35 +41,80 @@ async function handleSavingsExecution(
   }
   */
 
-  // For debugging
-  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, delegate }));
-
   // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
   // For now, we will support only USDC savings transfers.
-  // Check token support
-  if (!isAutoHodlSupportedToken(token, savingsChainId)) {
-    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${autohodlTokens}`);
+
+  // For debugging
+  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, chainId }));
+
+  // 1. Validate chain id
+  if (!isValidSourceChain(Number(chainId))) {
+    console.warn(`Invalid source chain id: ${chainId}`);
+    return;
+  }
+  const sourceChainId = Number(chainId) as EChainId;
+
+  // 2. Check token support - this step is essential to prevent fetching configs for unsupported tokens
+  if (!isAutoHodlSupportedToken(token)) {
+    console.warn(`Token not supported by any supported chain: ${token}`);
     return;
   }
 
-  // Fetch savings config
-  let savingsConfig: SavingsConfig;
+  // 3. Find savings chain id & savings config
+  let savingsConfig: SavingsConfig | null = null;
+  let savingsChainId: EChainId | null = null;
+
+  // Fetch savings config on all supported chains and choose first active config
   try {
-    savingsConfig = await getSavingsConfig(viemPublicClient, from, token, savingsChainId);
-    console.log('CONFIG:', savingsConfig);
+    for (const chain of chains) {
+      const chainId = chain.id as unknown as EChainId;
+      const viemPublicClient = getViemPublicClientByChain(chainId);
+      const config = await getSavingsConfig(viemPublicClient, from, token, chainId);
+
+      // 3A. Check if config is set
+      if (config.delegate === zeroAddress) {
+        console.warn(
+          `Savings config not found for user ${from} and token ${token} on chain ${ViemChainNameMap[chainId]}`,
+        );
+        continue;
+      }
+
+      // 3B. Check if config is active
+      if (!config.active) {
+        console.warn(
+          `Savings config is not active for user ${from} and token ${token} on chain ${ViemChainNameMap[chainId]}`,
+        );
+        continue;
+      }
+
+      savingsConfig = config;
+      savingsChainId = chainId;
+      break;
+    }
   } catch (configError) {
     console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
     // TODO: Notify dev team
     throw configError;
   }
 
-  // Check if config is set
-  if (savingsConfig.delegate === zeroAddress) {
-    console.warn(`Savings config not found for user ${from} and token ${token}`, 'Aborting execution.');
+  if (!savingsConfig || !savingsChainId) {
+    console.warn(`No active savings config found for user ${from} and token ${token}`, 'Aborting execution.');
     return;
   }
 
-  // check mode, and validate with streamId
+  console.log('SAVINGS CHAIN ID:', savingsChainId);
+  console.log('SAVINGS CONFIG:', savingsConfig);
+
+  // 4. Check token support for chain
+  if (!isAutoHodlSupportedTokenByChain(token, savingsChainId)) {
+    console.warn(
+      `Token not supported for chain ${ViemChainNameMap[savingsChainId]}: ${token}. Supported tokens: ${getAutoHodlSupportedTokens(savingsChainId)}`,
+      'Aborting execution.',
+    );
+    return;
+  }
+
+  // 5. Check config mode, and validate with streamId
   if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
     console.warn(
       `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${MoralisStreamId.MmcWithdrawal} for MetaMask Card mode.`,
@@ -93,13 +131,15 @@ async function handleSavingsExecution(
     return;
   }
 
-  // Check if config is active
-  if (!savingsConfig.active) {
-    console.warn(`Savings config is not active for user ${from} and token ${token}`, 'Aborting execution.');
-    return;
-  }
+  const [delegate, autohodl, viemPublicClient] = [
+    getDelegateAddressByChain(savingsChainId),
+    getAutoHodlAddressByChain(savingsChainId),
+    getViemPublicClientByChain(savingsChainId),
+  ];
 
-  // If toYield = true, and to = AUTOHODL_ADDRESS, skip execution
+  // 6. Check config yield settings
+
+  // 6A. If toYield = true, and to = AUTOHODL_ADDRESS, skip execution
   if (savingsConfig.toYield === true && getAddress(to) === getAddress(autohodl)) {
     console.warn(
       'This is a savings tx.',
@@ -109,7 +149,7 @@ async function handleSavingsExecution(
     return;
   }
 
-  // If toYield = false, and to = savingsAddress, skip execution
+  // 6B. If toYield = false, and to = savingsAddress, skip execution
   if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {
     console.warn(
       'This is a savings tx.',
@@ -119,7 +159,7 @@ async function handleSavingsExecution(
     return;
   }
 
-  // Verify delegate
+  // 7. Verify delegate
   if (getAddress(savingsConfig.delegate) !== getAddress(delegate)) {
     console.warn(
       `Delegate mismatch in savings config for user ${from} and token ${token}`,
@@ -133,7 +173,7 @@ async function handleSavingsExecution(
     );
   }
 
-  // Check approval amount for the autohodl contract from user's address
+  // 8. Check approval amount for the autohodl contract from user's address
   let allowance: bigint;
   try {
     allowance = await fetchAllowance({
@@ -152,22 +192,23 @@ async function handleSavingsExecution(
     throw allowanceError;
   }
 
-  // Calculate amount for savings tx
+  // 9. Calculate amount for savings tx
   const roundUpTo: bigint = savingsConfig.roundUp;
   console.log('TRANSFER AMOUNT:', transferAmount);
   console.log('ROUNDUP TO:', roundUpTo);
   const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
-  // Check if allowance is sufficient
+  // 19. Check if allowance is sufficient
   if (allowance < savingsAmount) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
     // TODO: notify user when allowance is insufficient
     return;
   }
-  // TODO: check balance before executing savings tx
 
-  // Call the delegateSaving fn of the SC.
+  // TODO: 11. Check balance before executing savings tx
+
+  // 12. Call the delegateSaving fn of the SC.
   try {
     const txHash = await delegateSaving({
       user: from as Address,
