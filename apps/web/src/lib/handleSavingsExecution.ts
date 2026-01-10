@@ -25,6 +25,7 @@ async function handleSavingsExecution(
   const token: Address = getAddress(contract);
   const from = _from as Address;
 
+  const sourceChainId = Number(chainId) as EChainId;
   const savingsChainId = Number(chainId) as EChainId;
 
   const [delegate, autohodl, autohodlTokens, viemPublicClient] = [
@@ -164,6 +165,7 @@ async function handleSavingsExecution(
     // TODO: notify user when allowance is insufficient
     return;
   }
+  // TODO: check balance before executing savings tx
 
   // Call the delegateSaving fn of the SC.
   try {
@@ -171,7 +173,7 @@ async function handleSavingsExecution(
       user: from as Address,
       asset: token,
       value: savingsAmount,
-      data: { sourceTxHash: sourceTxHash as Hex, purchaseAmount: transferAmount },
+      data: { sourceTxHash: sourceTxHash as Hex, purchaseAmount: transferAmount, sourceChainId },
       chainId: savingsChainId,
     });
 

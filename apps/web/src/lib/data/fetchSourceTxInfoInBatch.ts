@@ -18,15 +18,15 @@ import { fetchTransactionReceiptsInBatch } from './fetchTransactionReceiptsInBat
  */
 export async function fetchSourceTxInfoInBatch(
   transactionHashes: string[],
-  chainId: EChainId,
+  defaultChainId: EChainId,
 ): Promise<SourceTxInfo[]> {
-  const receipts: ITransactionReceipt[] = await fetchTransactionReceiptsInBatch(transactionHashes, chainId);
+  const receipts: ITransactionReceipt[] = await fetchTransactionReceiptsInBatch(transactionHashes, defaultChainId);
 
   return receipts.map((receipt: ITransactionReceipt) => {
     if (receipt) {
       const log = receipt.logs.find((log) => log.topics.some((topic) => topic === SavingDelegatedEventSigHash));
       if (log) {
-        const sourceTxInfo: SourceTxInfo = decodeDelegateSavingData(log.data);
+        const sourceTxInfo: SourceTxInfo = decodeDelegateSavingData(log.data, defaultChainId);
         return sourceTxInfo;
       }
     }

@@ -4,6 +4,7 @@ import { MMCardDelegateAbi } from '@/lib/abis';
 import { account, getViemWalletClientByChain } from '@/lib/clients/server';
 import type { EChainId } from '@/lib/constants';
 import { getDelegateAddressByChain, getViemChain } from '@/lib/helpers';
+import type { SourceTxInfo } from '@/types/autohodl';
 
 /**
  * Executes a savings transaction on the MMCardDelegate contract.
@@ -23,7 +24,7 @@ export async function delegateSaving({
   user: Address;
   asset: Address;
   value: bigint;
-  data: { sourceTxHash: Hex; purchaseAmount: bigint };
+  data: SourceTxInfo;
   chainId: EChainId;
 }): Promise<Hex> {
   console.log('Delegate Saving called with:', { user, asset, value, data });
@@ -31,8 +32,8 @@ export async function delegateSaving({
   const walletClient = getViemWalletClientByChain(chainId);
   if (!walletClient) throw new Error('No wallet client found for chain');
 
-  const params = [{ type: 'bytes32' }, { type: 'uint256' }];
-  const encoded = encodeAbiParameters(params, [data.sourceTxHash, data.purchaseAmount]);
+  const params = [{ type: 'bytes32' }, { type: 'uint256' }, { type: 'uint256' }];
+  const encoded = encodeAbiParameters(params, [data.sourceTxHash, data.purchaseAmount, BigInt(data.sourceChainId)]);
   console.log('encoded:', encoded);
 
   return walletClient.writeContract({

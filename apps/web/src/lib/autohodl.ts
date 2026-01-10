@@ -11,14 +11,36 @@ import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
 import type { EChainId } from './constants';
 import { getAutoHodlAddressByChain } from './helpers';
 
-export function decodeDelegateSavingData(data: Hex): SourceTxInfo {
-  const params = [{ type: 'uint256' }, { type: 'uint256' }, { type: 'bytes32' }, { type: 'uint256' }];
-  const decoded = decodeAbiParameters(params, data);
+export function decodeDelegateSavingData(data: Hex, defaultChainId: EChainId): SourceTxInfo {
+  // New format with sourceChainId (5 params)
+  const newParams = [
+    { type: 'uint256' },
+    { type: 'uint256' },
+    { type: 'bytes32' },
+    { type: 'uint256' },
+    { type: 'uint256' },
+  ];
 
-  return {
-    sourceTxHash: decoded[2] as Hex,
-    purchaseAmount: decoded[3] as bigint,
-  };
+  // Old format without sourceChainId (4 params)
+  const oldParams = [{ type: 'uint256' }, { type: 'uint256' }, { type: 'bytes32' }, { type: 'uint256' }];
+
+  // Try new format first, fall back to old format for backward compatibility
+  try {
+    const decoded = decodeAbiParameters(newParams, data);
+    return {
+      sourceTxHash: decoded[2] as Hex,
+      purchaseAmount: decoded[3] as bigint,
+      sourceChainId: Number(decoded[4]),
+    };
+  } catch {
+    // Fall back to old format without sourceChainId
+    const decoded = decodeAbiParameters(oldParams, data);
+    return {
+      sourceTxHash: decoded[2] as Hex,
+      purchaseAmount: decoded[3] as bigint,
+      sourceChainId: defaultChainId,
+    };
+  }
 }
 
 export function parseSavingsConfig(arr: SavingsConfigArray | Readonly<SavingsConfigArray>): SavingsConfig {
