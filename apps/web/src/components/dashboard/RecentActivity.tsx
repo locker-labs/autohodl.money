@@ -14,6 +14,7 @@ import { EAutoHodlTxType } from '@/enums';
 import { getTokenDecimalsByAddress, getUsdcAddressByChain } from '@/lib/helpers';
 import { sortByTimestampDesc } from '@/lib/helpers/sort';
 import { useMemo } from 'react';
+import { ChainDisplay } from '@/components/ui/ChainDisplay';
 
 export function RecentActivity(): React.JSX.Element {
   const { allTxs: allSavingsTxs, loading: loadingSavings } = useSavingsTxs();
@@ -110,34 +111,59 @@ export function RecentActivity(): React.JSX.Element {
                             color='#22C55E'
                           />
                         )}
-                        <div>
-                          <p className='font-semibold text-black text-base text-left'>
-                            {formatAmount(
-                              formatUnits(
-                                BigInt(tx.value ?? 0),
-                                getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
-                              ),
-                            )}
-                          </p>
-                          <p className='font-normal text-left'>
-                            {isSelfWithdrawal
-                              ? `Self withdrawal`
-                              : isWithdrawalTx
-                                ? `Sent to ${formatAddress(tx.to)}`
-                                : 'Deposited to aave'}
-                          </p>
+
+                        {/* Left div: Amount, title, savings chain */}
+                        <div className='grid grid-rows-3 gap-[6px]'>
+                          <div className='row-start-1 flex justify-start items-end'>
+                            <p className='font-semibold text-black text-base text-left leading-[16px]'>
+                              {formatAmount(
+                                formatUnits(
+                                  BigInt(tx.value ?? 0),
+                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
+                                ),
+                              )}
+                            </p>
+                          </div>
+                          <div className='row-start-2'>
+                            <p className='font-normal text-[#6b6b6b] text-sm text-left leading-[16px]'>
+                              {isSelfWithdrawal
+                                ? `Self withdrawal`
+                                : isWithdrawalTx
+                                  ? `Sent to ${formatAddress(tx.to)}`
+                                  : 'Round-up saved'}
+                            </p>
+                          </div>
+                          <div className='row-start-3 flex justify-start items-start'>
+                            <ChainDisplay chainId={tx.chainId} />
+                          </div>
                         </div>
                       </div>
 
-                      <div>
-                        <p className='font-normal text-[#0f0f0f] text-base text-right'>
-                          {tx?.timestamp ? timeAgoFromHex(tx.timestamp) : null}
-                        </p>
-                        <p className='font-normal text-[#0f0f0f] text-base text-right'>
-                          {isWithdrawalTx
-                            ? null
-                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId))))}`}
-                        </p>
+                      {/* Right div: Timestamp, Source chain, Purchase amount */}
+                      <div className='grid grid-rows-3 gap-[6px]'>
+                        <div className='row-start-1 flex justify-end items-end'>
+                          {/* For savings tx, show purchase amount */}
+                          {!isWithdrawalTx && (
+                            <p className='font-normal text-[#6b6b6b] text-[10px] text-right leading-[16px]'>
+                              purchase:{' '}
+                              {formatAmount(
+                                formatUnits(
+                                  BigInt(tx.purchaseValue),
+                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
+                                ),
+                              )}
+                            </p>
+                          )}
+                        </div>
+                        <div className='row-start-2'>
+                          <p className='font-normal text-[#0f0f0f] text-sm text-right leading-[16px]'>
+                            {tx?.timestamp ? timeAgoFromHex(tx.timestamp) : null}
+                          </p>
+                        </div>
+                        <div className='row-start-3 flex justify-end items-start'>
+                          {/* For savings tx: show source & savings chain */}
+                          {!isWithdrawalTx && <ChainDisplay chainId={tx.sourceChainId} />}
+                        </div>
                       </div>
                     </div>
                   </div>

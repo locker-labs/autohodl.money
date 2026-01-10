@@ -26,6 +26,12 @@ const ViemChainMap: Record<EChainId, Chain> = {
   [EChainId.Sepolia]: sepolia,
 };
 
+const ViemChainNameMap: Record<EChainId, string> = {
+  [EChainId.ArcTestnet]: 'Arc Testnet',
+  [EChainId.Linea]: 'Linea',
+  [EChainId.Sepolia]: 'Sepolia',
+};
+
 const ViemChainImageMap: Record<EChainId, string> = {
   [EChainId.Linea]: '/LineaLogomarkBlueBG.svg',
   [EChainId.Sepolia]: '/ethereum-eth.svg',
@@ -254,6 +260,7 @@ export {
   mockDefaultChainId,
   AutoHodlSupportedTokenMap,
   ViemChainImageMap,
+  ViemChainNameMap,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

@@ -95,5 +95,6 @@ function savingsTxMapper(tx: Erc20Transfer & SourceTxInfo, chainId: EChainId): I
     blockNum: tx.blockNum as Hex,
     type: EAutoHodlTxType.Savings,
     chainId,
+    sourceChainId: tx.sourceChainId as EChainId,
   };
 }

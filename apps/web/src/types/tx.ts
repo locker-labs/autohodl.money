@@ -26,6 +26,7 @@ export interface ISavingsTx {
   sourceTxHash: Hex;
   purchaseValue: bigint;
   chainId: EChainId;
+  sourceChainId: EChainId;
 }
 
 export type ITx = IWithdrawalTx | ISavingsTx;
