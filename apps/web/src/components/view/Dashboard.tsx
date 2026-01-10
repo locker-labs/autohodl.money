@@ -1,5 +1,5 @@
 import Loading from '@/app/loading';
-import { Controls, ControlsMobile, RecentActivity, SavingsInfoCards } from '@/components/dashboard';
+import { Controls, RecentActivity, SavingsInfoCards } from '@/components/dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useIsMobile from '@/hooks/useIsMobile';
 
@@ -38,7 +38,7 @@ const Dashboard = () => {
             <div className='w-full gap-5 grid lg:grid-cols-12'>
               {/* 5 - Controls Card */}
               <div className='w-full lg:col-span-6'>
-                <ControlsMobile />
+                <Controls />
               </div>
             </div>
           </div>
