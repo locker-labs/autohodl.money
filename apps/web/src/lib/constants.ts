@@ -131,6 +131,20 @@ const TokenDecimalMap = {
 } as const satisfies Record<TTokenAddress, number>;
 
 /**
+ * Token Tickers
+ */
+
+const TokenTickerMap = {
+  [SusdcAddressMap[EChainId.ArcTestnet]]: 'sUSDC',
+  [SusdcAddressMap[EChainId.Linea]]: 'sUSDC',
+  [SusdcAddressMap[EChainId.Sepolia]]: 'sAAVE',
+
+  [UsdcAddressMap[EChainId.ArcTestnet]]: 'USDC',
+  [UsdcAddressMap[EChainId.Linea]]: 'USDC',
+  [UsdcAddressMap[EChainId.Sepolia]]: 'AAVE',
+} as const satisfies Record<TTokenAddress, string>;
+
+/**
  * AutoHodl Contract Address
  */
 
@@ -261,6 +275,7 @@ export {
   AutoHodlSupportedTokenMap,
   ViemChainImageMap,
   ViemChainNameMap,
+  TokenTickerMap,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

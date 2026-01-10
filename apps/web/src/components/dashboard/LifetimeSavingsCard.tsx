@@ -16,10 +16,10 @@ export function LifetimeSavingsCard() {
     : 0;
 
   return (
-    <Card className='flex items-center justify-start rounded-xl border border-app-green'>
+    <Card className='py-4 px-5 flex items-center justify-start rounded-xl border border-app-green'>
       <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
         {/* Icon */}
-        <Wallet className='min-w-10 min-h-10' size={40} strokeWidth={1} color='#000000' />
+        <Wallet className='min-w-6 min-h-6' size={24} strokeWidth={1} color='#000000' />
         <div>
           {!isReady ? (
             <PriceSkeleton />
@@ -31,7 +31,7 @@ export function LifetimeSavingsCard() {
               <p className='font-light text-sm'>USD</p>
             </div>
           )}
-          <div className='mt-2 flex items-center justify-start gap-2'>
+          <div className='mt-1 flex items-center justify-start gap-2'>
             <p className='text-black text-lg text-left sm:text-center md:text-left'>Lifetime Savings</p>
             <AdaptiveInfoTooltip content={'Lifetime spare change saved. Does not include yield.'} />
           </div>
