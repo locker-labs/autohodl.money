@@ -141,7 +141,7 @@ const AutoHodlAddressMap = {
 const MMCardDelegateAddressMap = {
   [EChainId.ArcTestnet]: '0xccb62b9449574bbda504709081919be5af34d1d0',
   [EChainId.Linea]: '0xB6848Bc4953870c796032fc860dbc8a14794C5B7',
-  [EChainId.Sepolia]: '0x7c334f35BF2B4a9e55f60CF3287c885598cF9A02',
+  [EChainId.Sepolia]: '0xd247D46BC01067EcB5b94FC3Cb73A18A38Db5C33',
 } as const satisfies TChainIdMap<Address>;
 
 /**
