@@ -199,7 +199,7 @@ async function handleSavingsExecution(
   const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
-  // 19. Check if allowance is sufficient
+  // 10. Check if allowance is sufficient
   if (allowance < savingsAmount) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
     // TODO: notify user when allowance is insufficient
