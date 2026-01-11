@@ -3,8 +3,8 @@ export const paths = {
   GetMetaMaskCard: 'https://metamask.io/card',
   Arbitrum: 'https://devfolio.co/projects/auto-hodl-e5dd',
   Base: 'https://devfolio.co/projects/auto-hodl-e5dd',
-  MetaMask: 'https://x.com/MetaMaskDev/status/1950918298490527834',
-  Circle: 'https://x.com/MetaMaskDev/status/1950918298490527834',
+  MetaMask: 'https://x.com/MetaMaskDev/status/1950918297483948491',
+  Circle: 'https://x.com/MetaMaskDev/status/1950918297483948491',
 };
 
 export const links = {

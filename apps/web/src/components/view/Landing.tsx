@@ -35,18 +35,16 @@ export default function LandingPage() {
         </Link>
 
         <Button
-          type={'button'}
           onAction={() => open()}
-          disabled={false}
           aria-disabled={false}
           className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
-          title={'Connect Wallet'}
+          title={'Connect wallet'}
         >
-          Get Started
+          Get started
         </Button>
       </div>
 
-      <section className='px-[24px] lg:px-[96px] bg-[#f7feec] h-screen flex flex-col items-center lg:justify-center'>
+      <section className='px-[24px] lg:px-[96px] bg-[#f7feec] min-h-screen lg:h-screen flex flex-col items-center lg:justify-center'>
         <div className={'h-[120px] py-4 max-w-[1080px] w-full hidden lg:flex justify-between items-end'}>
           <Link href='/'>
             <Image
@@ -61,46 +59,38 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile */}
-        <div className='lg:hidden w-full max-w-[1080px] flex flex-col items-center justify-center gap-[60px]'>
-          <div className='mt-[80px]'>
-            <p className='text-[44px] font-semibold text-center leading-none'>Save your spare change</p>
-            <p className='mt-[16px] text-[#4D4A4A] text-[20px] w-full'>
-              Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
-              and more ways to HODL.
-            </p>
-            <div className='flex justify-center'>
-              <Button
-                type={'button'}
-                onAction={() => open()}
-                disabled={false}
-                aria-disabled={false}
-                className={'mt-[16px] w-[144px] h-[44px] font-bold rounded-[8px]'}
-                title={'Connect Wallet'}
-              >
-                Get Started
-              </Button>
-            </div>
+        <div className='mt-[40px] lg:hidden w-full max-w-[1080px]'>
+          <H2>Save your spare change</H2>
+          <Description className='mt-[16px] text-center'>
+            Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
+            and more ways to HODL.
+          </Description>
+          <div className='mt-[16px] flex justify-center'>
+            <Button
+              onAction={() => open()}
+              className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
+              title={'Connect wallet'}
+            >
+              Get started
+            </Button>
           </div>
-          <div className='max-w-[480px] w-fit flex items-center justify-center'>
-            <Image className='aspect-auto' src={'/hero.landing.png'} alt='hero' width={600} height={400} />
+          <div className='mx-auto mt-[60px] max-w-[480px] w-fit flex items-center justify-center'>
+            <Image className='aspect-auto' src={'/hero.landing.png'} alt='hero' width={400} height={400} />
           </div>
         </div>
 
         {/* Desktop */}
         <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1080px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
           <div>
-            <h1 className='text-[44px] lg:text-[42px] font-medium max-w-[700px]'>Simple savings and investments.</h1>
-            <h4 className='mt-[16px] text-[#4D4A4A] text-[20px] max-w-[500px]'>
+            <H2 className='text-start'>Simple savings and investments.</H2>
+            <Description className='mt-[16px] max-w-[500px]'>
               Earn yield on your spare <span className='line-through'>change</span> crypto, invest while you spend, and
               more ways to HODL.
-            </h4>
+            </Description>
             <Button
-              type={'button'}
               onAction={() => open()}
-              disabled={false}
-              aria-disabled={false}
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
-              title={'Connect Wallet'}
+              title={'Connect wallet'}
             >
               Get started
             </Button>
@@ -111,23 +101,24 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        <div className='w-full h-[120px]' />
+
+        {/* show only on desktop */}
+        <div className='hidden lg:block w-full h-[120px]' />
       </section>
 
       {/* On-chain Savings Simplified */}
       {/* mobile */}
-      <section className='lg:hidden p-[28px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
-        <div className={'mb-[40px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <p className='text-[40px] font-medium'>
-            On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
-          </p>
-          <p className='text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
+      <section className='lg:hidden px-[24px] py-[40px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
+        <div className={'max-w-[1080px] w-full flex flex-col justify-center items-center'}>
+          <H2 className='w-full text-start font-light'>Onchain Savings,</H2>
+          <H2 className='w-full text-start text-[#78E76E]'>Simplified</H2>
+          <Description className='mt-[32px]'>
             autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
             yield.
-          </p>
+          </Description>
         </div>
 
-        <div className='mb-4 max-w-[1080px] grid gap-[32px]'>
+        <div className='mt-[40px] mb-4 max-w-[1080px] grid gap-[16px]'>
           <BorderCard
             imgSrc='/coins.png'
             title='Spend normally'
@@ -148,13 +139,15 @@ export default function LandingPage() {
       {/* Desktop */}
       <section className='hidden p-[48px] bg-[#ffffff] lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <p className='text-[40px] font-medium'>
+          {/* <p className='text-[40px] font-medium'>
             On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
-          </p>
-          <p className='max-w-[600px] text-center text-[#4D4A4A] text-[20px] mt-[16px]'>
+          </p> */}
+          <H2 className=''>Onchain Savings,</H2>
+          <H2 className='text-[#78E76E] w-full'>Simplified</H2>
+          <Description className='mt-[16px] max-w-[600px] text-center'>
             autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
             passive yield.
-          </p>
+          </Description>
         </div>
 
         <div className='max-w-[1080px] grid grid-cols-3 gap-[32px]'>
@@ -181,25 +174,22 @@ export default function LandingPage() {
         <div className={'mb-12 lg:mb-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
             <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
-            <p className='text-[40px] font-medium'>MetaMask Card</p>
-            <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
+            <H2>MetaMask Card</H2>
+            <Description className='mt-[24px] mb-[24px] lg:mb-[32px] max-w-[500px]'>
               Save & earn yield on your MetaMask Card transfers. autoHODL ranked #1 by MetaMask in Smart Agents &
               Liquidity Automation.
-            </p>
+            </Description>
 
             <Button
-              type={'button'}
               onAction={() => open()}
-              disabled={false}
-              aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Start now'}
             >
               Start now
             </Button>
           </div>
-          <div className='my-8 lg:my-0 transition-transform duration-500 hover:rotate-[13deg] lg:size-[800px] flex items-center justify-center'>
-            <Image src='/metamask-card4x.avif' alt='img' width={800} height={800} />
+          <div className='my-8 lg:my-0 transition-transform duration-500 lg:size-[800px] flex items-center justify-center'>
+            <Image src='/mmcard-hero.png' alt='img' width={800} height={800} />
           </div>
         </div>
       </section>
@@ -208,18 +198,14 @@ export default function LandingPage() {
       <section className='lg:px-12 bg-white flex items-center justify-center'>
         <div className={'mt-12 mb-12 lg:mb-0 lg:mt-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
-            {/* <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p> */}
-            <p className='text-[40px] font-medium'>Spendable Yield Tokens</p>
-            <p className='mb-[24px] lg:mb-[32px] max-w-[500px] text-[#4D4A4A] text-[20px]'>
+            <p className='text-[40px] font-semibold leading-[44px]'>Spendable Yield Tokens</p>
+            <Description className='mt-[20px] mb-[24px] lg:mb-[32px] max-w-[500px]'>
               autoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them. They work
               like normal tokens but grow automatically in your wallet without staking, locking, or claiming.
-            </p>
+            </Description>
 
             <Button
-              type={'button'}
               onAction={() => window.open(paths.LearnMoreSYT, '_blank')}
-              disabled={false}
-              aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Learn more'}
               btnStyle='secondary'
@@ -227,8 +213,15 @@ export default function LandingPage() {
               Learn more
             </Button>
           </div>
-          <div className='my-8 lg:my-0 transition-transform duration-500 hover:scale-103 lg:size-[800px] flex items-center justify-center max-w-[800px]'>
-            <Image src='/syt.png' alt='img' width={800} height={800} />
+          <div
+            className={`mx-[20px] lg:mx-0 
+          transition-transform duration-500 hover:scale-103 lg:size-[700px] 
+          flex items-center justify-center 
+          max-w-[700px]
+          aspect-square rounded-[24px] bg-[#F7FEEC] lg:bg-[#ffffff]
+            `}
+          >
+            <Image className='aspect-auto' src='/syt.png' alt='img' width={700} height={700} />
           </div>
         </div>
       </section>
@@ -246,7 +239,7 @@ export default function LandingPage() {
             {testimonials.map((t) => (
               <CarouselItem key={t.idx}>
                 <div className='items-center justify-center p-0 lg:p-6'>
-                  <p className='text-[24px] lg:text-[32px] font-base'>{t.text}</p>
+                  <p className='text-[24px] lg:text-[32px] font-base text-center'>{t.text}</p>
                   <div className='mt-[24px] lg:mt-[47px]'>
                     <p className='text-[24px] font-bold'>{t.author}</p>
                     <p className='text-[20px] font-medium'>{t.role}</p>
@@ -259,12 +252,12 @@ export default function LandingPage() {
       </section>
 
       {/* Recognized by */}
-      <section className='p-[48px] bg-[#ffffff] flex flex-col items-center justify-center'>
+      <section className='py-[48px] px-[24px] bg-[#ffffff] flex flex-col items-center justify-center'>
         <div className={'mb-[40px] lg:mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <p className='text-[40px] font-medium'>Recognized by</p>
+          <H2>Recognized by</H2>
         </div>
 
-        <div className='lg:mb-0 mb-4 max-w-[1080px] grid grid-cols-2 gap-[32px]'>
+        <div className='lg:mb-0 mb-4 max-w-[1080px] grid grid-cols-2 gap-[12px] lg:gap-[32px]'>
           <BorderCard2 href={paths.MetaMask} imgSrc='/MetaMask-icon-fox-with-margins.svg' />
           <BorderCard2 href={paths.Circle} imgSrc='/circle-icon.svg' />
           <BorderCard2 href={paths.Arbitrum} imgSrc='/0923_Arbitrum_Logos_Logomark_RGB.svg' />
@@ -276,18 +269,15 @@ export default function LandingPage() {
       <section className='px-[24px] bg-[#f7feec] lg:h-[420px] flex flex-col items-center justify-center'>
         <div className='w-full max-w-[1080px] flex items-center justify-between gap-[60px]'>
           <div className='mt-8 lg:mt-0 mb-12 lg:mb-0'>
-            <h1 className='text-[42px] font-medium max-w-[600px]'>
+            <H2 className='text-start max-w-[600px]'>
               Setup once. <br className='sm:hidden' />
-              <span className='text-[#78E76E] font-bold'>Save forever.</span>
-            </h1>
-            <h4 className='mt-4 lg:mt-0 mb-[40px] text-[24px]'>
+              <span className='text-[#78E76E]'>Save forever.</span>
+            </H2>
+            <h4 className='mt-[24px] mb-[40px] text-[24px]'>
               Join thousands of users who are building wealth every time you spend.
             </h4>
             <Button
-              type={'button'}
               onAction={() => open()}
-              disabled={false}
-              aria-disabled={false}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
               title={'Get started'}
             >
@@ -314,7 +304,7 @@ function BorderCard({
 }) {
   return (
     <div
-      className={`border border-[#78E76E] rounded-[8px] p-[16px] flex flex-col items-center justify-center ${className}`}
+      className={`border border-[#78E76E] rounded-[16px] p-[16px] flex flex-col items-center justify-center ${className}`}
     >
       <div className='transition-transform duration-500 hover:scale-105 w-[200px] aspect-auto p-4 flex items-center justify-center'>
         <div className='h-[200px] aspect-auto p-4 flex items-center justify-center'>
@@ -334,7 +324,7 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
   return (
     <Link href={href} target='_blank' rel='noopener noreferrer'>
       <div
-        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[8px] p-[32px] flex flex-col items-center justify-center ${className}`}
+        className={`group relative transition-all duration-500 cursor-pointer hover:scale-105 border border-[#78E76E] rounded-[16px] hover:rounded-[24px] p-[32px] flex flex-col items-center justify-center ${className}`}
       >
         <div className='group-hover:opacity-100 absolute top-4 right-4 group-hover:top-3 group-hover:right-3 opacity-0 transition-all duration-300'>
           <ArrowUpRight size={24} color='#78E76E' />
@@ -344,4 +334,13 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
       </div>
     </Link>
   );
+}
+
+function H2({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <h2 className={`text-[40px] font-semibold text-center leading-[44px] ${className}`}>{children}</h2>;
+}
+
+function Description({ children, className }: { children: React.ReactNode; className?: string }) {
+  // leading-[44px]
+  return <p className={`text-[#4D4A4A] text-[17px] lg:text-[20px] font-medium  ${className}`}>{children}</p>;
 }

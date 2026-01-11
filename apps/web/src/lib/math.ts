@@ -5,12 +5,21 @@ export function roundOff(value: string | number, decimals = 0): number {
   return Math.round(Number(`${whole}.${decimal}`) * 10 ** decimals) / 10 ** decimals;
 }
 
-export function formatAmount(value: number, sign = '$'): string {
-  const absValue = Math.abs(value);
+/**
+ * Render a number as a formatted amount with two decimal places and a denomination symbol.
+ * @param value The numeric value to format.
+ * @param denomination The symbol to prepend to the formatted amount.
+ * @returns A string representing the formatted amount with the denomination.
+ */
+export function formatAmount(value: number | string, denomination = '$'): string {
+  const num = Number(value);
+  const absValue = Math.abs(num);
 
-  if (value < 0) {
-    return `-${sign}${absValue}`;
+  if (!Number.isFinite(num)) return '0.00';
+
+  if (num < 0) {
+    return `-${denomination}${absValue.toFixed(2)}`;
   }
 
-  return `${sign}${absValue}`;
+  return `${denomination}${absValue.toFixed(2)}`;
 }

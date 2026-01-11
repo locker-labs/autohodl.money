@@ -12,6 +12,7 @@ import { SavingsMode } from '@/types/autohodl';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const savingOptions = [
   { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
@@ -63,6 +64,8 @@ export default function SetSavingConfig() {
       info: `The change you save will be deposited into an account of your choice but won't earn any yield`,
     },
   ];
+
+  const { trackAllowanceSetEvent } = useAnalytics();
 
   const { allowanceFormatted } = useErc20Allowance({
     owner: address as Address,
@@ -116,6 +119,7 @@ export default function SetSavingConfig() {
     });
   };
 
+  // Effect to check if approval is needed
   useEffect(() => {
     if (allowanceFormatted !== undefined && allowanceFormatted < (savingsCap ?? 0)) {
       setIsApprovalNeeded(true);
@@ -123,11 +127,20 @@ export default function SetSavingConfig() {
       setIsApprovalNeeded(false);
     }
   }, [allowanceFormatted, savingsCap]);
+
+  // Effect to continue setup if approval is confirmed
   useEffect(() => {
-    if (isConfirmed) {
-      setIsApprovalNeeded(false);
-      handleFinishSetup();
-    }
+    const continuteSetupIfApproved = async () => {
+      if (isConfirmed) {
+        setIsApprovalNeeded(false);
+        if (savingsCap) {
+          await trackAllowanceSetEvent(savingsCap);
+        }
+
+        handleFinishSetup();
+      }
+    };
+    continuteSetupIfApproved();
   }, [isConfirmed]);
 
   const title = `Setup Round-Up Savings`;
@@ -336,7 +349,7 @@ export default function SetSavingConfig() {
       {isApprovalNeeded === true ? (
         <Button
           className='rounded-lg w-full'
-          title={'Add token allowance'}
+          title={'Approve spending allowance in wallet'}
           onAction={handleApprove}
           disabled={disabled}
         >

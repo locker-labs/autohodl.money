@@ -1,4 +1,11 @@
 node_modules
+# Next build artifacts
+.next/
+apps/**/.next/
+apps/**/out/
+out/
+# Vercel
+.vercel/
 # ---------------------
 # Global Node + Editor
 # ---------------------
