@@ -1,7 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { chains } from '@/config';
 import { useAutoHodl } from '@/context/AutoHodlContext';
-import type { EChainId } from '@/lib/constants';
+import { ViemChainNameMap, type EChainId } from '@/lib/constants';
 
 const ChainSelector = ({ defaultChainId }: { defaultChainId: EChainId }) => {
   const { switchChain } = useAutoHodl();
@@ -32,7 +32,7 @@ const ChainSelector = ({ defaultChainId }: { defaultChainId: EChainId }) => {
       <SelectContent>
         {chains.map((chain) => (
           <SelectItem key={chain.id} value={String(chain.id)}>
-            {chain.name}
+            {ViemChainNameMap[chain.id as EChainId]}
           </SelectItem>
         ))}
       </SelectContent>

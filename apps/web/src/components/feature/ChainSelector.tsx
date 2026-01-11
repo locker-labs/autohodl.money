@@ -11,7 +11,7 @@ import {
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useChainSwitchContext } from '@/context/ChainSwitchContext';
 import { getViemChain, getViemChainImage } from '@/lib/helpers';
-import type { EChainId } from '@/lib/constants';
+import { ViemChainNameMap, type EChainId } from '@/lib/constants';
 import { chains } from '@/config';
 
 export function ChainSelector() {
@@ -38,12 +38,12 @@ export function ChainSelector() {
         >
           <Image
             src={getViemChainImage(savingsChainId)}
-            alt={currentChain.name}
+            alt={ViemChainNameMap[savingsChainId]}
             width={20}
             height={20}
             className='min-w-5 min-h-5 max-h-5 max-w-5'
           />
-          <span className='text-sm font-medium hidden sm:inline'>{currentChain.name}</span>
+          <span className='text-sm font-medium hidden sm:inline'>{ViemChainNameMap[savingsChainId]}</span>
           <ChevronDown className='w-4 h-4 text-gray-600' />
         </button>
       </DropdownMenuTrigger>
@@ -51,6 +51,7 @@ export function ChainSelector() {
         {chains.map((chain) => {
           const chainId = chain.id as EChainId;
           const isCurrentChain = chainId === savingsChainId;
+          const chainName = ViemChainNameMap[chainId];
 
           return (
             <DropdownMenuItem
@@ -62,12 +63,12 @@ export function ChainSelector() {
               <div className='flex items-center gap-2'>
                 <Image
                   src={getViemChainImage(chainId)}
-                  alt={chain.name}
+                  alt={chainName}
                   width={20}
                   height={20}
                   className='min-w-5 min-h-5 max-h-5 max-w-5'
                 />
-                <span>{chain.name}</span>
+                <span>{chainName}</span>
               </div>
               {isCurrentChain && <Check className='w-4 h-4 text-green-600' />}
             </DropdownMenuItem>

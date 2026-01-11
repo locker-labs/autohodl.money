@@ -247,7 +247,9 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
    */
   const handleCancel = () => {
     setModalOpen(false);
-    resetState();
+    setTimeout(() => {
+      resetState();
+    }, 300);
   };
 
   /**

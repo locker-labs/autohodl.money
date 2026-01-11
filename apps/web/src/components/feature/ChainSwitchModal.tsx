@@ -10,8 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { LoaderSecondary } from '@/components/ui/loader';
-import { getViemChain } from '@/lib/helpers';
-import type { EChainId } from '@/lib/constants';
+import { ViemChainNameMap, type EChainId } from '@/lib/constants';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export type ChainSwitchFlow = 'has-config' | 'no-config';
@@ -42,7 +41,7 @@ export function ChainSwitchModal({
   onConfirm,
   onCancel,
 }: ChainSwitchModalProps) {
-  const targetChain = targetChainId ? getViemChain(targetChainId) : null;
+  const targetChainName = targetChainId ? ViemChainNameMap[targetChainId] : null;
   const isExecuting = ['deactivating', 'switching', 'activating'].includes(state.step);
   const isComplete = state.step === 'complete';
   const isError = state.step === 'error';
@@ -68,7 +67,7 @@ export function ChainSwitchModal({
         <DialogHeader>
           <DialogTitle>Switch Savings Chain</DialogTitle>
           <DialogDescription>
-            {targetChain ? `Switch to ${targetChain.name}` : 'Switch your savings chain'}
+            {targetChainName ? `Switch to ${targetChainName}` : 'Switch your savings chain'}
           </DialogDescription>
         </DialogHeader>
 
@@ -76,21 +75,7 @@ export function ChainSwitchModal({
           {isComplete ? (
             <div className='flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg'>
               <CheckCircle2 className='w-5 h-5 text-green-600 flex-shrink-0' />
-              <p className='text-sm text-green-800'>Successfully switched to {targetChain?.name}!</p>
-            </div>
-          ) : isError ? (
-            <div className='border border-red-200 rounded-lg overflow-hidden'>
-              <div className='max-w-[456px] max-h-[200px] flex items-start gap-3 p-4 bg-red-50 overflow-auto'>
-                <AlertCircle className='w-5 h-5 text-red-600 flex-shrink-0 mt-0.5' />
-                <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-red-800'>Error switching chain</p>
-                  {state.error && (
-                    <p className='text-sm text-red-700 mt-1 break-words' title={state.error}>
-                      {state.error}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <p className='text-sm text-green-800'>Successfully switched to {targetChainName}!</p>
             </div>
           ) : (
             <>
@@ -101,11 +86,11 @@ export function ChainSwitchModal({
                 </p>
                 <ol className='text-sm text-app-green-dark/80 space-y-1 ml-4 list-decimal'>
                   <li>Mark current savings chain&apos;s config as inactive</li>
-                  <li>Switch to {targetChain?.name}</li>
+                  <li>Switch to {targetChainName}</li>
                   <li>
                     {flow === 'has-config'
-                      ? `Mark the ${targetChain?.name} config as active`
-                      : `Create a new savings config on ${targetChain?.name} with same settings`}
+                      ? `Mark the ${targetChainName} config as active`
+                      : `Create a new savings config on ${targetChainName} with same settings`}
                   </li>
                 </ol>
               </div>
@@ -115,7 +100,7 @@ export function ChainSwitchModal({
                 <div className='flex items-start gap-3'>
                   <AlertCircle className='w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5' />
                   <p className='text-sm text-yellow-800'>
-                    Make sure you have some balance on {targetChain?.name} for signing transactions.
+                    Make sure you have some balance on {targetChainName} for signing transactions.
                   </p>
                 </div>
               </div>
@@ -141,7 +126,7 @@ export function ChainSwitchModal({
                     ) : (
                       <div className='w-5 h-5 rounded-full border-2 border-gray-300' />
                     )}
-                    <p className='text-sm'>Switching to {targetChain?.name}</p>
+                    <p className='text-sm'>Switching to {targetChainName}</p>
                   </div>
                   <div className='flex items-center gap-3'>
                     {getStepStatus('activating') === 'complete' ? (
@@ -155,6 +140,23 @@ export function ChainSwitchModal({
                   </div>
                 </div>
               )}
+
+              {/* Error Message */}
+              {/* {isError && (
+                <div className='mt-4 border border-red-200 rounded-lg overflow-hidden'>
+                  <div className='max-w-[456px] max-h-[200px] flex items-start gap-3 p-4 bg-red-50 overflow-auto'>
+                    <AlertCircle className='w-5 h-5 text-red-600 flex-shrink-0 mt-0.5' />
+                    <div className='flex-1 min-w-0'>
+                      <p className='text-sm font-medium text-red-800'>Error switching chain</p>
+                      {state.error && (
+                        <p className='text-sm text-red-700 mt-1 break-words' title={state.error}>
+                          {state.error}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )} */}
             </>
           )}
         </div>
@@ -167,7 +169,7 @@ export function ChainSwitchModal({
               <Button variant='outline' onClick={handleCancel}>
                 Close
               </Button>
-              <Button onClick={onConfirm}>Try Again</Button>
+              <Button onClick={onConfirm}>Try again</Button>
             </>
           ) : (
             <>

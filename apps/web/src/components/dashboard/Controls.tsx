@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { SupportedAccounts } from '@/lib/constants';
+import { SupportedAccounts, ViemChainNameMap } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
 import { useConnection } from 'wagmi';
 import { CopyContentButton } from '@/components/feature/CopyContentButton';
@@ -224,12 +224,12 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
                       <div className='flex items-center justify-start gap-3'>
                         <Image
                           src={getViemChainImage(savingsChainId)}
-                          alt={chain.name}
+                          alt={ViemChainNameMap[savingsChainId]}
                           width={20}
                           height={20}
                           className='min-w-5 min-h-5 max-h-5 max-w-5'
                         />
-                        <p className='text-[15px]'>{chain.name}</p>
+                        <p className='text-[15px]'>{ViemChainNameMap[savingsChainId]}</p>
                       </div>
                     </div>
                   </div>
