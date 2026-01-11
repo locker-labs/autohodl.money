@@ -2,7 +2,7 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { type EChainId, MoralisStreamId, ViemChainNameMap } from '@/lib/constants';
+import { type EChainId, MoralisStreamId, TokenDecimalMap, TTokenAddress, ViemChainNameMap } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
@@ -11,10 +11,9 @@ import {
   isAutoHodlSupportedToken,
   getAutoHodlAddressByChain,
   getDelegateAddressByChain,
-  getAutoHodlSupportedTokens,
   getViemPublicClientByChain,
   isValidSourceChain,
-  isAutoHodlSupportedTokenByChain,
+  getUsdcAddressByChain,
 } from '@/lib/helpers';
 import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 import { chains } from '@/config';
@@ -69,12 +68,13 @@ async function handleSavingsExecution(
     for (const chain of chains) {
       const chainId = chain.id as unknown as EChainId;
       const viemPublicClient = getViemPublicClientByChain(chainId);
-      const config = await getSavingsConfig(viemPublicClient, from, token, chainId);
+      const savingsToken = getUsdcAddressByChain(chainId);
+      const config = await getSavingsConfig(viemPublicClient, from, savingsToken, chainId);
 
       // 3A. Check if config is set
       if (config.delegate === zeroAddress) {
         console.warn(
-          `Savings config not found for user ${from} and token ${token} on chain ${ViemChainNameMap[chainId]}`,
+          `Savings config not found for user ${from} and token ${savingsToken} on chain ${ViemChainNameMap[chainId]}`,
         );
         continue;
       }
@@ -82,7 +82,7 @@ async function handleSavingsExecution(
       // 3B. Check if config is active
       if (!config.active) {
         console.warn(
-          `Savings config is not active for user ${from} and token ${token} on chain ${ViemChainNameMap[chainId]}`,
+          `Savings config is not active for user ${from} and token ${savingsToken} on chain ${ViemChainNameMap[chainId]}`,
         );
         continue;
       }
@@ -98,21 +98,23 @@ async function handleSavingsExecution(
   }
 
   if (!savingsConfig || !savingsChainId) {
-    console.warn(`No active savings config found for user ${from} and token ${token}`, 'Aborting execution.');
+    console.warn(`No active savings config found for user ${from}`, 'Aborting execution.');
     return;
   }
 
   console.log('SAVINGS CHAIN ID:', savingsChainId);
   console.log('SAVINGS CONFIG:', savingsConfig);
 
-  // 4. Check token support for chain
-  if (!isAutoHodlSupportedTokenByChain(token, savingsChainId)) {
-    console.warn(
-      `Token not supported for chain ${ViemChainNameMap[savingsChainId]}: ${token}. Supported tokens: ${getAutoHodlSupportedTokens(savingsChainId)}`,
-      'Aborting execution.',
-    );
-    return;
-  }
+  const savingsToken = getUsdcAddressByChain(savingsChainId);
+
+  // // 4. Check token support for chain
+  // if (!isAutoHodlSupportedTokenByChain(token, savingsChainId)) {
+  //   console.warn(
+  //     `Token not supported for chain ${ViemChainNameMap[savingsChainId]}: ${token}. Supported tokens: ${getAutoHodlSupportedTokens(savingsChainId)}`,
+  //     'Aborting execution.',
+  //   );
+  //   return;
+  // }
 
   // 5. Check config mode, and validate with streamId
   if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
@@ -162,13 +164,13 @@ async function handleSavingsExecution(
   // 7. Verify delegate
   if (getAddress(savingsConfig.delegate) !== getAddress(delegate)) {
     console.warn(
-      `Delegate mismatch in savings config for user ${from} and token ${token}`,
+      `Delegate mismatch in savings config for user ${from} and token ${savingsToken}`,
       `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
       'Aborting execution.',
     );
     // TODO: Notify dev team
     throw new Error(
-      `Delegate mismatch in savings config for user ${from} and token ${token} ` +
+      `Delegate mismatch in savings config for user ${from} and token ${savingsToken} ` +
         `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
     );
   }
@@ -178,7 +180,7 @@ async function handleSavingsExecution(
   try {
     allowance = await fetchAllowance({
       publicClient: viemPublicClient,
-      tokenAddress: token,
+      tokenAddress: savingsToken,
       owner: from as Address,
       spender: autohodl,
     });
@@ -192,11 +194,17 @@ async function handleSavingsExecution(
     throw allowanceError;
   }
 
+  const savingsTokenDecimals = TokenDecimalMap[getUsdcAddressByChain(savingsChainId)];
+  const sourceTokenDecimals = TokenDecimalMap[token as TTokenAddress];
+  console.log('transferAmount', transferAmount);
+  const normalizedTransferAmount =
+    (transferAmount * BigInt(10 ** savingsTokenDecimals)) / BigInt(10 ** sourceTokenDecimals);
+
   // 9. Calculate amount for savings tx
   const roundUpTo: bigint = savingsConfig.roundUp;
-  console.log('TRANSFER AMOUNT:', transferAmount);
+  console.log('TRANSFER AMOUNT:', normalizedTransferAmount);
   console.log('ROUNDUP TO:', roundUpTo);
-  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
+  const savingsAmount: bigint = computeRoundUpAndSavings(normalizedTransferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
   // 10. Check if allowance is sufficient
@@ -212,7 +220,7 @@ async function handleSavingsExecution(
   try {
     const txHash = await delegateSaving({
       user: from as Address,
-      asset: token,
+      asset: savingsToken,
       value: savingsAmount,
       data: { sourceTxHash: sourceTxHash as Hex, purchaseAmount: transferAmount, sourceChainId },
       chainId: savingsChainId,
