@@ -81,6 +81,9 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
+        let fallbackConfig: SavingsConfig | null = null;
+        let fallbackChainId: EChainId | null = null;
+
         for (const chain of chains) {
           const chainId = chain.id as EChainId;
           const config = await getSavingsConfig(
@@ -89,16 +92,32 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
             getUsdcAddressByChain(chainId),
             chainId,
           );
-          const found = config && config.savingAddress !== zeroAddress;
-          if (found) {
-            setConfig(config);
-            setSavingsChainId(chainId);
-            switchChain(chainId);
-            break;
+
+          if (config && config.delegate !== zeroAddress) {
+            if (!fallbackConfig && !fallbackChainId) {
+              fallbackConfig = config;
+              fallbackChainId = chainId;
+            }
+
+            if (config.active) {
+              setConfig(config);
+              setSavingsChainId(chainId);
+              await switchChain(chainId);
+              return;
+            }
           }
-          setConfig(null);
-          setSavingsChainId(null);
         }
+
+        // if no config is active, set first config found as fallback
+        if (fallbackConfig && fallbackChainId) {
+          setConfig(fallbackConfig);
+          setSavingsChainId(fallbackChainId);
+          await switchChain(fallbackChainId);
+          return;
+        }
+
+        setConfig(null);
+        setSavingsChainId(null);
       } catch (error) {
         console.error('Error fetching savings config:', error);
         setConfig(null);

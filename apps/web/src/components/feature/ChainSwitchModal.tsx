@@ -1,0 +1,186 @@
+'use client';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { LoaderSecondary } from '@/components/ui/loader';
+import { getViemChain } from '@/lib/helpers';
+import type { EChainId } from '@/lib/constants';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
+
+export type ChainSwitchFlow = 'has-config' | 'no-config';
+
+export type ChainSwitchState = {
+  step: 'idle' | 'checking' | 'confirming' | 'deactivating' | 'switching' | 'activating' | 'complete' | 'error';
+  error: string | null;
+  targetChainId: EChainId | null;
+  flow: ChainSwitchFlow | null;
+};
+
+interface ChainSwitchModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  targetChainId: EChainId | null;
+  flow: ChainSwitchFlow | null;
+  state: ChainSwitchState;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export function ChainSwitchModal({
+  open,
+  onOpenChange,
+  targetChainId,
+  flow,
+  state,
+  onConfirm,
+  onCancel,
+}: ChainSwitchModalProps) {
+  const targetChain = targetChainId ? getViemChain(targetChainId) : null;
+  const isExecuting = ['deactivating', 'switching', 'activating'].includes(state.step);
+  const isComplete = state.step === 'complete';
+  const isError = state.step === 'error';
+
+  const getStepStatus = (step: 'deactivating' | 'switching' | 'activating') => {
+    if (state.step === step) return 'current';
+    const stepOrder = ['deactivating', 'switching', 'activating'];
+    const currentIndex = stepOrder.indexOf(state.step);
+    const stepIndex = stepOrder.indexOf(step);
+    if (currentIndex > stepIndex) return 'complete';
+    return 'pending';
+  };
+
+  const handleCancel = () => {
+    if (!isExecuting) {
+      onCancel();
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className='sm:max-w-[500px]'>
+        <DialogHeader>
+          <DialogTitle>Switch Savings Chain</DialogTitle>
+          <DialogDescription>
+            {targetChain ? `Switch to ${targetChain.name}` : 'Switch your savings chain'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div>
+          {isComplete ? (
+            <div className='flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg'>
+              <CheckCircle2 className='w-5 h-5 text-green-600 flex-shrink-0' />
+              <p className='text-sm text-green-800'>Successfully switched to {targetChain?.name}!</p>
+            </div>
+          ) : isError ? (
+            <div className='border border-red-200 rounded-lg overflow-hidden'>
+              <div className='max-w-[456px] max-h-[200px] flex items-start gap-3 p-4 bg-red-50 overflow-auto'>
+                <AlertCircle className='w-5 h-5 text-red-600 flex-shrink-0 mt-0.5' />
+                <div className='flex-1 min-w-0'>
+                  <p className='text-sm font-medium text-red-800'>Error switching chain</p>
+                  {state.error && (
+                    <p className='text-sm text-red-700 mt-1 break-words' title={state.error}>
+                      {state.error}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Info Message */}
+              <div className='mb-4 p-4 bg-app-green/10 border border-app-green/30 rounded-lg'>
+                <p className='text-sm text-app-green-dark font-medium mb-2'>
+                  You will be prompted to complete these steps:
+                </p>
+                <ol className='text-sm text-app-green-dark/80 space-y-1 ml-4 list-decimal'>
+                  <li>Mark current savings chain&apos;s config as inactive</li>
+                  <li>Switch to {targetChain?.name}</li>
+                  <li>
+                    {flow === 'has-config'
+                      ? `Mark the ${targetChain?.name} config as active`
+                      : `Create a new savings config on ${targetChain?.name} with same settings`}
+                  </li>
+                </ol>
+              </div>
+
+              {/* Warning */}
+              <div className='p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
+                <div className='flex items-start gap-3'>
+                  <AlertCircle className='w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5' />
+                  <p className='text-sm text-yellow-800'>
+                    Make sure you have some balance on {targetChain?.name} for signing transactions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Steps */}
+              {isExecuting && (
+                <div className='mt-4 space-y-3'>
+                  <div className='flex items-center gap-3'>
+                    {getStepStatus('deactivating') === 'complete' ? (
+                      <CheckCircle2 className='w-5 h-5 text-green-600' />
+                    ) : getStepStatus('deactivating') === 'current' ? (
+                      <LoaderSecondary />
+                    ) : (
+                      <div className='w-5 h-5 rounded-full border-2 border-gray-300' />
+                    )}
+                    <p className='text-sm'>Deactivating current config</p>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    {getStepStatus('switching') === 'complete' ? (
+                      <CheckCircle2 className='w-5 h-5 text-green-600' />
+                    ) : getStepStatus('switching') === 'current' ? (
+                      <LoaderSecondary />
+                    ) : (
+                      <div className='w-5 h-5 rounded-full border-2 border-gray-300' />
+                    )}
+                    <p className='text-sm'>Switching to {targetChain?.name}</p>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    {getStepStatus('activating') === 'complete' ? (
+                      <CheckCircle2 className='w-5 h-5 text-green-600' />
+                    ) : getStepStatus('activating') === 'current' ? (
+                      <LoaderSecondary />
+                    ) : (
+                      <div className='w-5 h-5 rounded-full border-2 border-gray-300' />
+                    )}
+                    <p className='text-sm'>{flow === 'has-config' ? 'Activating config' : 'Creating new config'}</p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <DialogFooter>
+          {isComplete ? (
+            <Button onClick={() => onOpenChange(false)}>Close</Button>
+          ) : isError ? (
+            <>
+              <Button variant='outline' onClick={handleCancel}>
+                Close
+              </Button>
+              <Button onClick={onConfirm}>Try Again</Button>
+            </>
+          ) : (
+            <>
+              <Button variant='outline' onClick={handleCancel} disabled={isExecuting}>
+                Cancel
+              </Button>
+              <Button onClick={onConfirm} disabled={isExecuting}>
+                {isExecuting ? 'Processing...' : 'Continue'}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

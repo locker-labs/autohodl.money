@@ -6,6 +6,7 @@ import { createAppKit } from '@reown/appkit/react';
 import type { ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { AutoHodlProvider } from '@/context/AutoHodlContext';
+import { ChainSwitchProvider } from '@/context/ChainSwitchContext';
 import { ViemChainImageMap } from '@/lib/constants';
 
 // Set up queryClient
@@ -47,7 +48,9 @@ function ContextProvider({ children, cookies }: { children: ReactNode; cookies: 
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config} initialState={initialState}>
       <QueryClientProvider client={queryClient}>
-        <AutoHodlProvider>{children}</AutoHodlProvider>
+        <AutoHodlProvider>
+          <ChainSwitchProvider>{children}</ChainSwitchProvider>
+        </AutoHodlProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

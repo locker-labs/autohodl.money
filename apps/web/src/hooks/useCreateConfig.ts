@@ -3,7 +3,7 @@ import { useConnection, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
 import { encodeAbiParameters, parseUnits } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
-import { type EChainId, TokenDecimalMap } from '@/lib/constants';
+import { type EChainId, TokenDecimalMap, ViemChainMap } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { extraDataParams, type SavingsMode } from '@/types/autohodl';
 import { useAnalytics } from './useAnalytics';
@@ -76,6 +76,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
       extraData,
     ] as const;
     const tx = await walletClient.writeContract({
+      chain: ViemChainMap[savingsChainId],
       address: autohodl,
       abi: AutoHodlAbi,
       functionName: 'setSavingConfig',
@@ -124,6 +125,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
         extraData,
       ] as const;
       const tx = await walletClient.writeContract({
+        chain: ViemChainMap[savingsChainId],
         address: autohodl,
         abi: AutoHodlAbi,
         functionName: 'setSavingConfig',
