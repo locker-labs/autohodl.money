@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { SupportedAccounts, ViemChainNameMap } from '@/lib/constants';
+import { SupportedAccounts } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
 import { useConnection } from 'wagmi';
 import { CopyContentButton } from '@/components/feature/CopyContentButton';
@@ -24,7 +24,8 @@ import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
 import SavingsLimit from '@/components/subcomponents/SavingsLimit';
 import { formatAmount } from '@/lib/math';
-import { getUsdcAddressByChain, getViemChain, getViemChainImage } from '@/lib/helpers';
+import { getUsdcAddressByChain } from '@/lib/helpers';
+import { ChainSelector } from '@/components/feature/ChainSelector';
 
 enum SectionId {
   AccountDetails = 'account-details',
@@ -35,7 +36,7 @@ enum SectionId {
 const sections: { id: SectionId; label: string }[] = [
   { id: SectionId.AccountDetails, label: 'Account Details' },
   { id: SectionId.RoundupSettings, label: 'Round-up Settings' },
-  { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
+  // { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
 ];
 
 export function Controls(): React.JSX.Element {
@@ -132,8 +133,12 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
         {/* Account Details Section */}
         {selectedSection === SectionId.AccountDetails && (
           <div>
+            <div className=''>
+              <ActiveSwitch />
+            </div>
+
             {/* Source of Funds */}
-            <div className='w-full'>
+            <div className='mt-2 w-full'>
               <p className='text-sm font-medium'>Source of Funds</p>
 
               <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
@@ -149,7 +154,7 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
                   </div>
                 </div>
 
-                <div className='flex flex-wrap items-center justify-end gap-1 px-3'>
+                <div className='flex flex-wrap items-center justify-end gap-1'>
                   <p>Balance: </p>
                   {!token.isReady ? (
                     <PriceSkeleton />
@@ -210,31 +215,17 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
               </div>
             </div>
 
+            <div className='mt-2'>
+              <SavingsLimit />
+            </div>
+
             {/* Savings Chain */}
-            {savingsChainId &&
-              (() => {
-                const chain = getViemChain(savingsChainId);
-                if (!chain) return null;
-                return (
-                  <div className='mt-4 mb-1'>
-                    <div>
-                      <p className='text-sm font-medium'>Savings Chain</p>
-                    </div>
-                    <div className='mt-2 w-full h-10 border border-gray-300 rounded-lg flex items-center justify-start gap-3 px-3'>
-                      <div className='flex items-center justify-start gap-3'>
-                        <Image
-                          src={getViemChainImage(savingsChainId)}
-                          alt={ViemChainNameMap[savingsChainId]}
-                          width={20}
-                          height={20}
-                          className='min-w-5 min-h-5 max-h-5 max-w-5'
-                        />
-                        <p className='text-[15px]'>{ViemChainNameMap[savingsChainId]}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+            <div className='mt-2'>
+              <div className='w-full flex items-center justify-between gap-2 my-1'>
+                <p className='text-sm font-medium'>Savings Chain</p>
+                <ChainSelector />
+              </div>
+            </div>
           </div>
         )}
 

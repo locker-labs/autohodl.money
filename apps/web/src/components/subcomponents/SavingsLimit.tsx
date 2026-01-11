@@ -86,7 +86,7 @@ const SavingsLimit = () => {
             }}
             className='h-10 rounded-md border border-gray-300 px-3 text-base md:text-base focus-visible:outline-none focus-visible:border-app-green-dark transition-colors'
           />
-          <div className='mt-2 flex items-center gap-2'>
+          <div className='my-2 flex items-center gap-2'>
             <Button
               className='rounded-lg w-full'
               title={'Add token allowance'}
@@ -106,7 +106,7 @@ const SavingsLimit = () => {
           aria-label='Edit savings limit'
         >
           <div className='w-full flex items-center justify-between'>
-            <div className='py-1 text-sm font-medium text-black'>Savings limit (USDC):</div>
+            <div className='py-1 text-sm font-medium text-black'>Savings Limit (USDC):</div>
             <div className='flex items-center justify-center gap-2'>
               <div className='py-1 text-base font-medium text-black'>{allowanceFormatted}</div>
               <div className='hidden group-hover:block group-hover:bg-gray-100 hover:bg-gray-200 p-1 rounded-md'>

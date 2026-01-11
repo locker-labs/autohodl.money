@@ -41,7 +41,7 @@ export function ChainSelector() {
             alt={ViemChainNameMap[savingsChainId]}
             width={20}
             height={20}
-            className='min-w-5 min-h-5 max-h-5 max-w-5'
+            className='min-w-5 min-h-5 max-h-5 max-w-5 rounded-full'
           />
           <span className='text-sm font-medium hidden sm:inline'>{ViemChainNameMap[savingsChainId]}</span>
           <ChevronDown className='w-4 h-4 text-gray-600' />
@@ -66,7 +66,7 @@ export function ChainSelector() {
                   alt={chainName}
                   width={20}
                   height={20}
-                  className='min-w-5 min-h-5 max-h-5 max-w-5'
+                  className='min-w-5 min-h-5 max-h-5 max-w-5 rounded-full'
                 />
                 <span>{chainName}</span>
               </div>
