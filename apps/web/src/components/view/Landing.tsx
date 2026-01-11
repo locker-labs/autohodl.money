@@ -62,7 +62,8 @@ export default function LandingPage() {
         <div className='mt-[40px] lg:hidden w-full max-w-[1080px]'>
           <H2>Save your spare change</H2>
           <Description className='mt-[16px] text-center'>
-            Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop, and more ways to HODL.
+            Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
+            and more ways to HODL.
           </Description>
           <div className='mt-[16px] flex justify-center'>
             <Button
@@ -85,7 +86,7 @@ export default function LandingPage() {
             <Description className='mt-[16px] max-w-[500px]'>
               Earn yield on your spare <span className='line-through'>change</span> crypto, invest while you spend, and
               more ways to HODL.
-          </Description>
+            </Description>
             <Button
               onAction={() => open()}
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
@@ -112,7 +113,8 @@ export default function LandingPage() {
           <H2 className='w-full text-start font-light'>Onchain Savings,</H2>
           <H2 className='w-full text-start text-[#78E76E]'>Simplified</H2>
           <Description className='mt-[32px]'>
-            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn yield.
+            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
+            yield.
           </Description>
         </div>
 
@@ -143,7 +145,8 @@ export default function LandingPage() {
           <H2 className=''>Onchain Savings,</H2>
           <H2 className='text-[#78E76E] w-full'>Simplified</H2>
           <Description className='mt-[16px] max-w-[600px] text-center'>
-            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn passive yield.
+            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
+            passive yield.
           </Description>
         </div>
 
@@ -210,12 +213,14 @@ export default function LandingPage() {
               Learn more
             </Button>
           </div>
-          <div className={`mx-[20px] lg:mx-0 
+          <div
+            className={`mx-[20px] lg:mx-0 
           transition-transform duration-500 hover:scale-103 lg:size-[700px] 
           flex items-center justify-center 
           max-w-[700px]
           aspect-square rounded-[24px] bg-[#F7FEEC] lg:bg-[#ffffff]
-            `}>
+            `}
+          >
             <Image className='aspect-auto' src='/syt.png' alt='img' width={700} height={700} />
           </div>
         </div>
@@ -331,12 +336,11 @@ function BorderCard2({ className, imgSrc, href }: { className?: string; imgSrc: 
   );
 }
 
-
 function H2({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (<h2 className={`text-[40px] font-semibold text-center leading-[44px] ${className}`}>{children}</h2>);
+  return <h2 className={`text-[40px] font-semibold text-center leading-[44px] ${className}`}>{children}</h2>;
 }
 
 function Description({ children, className }: { children: React.ReactNode; className?: string }) {
   // leading-[44px]
-  return (<p className={`text-[#4D4A4A] text-[17px] lg:text-[20px] font-medium  ${className}`}>{children}</p>);
+  return <p className={`text-[#4D4A4A] text-[17px] lg:text-[20px] font-medium  ${className}`}>{children}</p>;
 }

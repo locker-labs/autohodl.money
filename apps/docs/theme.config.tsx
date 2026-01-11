@@ -1,5 +1,5 @@
-import React from 'react'
-import { DocsThemeConfig } from 'nextra-theme-docs'
+import React from 'react';
+import type { DocsThemeConfig } from 'nextra-theme-docs';
 
 const config: DocsThemeConfig = {
   logo: <span>autoHODL Docs</span>,
@@ -15,7 +15,6 @@ const config: DocsThemeConfig = {
   footer: {
     text: 'autoHODL Documentation',
   },
-}
+};
 
-export default config
-
+export default config;
