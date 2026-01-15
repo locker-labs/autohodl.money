@@ -36,10 +36,15 @@ export async function POST(request: NextRequest) {
       console.error('No walletAddress provided in body');
       return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
     }
+    if (!body.savingsChainId) {
+      console.error('No savingsChainId provided in body');
+      return NextResponse.json({ error: 'Missing savingsChainId in body' }, { status: 400 });
+    }
 
     const trackingProperties: TTrackEventProperties = {
       twclid,
       walletAddress: body.walletAddress,
+      savingsChainId: body.savingsChainId,
       userAgent: request.headers.get('user-agent') ?? undefined,
       ip: request.headers.get('x-forwarded-for') ?? undefined,
     };

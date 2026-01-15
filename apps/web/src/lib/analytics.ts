@@ -8,6 +8,7 @@ const rudderanalytics = new RudderAnalytics(secrets.rudderstackWriteKey, {
 export type TTrackEventProperties = {
   twclid: string;
   walletAddress: string;
+  savingsChainId: number;
   allowance?: number;
   transactionHash?: string;
   ip?: string;
@@ -24,11 +25,13 @@ export function trackEvent(event: string, properties: TTrackEventProperties) {
         ip_address: properties.ip,
         user_agent: properties.userAgent,
         conversionId: `${event.split(' ').join('_').toLowerCase()}:${properties.walletAddress}`,
-        description: properties.allowance
-          ? `allowance:${properties.allowance}`
-          : properties.transactionHash
-            ? `transaction_hash:${properties.transactionHash}`
-            : 'wallet_connected',
+        description: `chain:${properties.savingsChainId} ${
+          properties.allowance
+            ? `allowance:${properties.allowance}`
+            : properties.transactionHash
+              ? `transaction_hash:${properties.transactionHash}`
+              : 'wallet_connected'
+        }`,
       },
     };
     rudderanalytics.track(params);
