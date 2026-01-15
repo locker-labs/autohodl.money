@@ -1,43 +1,22 @@
-import { APYCard, RoundupSavingsCard, YieldCard } from '@/components/ui/cards';
-import { chain } from '@/config';
+import { APYCard, RoundupSavingsCard, TotalSavingsCard } from '@/components/ui/cards';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { useAaveYieldBalance } from '@/hooks/useAaveYieldBalance';
-import { useTokenBalance } from '@/hooks/useTokenBalance';
-import { UsdcAddressMap } from '@/lib/constants';
-import type { Address } from 'viem';
+import { useSpareChange } from '@/hooks/useSpareChange';
 
 export function SavingsInfoCards(): React.JSX.Element {
-  const { config } = useAutoHodl();
+  const { config, sToken } = useAutoHodl();
 
-  // Yield balance from Aave Yield
-  const {
-    balanceFormatted: yieldBalance,
-    isLoading: yieldBalanceLoading,
-    isFetched: yieldBalanceFetched,
-  } = useAaveYieldBalance();
+  const { data: apy, isLoading: apyLoading } = useAaveAPY();
 
-  // APY from Aave
-  const { apy, loading: apyLoading } = useAaveAPY();
+  const { changeSaved, isReady: readyChange } = useSpareChange();
 
-  // Savings address balance
-  const {
-    // balance: savingsBalanceBigInt,
-    isFetched: savingsBalanceFetched,
-    isFetching: savingsBalanceFetching,
-    balanceNumber: savingsBalance,
-    // balanceString: savingsBalanceString,
-  } = useTokenBalance({
-    token: UsdcAddressMap[chain.id],
-    address: config?.savingAddress as Address,
-  });
+  const { balanceFormatted: tokenBalance, isReady: readyTokenBalance } = sToken;
 
   return (
-    <div className='grid grid-cols-1 sm:col-span-3 sm:grid-cols-3 gap-5'>
-      {/* Current yield balance - spare change saved */}
-      <YieldCard loading={!yieldBalanceFetched && yieldBalanceLoading} value={String(yieldBalance)} />
-      <APYCard loading={apyLoading} value={apy} />
-      <RoundupSavingsCard loading={!savingsBalanceFetched && savingsBalanceFetching} value={String(savingsBalance)} />
+    <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5'>
+      <TotalSavingsCard loading={!readyTokenBalance} value={tokenBalance} ticker={'sUSDC'} />
+      <RoundupSavingsCard loading={!readyChange} value={changeSaved} />
+      <APYCard loading={apyLoading} value={apy} showWarning={!!config && !config.toYield} />
     </div>
   );
 }

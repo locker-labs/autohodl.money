@@ -1,60 +1,95 @@
 import type { IERC20Transfer } from '@moralisweb3/streams-typings';
-import type { SavingsConfigArray } from '@/types/autohodl';
-import type { Hex, Address } from 'viem';
-import { AUTOHODL_ADDRESS, DELEGATE, MMC_TOKENS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { fetchAllowance } from '@/lib/helpers';
-import { executeSavingsTx } from './contract/server/executeSavingsTx';
-import { getSavingsConfigArray } from './contract/server/getSavingsConfig';
-import { chain } from '@/config';
+import type { Address, Hex } from 'viem';
+import { getAddress, zeroAddress } from 'viem';
+import { getTransactionLink } from '@/lib/blockExplorer';
+import { viemPublicClient } from '@/lib/clients/server';
+import { AUTOHODL_ADDRESS, AUTOHODL_SUPPORTED_TOKENS, DELEGATE, MoralisStreamId } from '@/lib/constants';
+import { getSavingsConfig } from '@/lib/autohodl';
+import { delegateSaving } from '@/lib/contract/server';
+import { fetchAllowance } from '@/lib/erc20/allowance';
+import { computeRoundUpAndSavings, isAutoHodlSupportedToken } from '@/lib/helpers';
+import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 
-export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Promise<Hex | undefined> {
-  const { from, contract: tokenAddress, value: transferAmount } = erc20Transfer;
+async function handleSavingsExecution(
+  erc20Transfer: IERC20Transfer,
+  { streamId }: { streamId: string; chainId: string },
+): Promise<Hex | undefined> {
+  const { from: _from, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
+  const transferAmount: bigint = BigInt(erc20Transfer.value);
+  const token: Address = getAddress(contract);
+  const from = _from as Address;
+
+  // Since we dont have access to metamask card,
+  // we can hardcode the `from` address for savings transfers.
+  // NOTE: Uncomment below for testing metamask card savings transfers
+
+  /**
+  let from: Address;
+  if (secrets.savingsFrom) {
+    from = secrets.savingsFrom as Address;
+  } else {
+    from = fromTransfer as Address;
+  }
+  */
 
   // For debugging
-  console.debug(JSON.stringify({ from, DELEGATE, tokenAddress }));
+  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, DELEGATE }));
 
-  // TODO: Check if the from address is an autohodl user (check savings config)
-  // for now, assume all transfers are from autohodl users
-  const isAutohodlUser = true;
-
-  if (!isAutohodlUser) {
-    console.log(`${from} is not an autohodl user, ignoring.`);
+  // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
+  // For now, we will support only USDC savings transfers.
+  // Check token support
+  if (!isAutoHodlSupportedToken(token)) {
+    console.warn(`Token not supported for savings execution: ${token} Supported tokens: ${AUTOHODL_SUPPORTED_TOKENS}`);
     return;
   }
 
-  // // Note: MMC spendable tokens include USDC, aUSDC, USDT, WETH, EURe, and GBPe on the Linea network.
-  // // For now, we will support only USDC savings transfers.
-  // if (tokenAddress.toLowerCase() !== MMC_TOKENS[0].toLowerCase()) {
-  //   console.warn('Only USDC is supported for now. Unsupported token:', tokenAddress);
-  //   return;
-  // }
-
-  // Check the current approval amount for the delegate from user's address
-  let allowance: bigint;
-
-  // Use USDC address for Sepolia, MMC_TOKENS[0] for Linea
-  const savingsToken: Address = chain.id === 11155111 ? USDC_ADDRESS : (tokenAddress as Address);
-
+  // Fetch savings config
+  let savingsConfig: SavingsConfig;
   try {
-    allowance = await fetchAllowance({
-      tokenAddress: savingsToken,
-      owner: from as Address,
-      spender: AUTOHODL_ADDRESS,
-    });
-  } catch (allowanceError) {
-    console.error(
-      'Error fetching allowance:',
-      allowanceError instanceof Error ? allowanceError.message : allowanceError,
+    savingsConfig = await getSavingsConfig(viemPublicClient, from, token);
+    console.log('CONFIG:', savingsConfig);
+  } catch (configError) {
+    console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
+    // TODO: Notify dev team
+    throw configError;
+  }
+
+  // Check if config is set
+  if (savingsConfig.delegate === zeroAddress) {
+    console.warn(`Savings config not found for user ${from} and token ${token}`, 'Aborting execution.');
+    return;
+  }
+
+  // check mode, and validate with streamId
+  if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${MoralisStreamId.MmcWithdrawal} for MetaMask Card mode.`,
+      'Aborting execution.',
     );
     return;
   }
 
-  // Fetch savings config for user and token (to verify delegate is set correctly)
-  let savingsConfig: Readonly<SavingsConfigArray>;
-  try {
-    savingsConfig = await getSavingsConfigArray(from as Address, savingsToken);
-  } catch (configError) {
-    console.error('Error fetching savings config:', configError instanceof Error ? configError.message : configError);
+  if (savingsConfig.mode === SavingsMode.All && streamId !== MoralisStreamId.EoaTransfer) {
+    console.warn(
+      `Transfer streamId ${streamId} does not match EOA Transfer streamId ${MoralisStreamId.EoaTransfer} for All Transfers mode.`,
+      'Aborting execution.',
+    );
+    return;
+  }
+
+  // Check if config is active
+  if (!savingsConfig.active) {
+    console.warn(`Savings config is not active for user ${from} and token ${token}`, 'Aborting execution.');
+    return;
+  }
+
+  // If toYield = true, and to = AUTOHODL_ADDRESS, skip execution
+  if (savingsConfig.toYield === true && getAddress(to) === getAddress(AUTOHODL_ADDRESS)) {
+    console.warn(
+      'This is a savings tx.',
+      `toYield = true and to = autoHODL for user ${from} and token ${token}`,
+      'Aborting execution.',
+    );
     return;
   }
   const roundUpAmount = savingsConfig[2];
@@ -65,29 +100,73 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
     return;
   }
 
-  // Check if config is active
-  if (!savingsConfig[3]) {
-    console.warn(`Savings config is not active for user ${from} and token ${savingsToken}. Aborting execution.`);
-    return;
-  }
-
-  // Check if delegate is set correctly in the config
-  if (savingsConfig[1].toLowerCase() !== DELEGATE.toLowerCase()) {
+  // If toYield = false, and to = savingsAddress, skip execution
+  if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {
     console.warn(
-      `Delegate mismatch in savings config. Expected: ${DELEGATE}, Found: ${savingsConfig[1]}. Aborting execution.`,
+      'This is a savings tx.',
+      `toYield = false and to = Savings address for user ${from} and token ${token}`,
+      'Aborting execution.',
     );
     return;
   }
 
+  // Verify delegate
+  if (getAddress(savingsConfig.delegate) !== getAddress(DELEGATE)) {
+    console.warn(
+      `Delegate mismatch in savings config for user ${from} and token ${token}`,
+      `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
+      'Aborting execution.',
+    );
+    // TODO: Notify dev team
+    throw new Error(
+      `Delegate mismatch in savings config for user ${from} and token ${token} ` +
+        `Expected: ${DELEGATE}, Found: ${savingsConfig.delegate}`,
+    );
+  }
 
-  // Call the executeSavings fn of the SC.
+  // Check approval amount for the autohodl contract from user's address
+  let allowance: bigint;
   try {
-    const txHash = await executeSavingsTx({
-      user: from as Address,
-      token: savingsToken,
-      value: savingsAmountBigInt,
+    allowance = await fetchAllowance({
+      publicClient: viemPublicClient,
+      tokenAddress: token,
+      owner: from as Address,
+      spender: AUTOHODL_ADDRESS,
     });
-    console.log('Savings transaction executed:', txHash);
+    console.log('ALLOWANCE:', allowance);
+  } catch (allowanceError) {
+    console.error(
+      'Error fetching allowance:',
+      allowanceError instanceof Error ? allowanceError.message : allowanceError,
+    );
+    // TODO: Notify dev team
+    throw allowanceError;
+  }
+
+  // Calculate amount for savings tx
+  const roundUpTo: bigint = savingsConfig.roundUp;
+  console.log('TRANSFER AMOUNT:', transferAmount);
+  console.log('ROUNDUP TO:', roundUpTo);
+  const savingsAmount: bigint = computeRoundUpAndSavings(transferAmount, roundUpTo).savingsAmount;
+  console.log('SAVINGS AMOUNT:', savingsAmount);
+
+  // Check if allowance is sufficient
+  if (allowance < savingsAmount) {
+    console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
+    // TODO: notify user when allowance is insufficient
+    return;
+  }
+
+  // Call the delegateSaving fn of the SC.
+  try {
+    const txHash = await delegateSaving({
+      user: from as Address,
+      asset: token,
+      value: savingsAmount,
+      data: { sourceTxHash: sourceTxHash as Hex, purchaseAmount: transferAmount },
+    });
+
+    console.log('SAVINGS TX:', getTransactionLink(txHash));
     return txHash;
   } catch (executionError) {
     console.error(
@@ -97,18 +176,4 @@ export async function handleSavingsExecution(erc20Transfer: IERC20Transfer): Pro
   }
 }
 
-export function computeRoundUpAndSavings(
-  transferAmount: bigint,
-  roundUpTo: bigint
-): { roundUpAmount: bigint; savingsAmount: bigint } {
-  if (roundUpTo <= BigInt(0)) {
-    throw new Error("roundUpTo must be > 0");
-  }
-  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
-  const roundUpAmount =
-    ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
-
-  const savingsAmount = roundUpAmount - transferAmount;
-
-  return { roundUpAmount, savingsAmount };
-}
+export { handleSavingsExecution };

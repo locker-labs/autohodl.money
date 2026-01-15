@@ -19,6 +19,5 @@ export async function fetchAllowance({
     args: [owner, spender],
   });
 
-  console.log('Current allowance:', allowance);
   return allowance;
 }

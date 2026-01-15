@@ -1,5 +1,6 @@
 // components/Button.tsx
 
+import { Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type ButtonType = 'button' | 'submit' | 'reset';
@@ -10,7 +11,9 @@ type Props = {
   onAction?: () => void;
   type?: ButtonType;
   disabled?: boolean;
+  loading?: boolean;
   className?: string;
+  btnStyle?: 'primary' | 'secondary';
 };
 
 export default function Button({
@@ -19,8 +22,18 @@ export default function Button({
   onAction,
   type = 'button',
   disabled = false,
+  loading = false,
   className = '',
+  btnStyle = 'primary',
 }: Props) {
+  let classes = '';
+
+  if (btnStyle === 'primary') {
+    classes = 'bg-[#78E76E] active:bg-gray-200/10';
+  } else if (btnStyle === 'secondary') {
+    classes = 'border border-[#78E76E] active:bg-gray-200/10';
+  }
+
   return (
     <button
       type={type}
@@ -28,17 +41,22 @@ export default function Button({
       disabled={disabled}
       aria-disabled={disabled}
       className={[
-        'transition-colors duration-300',
-        'inline-flex items-center justify-center rounded-[12px]',
+        'active:scale-97',
+        'transition-all duration-300',
+        'cursor-pointer disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 rounded-[12px]',
         'px-4 py-2 text-sm font-medium',
-        'bg-[#78E76E] text-black hover:bg-white',
-        'disabled:opacity-50 disabled:pointer-events-none',
+        classes,
+        'disabled:bg-gray-400/50',
+        // 'hover:border-[#78E76E] hover:border-2 hover:bg-white',
+        'text-black',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black',
         className,
       ].join(' ')}
       title={title}
     >
       {children ?? title}
+      {loading && <Loader2 size={16} className='animate-spin' />}
     </button>
   );
 }
