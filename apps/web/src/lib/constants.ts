@@ -231,15 +231,31 @@ const AaveApyConfig = {
 
 // Supported tokens to Moralis Stream ID map
 const TokenToTransferStreamIdMap: Record<TUsdcAddress, string> = {
-  [UsdcAddressMap[EChainId.ArcTestnet]]: secrets.MoralisStreamIdEoaTransfer,
-  [UsdcAddressMap[EChainId.Sepolia]]: secrets.MoralisStreamIdEoaTransfer,
-  [UsdcAddressMap[EChainId.Linea]]: secrets.MoralisStreamIdEoaTransfer,
+  [UsdcAddressMap[EChainId.ArcTestnet]]: secrets.MoralisStreamIdEoaTransferArcTestnet,
+  [UsdcAddressMap[EChainId.Sepolia]]: secrets.MoralisStreamIdEoaTransferSepolia,
+  [UsdcAddressMap[EChainId.Linea]]: secrets.MoralisStreamIdEoaTransferLinea,
 };
 
-const MoralisStreamId = {
-  MmcWithdrawal: secrets.MoralisStreamIdMmcWithdrawal,
-  EoaTransfer: secrets.MoralisStreamIdEoaTransfer,
-};
+enum EMoralisStreamId {
+  EoaTransfer = 'EoaTransfer',
+  MmcWithdrawal = 'MmcWithdrawal',
+}
+
+// Chain, env specific stream IDs
+const ChainToMoralisStreamIdMap = {
+  [EChainId.ArcTestnet]: {
+    [EMoralisStreamId.EoaTransfer]: secrets.MoralisStreamIdEoaTransferArcTestnet,
+    [EMoralisStreamId.MmcWithdrawal]: secrets.MoralisStreamIdMmcWithdrawalArcTestnet,
+  },
+  [EChainId.Sepolia]: {
+    [EMoralisStreamId.EoaTransfer]: secrets.MoralisStreamIdEoaTransferSepolia,
+    [EMoralisStreamId.MmcWithdrawal]: secrets.MoralisStreamIdMmcWithdrawalSepolia,
+  },
+  [EChainId.Linea]: {
+    [EMoralisStreamId.EoaTransfer]: secrets.MoralisStreamIdEoaTransferLinea,
+    [EMoralisStreamId.MmcWithdrawal]: secrets.MoralisStreamIdMmcWithdrawalLinea,
+  },
+} as const satisfies Record<EChainId, Record<EMoralisStreamId, string | null>>;
 
 /**
  * App settings
@@ -256,7 +272,6 @@ export {
   EChainId,
   MetaMaskCardAddressMap,
   MMCardDelegateAddressMap,
-  MoralisStreamId,
   USDC_ADDRESSES,
   USDC_ADDRESS_SET,
   UsdcAddressMap,
@@ -279,6 +294,8 @@ export {
   ViemChainImageMap,
   ViemChainNameMap,
   TokenTickerMap,
+  EMoralisStreamId,
+  ChainToMoralisStreamIdMap,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

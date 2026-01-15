@@ -2,7 +2,14 @@ import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import type { Address, Hex } from 'viem';
 import { getAddress, zeroAddress } from 'viem';
 import { getTransactionLink } from '@/lib/blockExplorer';
-import { type EChainId, MoralisStreamId, TokenDecimalMap, TTokenAddress, ViemChainNameMap } from '@/lib/constants';
+import {
+  ChainToMoralisStreamIdMap,
+  EChainId,
+  EMoralisStreamId,
+  TokenDecimalMap,
+  TTokenAddress,
+  ViemChainNameMap,
+} from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { delegateSaving } from '@/lib/contract/server';
 import { fetchAllowance } from '@/lib/erc20/allowance';
@@ -24,7 +31,7 @@ async function handleSavingsExecution(
 ): Promise<Hex | undefined> {
   const { from: _from, contract, to, transactionHash: sourceTxHash } = erc20Transfer;
   const transferAmount: bigint = BigInt(erc20Transfer.value);
-  const token: Address = getAddress(contract);
+  const sourceToken: Address = getAddress(contract);
   const from = _from as Address;
 
   // Since we dont have access to metamask card,
@@ -44,26 +51,26 @@ async function handleSavingsExecution(
   // For now, we will support only USDC savings transfers.
 
   // For debugging
-  console.debug(JSON.stringify({ from, to, token, sourceTxHash, value: erc20Transfer.value, chainId }));
+  console.debug(JSON.stringify({ from, to, sourceToken, sourceTxHash, value: erc20Transfer.value, chainId }));
 
-  // 1. Validate chain id
+  // 1. Validate source chain id
   if (!isValidSourceChain(Number(chainId))) {
     console.warn(`Invalid source chain id: ${chainId}`);
     return;
   }
   const sourceChainId = Number(chainId) as EChainId;
 
-  // 2. Check token support - this step is essential to prevent fetching configs for unsupported tokens
-  if (!isAutoHodlSupportedToken(token)) {
-    console.warn(`Token not supported by any supported chain: ${token}`);
+  // 2. Check source token support - this step is essential to prevent fetching configs for unsupported tokens
+  if (!isAutoHodlSupportedToken(sourceToken)) {
+    console.warn(`Token not supported by any supported chain: ${sourceToken}`);
     return;
   }
 
-  // 3. Find savings chain id & savings config
+  // 3. Find savings chain id & savings config using savings token
   let savingsConfig: SavingsConfig | null = null;
   let savingsChainId: EChainId | null = null;
 
-  // Fetch savings config on all supported chains and choose first active config
+  // Fetch savings config on all supported chains and pick first active config
   try {
     for (const chain of chains) {
       const chainId = chain.id as unknown as EChainId;
@@ -87,6 +94,7 @@ async function handleSavingsExecution(
         continue;
       }
 
+      // 3C. Set savings config
       savingsConfig = config;
       savingsChainId = chainId;
       break;
@@ -105,29 +113,25 @@ async function handleSavingsExecution(
   console.log('SAVINGS CHAIN ID:', savingsChainId);
   console.log('SAVINGS CONFIG:', savingsConfig);
 
+  // 4. Get savings token (TODO: support multiple savings tokens?)
   const savingsToken = getUsdcAddressByChain(savingsChainId);
 
-  // // 4. Check token support for chain
-  // if (!isAutoHodlSupportedTokenByChain(token, savingsChainId)) {
-  //   console.warn(
-  //     `Token not supported for chain ${ViemChainNameMap[savingsChainId]}: ${token}. Supported tokens: ${getAutoHodlSupportedTokens(savingsChainId)}`,
-  //     'Aborting execution.',
-  //   );
-  //   return;
-  // }
-
   // 5. Check config mode, and validate with streamId
-  if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== MoralisStreamId.MmcWithdrawal) {
+  const streamIds = ChainToMoralisStreamIdMap[sourceChainId];
+
+  // 5A. Check if config mode is MetaMask Card
+  if (savingsConfig.mode === SavingsMode.MetamaskCard && streamId !== streamIds[EMoralisStreamId.MmcWithdrawal]) {
     console.warn(
-      `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${MoralisStreamId.MmcWithdrawal} for MetaMask Card mode.`,
+      `Transfer streamId ${streamId} does not match MMC Withdrawal streamId ${streamIds[EMoralisStreamId.MmcWithdrawal]} for MetaMask Card mode.`,
       'Aborting execution.',
     );
     return;
   }
 
-  if (savingsConfig.mode === SavingsMode.All && streamId !== MoralisStreamId.EoaTransfer) {
+  // 5B. Check if config mode is All Transfers
+  if (savingsConfig.mode === SavingsMode.All && streamId !== streamIds[EMoralisStreamId.EoaTransfer]) {
     console.warn(
-      `Transfer streamId ${streamId} does not match EOA Transfer streamId ${MoralisStreamId.EoaTransfer} for All Transfers mode.`,
+      `Transfer streamId ${streamId} does not match EOA Transfer streamId ${streamIds[EMoralisStreamId.EoaTransfer]} for All Transfers mode.`,
       'Aborting execution.',
     );
     return;
@@ -145,7 +149,7 @@ async function handleSavingsExecution(
   if (savingsConfig.toYield === true && getAddress(to) === getAddress(autohodl)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = true and to = autoHODL for user ${from} and token ${token}`,
+      `toYield = true and to = autoHODL for user ${from} and savingsToken ${savingsToken}`,
       'Aborting execution.',
     );
     return;
@@ -155,7 +159,7 @@ async function handleSavingsExecution(
   if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {
     console.warn(
       'This is a savings tx.',
-      `toYield = false and to = Savings address for user ${from} and token ${token}`,
+      `toYield = false and to = Savings address for user ${from} and savingsToken ${savingsToken}`,
       'Aborting execution.',
     );
     return;
@@ -164,13 +168,13 @@ async function handleSavingsExecution(
   // 7. Verify delegate
   if (getAddress(savingsConfig.delegate) !== getAddress(delegate)) {
     console.warn(
-      `Delegate mismatch in savings config for user ${from} and token ${savingsToken}`,
+      `Delegate mismatch in savings config for user ${from} and savingsToken ${savingsToken}`,
       `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
       'Aborting execution.',
     );
     // TODO: Notify dev team
     throw new Error(
-      `Delegate mismatch in savings config for user ${from} and token ${savingsToken} ` +
+      `Delegate mismatch in savings config for user ${from} and savingsToken ${savingsToken} ` +
         `Expected: ${delegate}, Found: ${savingsConfig.delegate}`,
     );
   }
@@ -195,7 +199,7 @@ async function handleSavingsExecution(
   }
 
   const savingsTokenDecimals = TokenDecimalMap[getUsdcAddressByChain(savingsChainId)];
-  const sourceTokenDecimals = TokenDecimalMap[token as TTokenAddress];
+  const sourceTokenDecimals = TokenDecimalMap[sourceToken as TTokenAddress];
   console.log('transferAmount', transferAmount);
   const normalizedTransferAmount =
     (transferAmount * BigInt(10 ** savingsTokenDecimals)) / BigInt(10 ** sourceTokenDecimals);
