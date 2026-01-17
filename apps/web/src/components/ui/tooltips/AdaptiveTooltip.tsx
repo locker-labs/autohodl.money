@@ -6,8 +6,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 // Adaptive component that uses Popover on touch devices, Tooltip on non-touch
 interface AdaptiveTooltipProps {
-  children: React.ReactNode;
-  content: React.ReactNode;
+  children: React.JSX.Element | string;
+  content: React.JSX.Element | string;
   side?: 'top' | 'right' | 'bottom' | 'left';
   contentClassName?: string;
   triggerClassName?: string;

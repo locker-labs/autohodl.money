@@ -1,5 +1,6 @@
 'use client';
+import { AppKitButton } from '@reown/appkit/react';
 
 export const ConnectButton = () => {
-  return <appkit-button balance='hide' />;
+  return <AppKitButton balance='hide' />;
 };
