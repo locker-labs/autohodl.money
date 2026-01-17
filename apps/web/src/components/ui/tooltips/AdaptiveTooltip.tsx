@@ -39,9 +39,7 @@ const AdaptiveTooltip: React.FC<AdaptiveTooltipProps> = ({
   if (isTouchDevice) {
     return (
       <Popover>
-        <PopoverTrigger asChild className={triggerClassName}>
-          {children}
-        </PopoverTrigger>
+        <PopoverTrigger className={triggerClassName}>{children}</PopoverTrigger>
         <PopoverContent side={side} className={contentClassName}>
           {content}
         </PopoverContent>
@@ -52,9 +50,7 @@ const AdaptiveTooltip: React.FC<AdaptiveTooltipProps> = ({
   return (
     <TooltipProvider>
       <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild className={triggerClassName}>
-          {children}
-        </TooltipTrigger>
+        <TooltipTrigger className={triggerClassName}>{children}</TooltipTrigger>
         <TooltipContent side={side} className={contentClassName}>
           {content}
         </TooltipContent>
