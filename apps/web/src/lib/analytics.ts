@@ -6,7 +6,7 @@ const rudderanalytics = new RudderAnalytics(secrets.rudderstackWriteKey, {
 });
 
 export type TTrackEventProperties = {
-  twclid: string;
+  twclid?: string;
   walletAddress: string;
   savingsChainId: number;
   allowance?: number;
