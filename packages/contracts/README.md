@@ -1,6 +1,6 @@
 # 📦 `@autohodl.money/contracts`
 
-This package contains the **smart contracts** that power the **autoHODL** protocol — enabling automated savings and yield generation on EVM chains.
+This package contains the **smart contracts** that power the **autoHODL** protocol.
 
 ---
 
@@ -9,94 +9,26 @@ This package contains the **smart contracts** that power the **autoHODL** protoc
 ```
 packages/contracts/
 ├── src/
-│   ├── AutoHodl.sol              # Main savings automation contract
+│   ├── AutoHodl.sol
 │   ├── delegates/
-│   │   └── MMCardDelegate.sol    # Delegate contract for card-based savings
+│   │   └── MMCardDelegate.sol
 │   ├── interfaces/
-│   │   ├── IDelegate.sol         # Delegate interface
-│   │   ├── IERC20.sol            # ERC20 interface
-│   │   ├── ILockerPool.sol       # Instant liquidity pool interface
-│   │   ├── ILockerRouter.sol     # Router interface for deposits & settlements
-│   │   └── IVenueAdapter.sol     # Yield venue adapter interface
+│   │   ├── IDelegate.sol
+│   │   ├── IERC20.sol
+│   │   ├── ILockerPool.sol
+│   │   ├── ILockerRouter.sol
+│   │   └── IVenueAdapter.sol
 │   └── yield/
-│       ├── LockerRouter.sol      # Core router for yield allocation
-│       ├── LockerSYT.sol         # Spendable Yield Token (SYT) implementation
+│       ├── LockerRouter.sol
+│       ├── LockerSYT.sol
 │       └── adapters/
-│           └── AAVEAdapter.sol   # AAVE V3 yield adapter
-├── script/                       # Foundry deployment scripts
-├── test/                         # Contract tests (Foundry)
-├── lib/                          # External dependencies (forge libs)
-├── foundry.toml                  # Foundry configuration
+│           └── AAVEAdapter.sol
+├── script/
+├── test/
+├── lib/
+├── foundry.toml
 └── package.json
 ```
-
----
-
-## 🧠 Architecture Overview
-
-```mermaid
-graph TD
-    A[User Wallet] -->|setSavingConfig| B[AutoHodl.sol]
-    B -->|executeSavingsTx| C[MMCardDelegate]
-    C -->|delegateSaving| B
-    B -->|depositFor| D[LockerRouter.sol]
-    D -->|deposit| E[AAVEAdapter.sol]
-    E -->|supply| F[AAVE V3 Pool]
-    D -->|mint| G[LockerSYT.sol]
-    G -->|balanceOf| A
-```
-
----
-
-## 📦 Contract Breakdown
-
-### 🔹 [AutoHodl.sol](./src/AutoHodl.sol)
-
-The core savings automation contract. Manages:
-
-- **Saving configurations** per user per token (round-up amount, delegate, yield routing)
-- **Token allowlist** for supported assets
-- **Delegate allowlist** for authorized automation providers
-- **Savings execution** triggered by delegates
-
-**Key Functions:**
-- `setSavingConfig()` — User sets their savings preferences
-- `setSavingConfigForUser()` — Delegate sets config on behalf of a user
-- `executeSavingsTx()` — Delegate triggers a savings transaction
-
-### 🔹 [LockerRouter.sol](./src/yield/LockerRouter.sol)
-
-The yield routing engine that:
-
-- Routes deposits across yield adapters based on allocation weights (bps)
-- Mints SYT (Spendable Yield Tokens) to users
-- Handles withdrawals and underlying asset transfers
-- Manages per-asset allocation configurations
-
-**Key Functions:**
-- `deposit()` / `depositFor()` — Deposit assets and mint SYT
-- `sendUnderlying()` — Redeem underlying for a user
-- `setDefaultAlloc()` — Admin sets default yield allocation
-
-### 🔹 [LockerSYT.sol](./src/yield/LockerSYT.sol)
-
-**Spendable Yield Token** — an ERC20-compatible token representing a user's share of deposited assets. Features:
-
-- **Rebasing-style balance** — `balanceOf()` returns current claim in underlying assets
-- **Router-controlled minting/burning**
-- **Transfer triggers underlying redemption** (spendable yield)
-
-### 🔹 [AAVEAdapter.sol](./src/yield/adapters/AAVEAdapter.sol)
-
-AAVE V3 venue adapter implementing `IVenueAdapter`:
-
-- Deposits assets into AAVE lending pools
-- Handles instant redemptions
-- Tracks position value via aToken balances
-
-### 🔹 [MMCardDelegate.sol](./src/delegates/MMCardDelegate.sol)
-
-A delegate contract for card-based savings automation. Allows an authorized operator to trigger savings transactions on behalf of users.
 
 ---
 
@@ -207,14 +139,6 @@ forge script script/SetupAdapter.s.sol:SetupAdapterScript \
 | `SetupAdapter.s.sol` | Sets up yield adapter configuration |
 | `SetupSYT.s.sol` | Sets up SYT token for an asset |
 | `Deposit.s.sol` | Test deposit script |
-
----
-
-## 🧩 Integration
-
-This contract package integrates with:
-
-- **Frontend Application**: The [Web Dashboard](../../apps/web) provides the primary user interface and manages environment-specific contract configurations.
 
 ---
 
