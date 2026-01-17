@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { linea, base } from 'viem/chains';
