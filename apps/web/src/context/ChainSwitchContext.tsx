@@ -12,16 +12,7 @@ import { getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers
 import { toastCustom } from '@/components/ui/toast';
 import type { SavingsConfig } from '@/types/autohodl';
 import { config as wagmiConfig } from '@/config';
-import { ChainSwitchModal } from '@/components/feature/ChainSwitchModal';
-
-export type ChainSwitchFlow = 'has-config' | 'no-config';
-
-export type ChainSwitchState = {
-  step: 'idle' | 'checking' | 'confirming' | 'deactivating' | 'switching' | 'activating' | 'complete' | 'error';
-  error: string | null;
-  targetChainId: EChainId | null;
-  flow: ChainSwitchFlow | null;
-};
+import { ChainSwitchModal, type ChainSwitchFlow, type ChainSwitchState } from '@/components/feature/ChainSwitchModal';
 
 type ChainSwitchContextType = {
   // State
@@ -140,6 +131,9 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
     const roundUpTo = Number(formatUnits(config.roundUp, TokenDecimalMap[getUsdcAddressByChain(savingsChainId)]));
 
     try {
+      // Step 0: Switch to the savings chain
+      await switchChain(wagmiConfig, { chainId: savingsChainId });
+
       // Step 1: Mark current config as inactive
       setState({ step: 'deactivating', error: null, targetChainId, flow });
       if (config.active) {
@@ -249,7 +243,7 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
     setModalOpen(false);
     setTimeout(() => {
       resetState();
-    }, 300);
+    }, 500);
   };
 
   /**

@@ -7,7 +7,6 @@ import useCreateConfig from '@/hooks/useCreateConfig';
 import { TokenDecimalMap } from '@/lib/constants';
 import { getUsdcAddressByChain } from '@/lib/helpers';
 
-
 const ActiveSwitch = () => {
   const { config, setConfig, savingsChainId } = useAutoHodl();
   const { createConfig } = useCreateConfig();
@@ -40,6 +39,12 @@ const ActiveSwitch = () => {
     }
     iife();
   }, [activeLocal]);
+
+  useEffect(() => {
+    if (config?.active !== undefined) {
+      setActiveLocal(config?.active);
+    }
+  }, [config?.active]);
 
   return (
     <div className='flex items-center justify-between gap-2'>

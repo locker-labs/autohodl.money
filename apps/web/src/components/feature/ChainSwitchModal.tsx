@@ -63,7 +63,7 @@ export function ChainSwitchModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[500px]'>
+      <DialogContent className='sm:max-w-[500px]' showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Switch Savings Chain</DialogTitle>
           <DialogDescription>
@@ -140,23 +140,6 @@ export function ChainSwitchModal({
                   </div>
                 </div>
               )}
-
-              {/* Error Message */}
-              {/* {isError && (
-                <div className='mt-4 border border-red-200 rounded-lg overflow-hidden'>
-                  <div className='max-w-[456px] max-h-[200px] flex items-start gap-3 p-4 bg-red-50 overflow-auto'>
-                    <AlertCircle className='w-5 h-5 text-red-600 flex-shrink-0 mt-0.5' />
-                    <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-medium text-red-800'>Error switching chain</p>
-                      {state.error && (
-                        <p className='text-sm text-red-700 mt-1 break-words' title={state.error}>
-                          {state.error}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )} */}
             </>
           )}
         </div>
@@ -176,7 +159,7 @@ export function ChainSwitchModal({
               <Button variant='outline' onClick={handleCancel} disabled={isExecuting}>
                 Cancel
               </Button>
-              <Button onClick={onConfirm} disabled={isExecuting}>
+              <Button onClick={onConfirm} disabled={isExecuting} autoFocus>
                 {isExecuting ? 'Processing...' : 'Continue'}
               </Button>
             </>
