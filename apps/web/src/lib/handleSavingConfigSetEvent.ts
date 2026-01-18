@@ -1,11 +1,12 @@
 import type { Log } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
 import { type Address, getAddress } from 'viem';
-import { type EChainId, TokenToTransferStreamIdMap, type TUsdcAddress } from '@/lib/constants';
+import { ChainToMoralisStreamIdMap, type EChainId, EMoralisStreamId, type TUsdcAddress } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import { addAddressToEoaErc20TransferMoralisStream } from '@/lib/moralis';
 import { SavingsMode, type SavingsConfig } from '@/types/autohodl';
 import { getUsdcAddress, getViemPublicClientByChain } from '@/lib/helpers';
+import { chains } from '@/config';
 
 /**
  * if SavingConfigSet event logs found, then add user address to supported tokens' transfers stream
@@ -24,12 +25,6 @@ async function handleSavingConfigSetEvent(configSetLogs: Log[], savingsChainId: 
       }
 
       console.log(`New SavingConfigSet event found for user: ${user}, token: ${savingsToken}`);
-
-      const streamId: string | undefined = TokenToTransferStreamIdMap[savingsToken];
-      if (!streamId) {
-        console.error(`No stream ID configured for token: ${savingsToken}`);
-        // TODO: send alert to dev team
-      }
 
       // Fetch savings config
       let savingsConfig: SavingsConfig;
@@ -54,12 +49,24 @@ async function handleSavingConfigSetEvent(configSetLogs: Log[], savingsChainId: 
         // TODO: remove user from EOA stream if exists
         // await removeAddressFromEoaErc20TransferMoralisStream(streamId, user);
       } else if (savingsConfig.mode === SavingsMode.All) {
-        // For now, we support only one token per chain.
-        await addAddressToEoaErc20TransferMoralisStream({
-          streamId,
-          address: user,
-          savingsChainId,
+        // Add user address to Moralis streams for all supported chains
+        const addToStreamPromises = chains.map((chain) => {
+          const chainId = chain.id as EChainId;
+          const streamId = ChainToMoralisStreamIdMap[chainId]?.[EMoralisStreamId.EoaTransfer];
+
+          if (!streamId) {
+            console.warn(`No EOA transfer stream ID configured for chain: ${chainId}`);
+            return Promise.resolve(false);
+          }
+
+          return addAddressToEoaErc20TransferMoralisStream({
+            streamId,
+            address: user,
+            savingsChainId: chainId,
+          });
         });
+
+        await Promise.all(addToStreamPromises);
       }
     }
   }
