@@ -149,7 +149,7 @@ export function RecentActivity(): React.JSX.Element {
                               {formatAmount(
                                 formatUnits(
                                   BigInt(tx.purchaseValue),
-                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
+                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.sourceChainId)),
                                 ),
                               )}
                             </p>
