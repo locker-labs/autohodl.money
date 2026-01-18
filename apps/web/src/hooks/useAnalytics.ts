@@ -2,7 +2,7 @@ import { useAccount } from 'wagmi';
 import { EAnalyticsEvent } from '@/types/analytics';
 
 export function useAnalytics() {
-  const { address: walletAddress } = useAccount();
+  const { address: walletAddress, chainId: savingsChainId } = useAccount();
 
   const trackAnalyticsEvent = async (event: EAnalyticsEvent, properties?: Record<string, string | number>) => {
     if (!event) {
@@ -23,6 +23,7 @@ export function useAnalytics() {
         body: JSON.stringify({
           eventType: event,
           walletAddress,
+          savingsChainId: savingsChainId ?? null,
           ...(properties ?? {}),
         }),
       });

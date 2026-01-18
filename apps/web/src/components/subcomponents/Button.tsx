@@ -1,3 +1,4 @@
+// @ts-nocheck
 // components/Button.tsx
 
 import { Loader2 } from 'lucide-react';

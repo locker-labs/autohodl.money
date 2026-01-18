@@ -6,7 +6,8 @@
   "description": "Save while you spend",
   "workspaces": [
     "packages/contracts",
-    "apps/web"
+    "apps/web",
+    "apps/docs"
   ],
   "scripts": {
     "build": "bun --filter '@autohodl.money/*' build",
