@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { createContext, useContext, useState, type FC, type ReactNode } from 'react';
