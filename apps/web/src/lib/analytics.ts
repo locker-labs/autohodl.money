@@ -17,11 +17,20 @@ export type TTrackEventProperties = {
 
 export function trackEvent(event: string, properties: TTrackEventProperties) {
   try {
-    const params = {
+    const params: {
+      event: string;
+      userId: string;
+      properties: {
+        twclid?: string;
+        ip_address?: string;
+        user_agent?: string;
+        conversionId: string;
+        description: string;
+      };
+    } = {
       event,
       userId: properties.walletAddress,
       properties: {
-        twclid: properties.twclid,
         ip_address: properties.ip,
         user_agent: properties.userAgent,
         conversionId: `${event.split(' ').join('_').toLowerCase()}:${properties.walletAddress}`,
@@ -34,6 +43,10 @@ export function trackEvent(event: string, properties: TTrackEventProperties) {
         }`,
       },
     };
+    if (properties.twclid) {
+      params.properties.twclid = properties.twclid;
+    }
+
     rudderanalytics.track(params);
     console.log(`${event} event tracked:`, params);
   } catch (error) {
