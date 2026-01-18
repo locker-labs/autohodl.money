@@ -53,5 +53,3 @@ export function trackEvent(event: string, properties: TTrackEventProperties) {
     console.error(`${event} event tracking failed:`, error);
   }
 }
-
-export default rudderanalytics;
