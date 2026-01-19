@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Albert_Sans } from 'next/font/google';
-import { headers } from 'next/headers'; // added
+import { headers } from 'next/headers';
 import { Toaster } from 'sonner';
 import ContextProvider from '@/context';
 import './globals.css';
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/hero.landing.png',
+        url: 'https://www.autohodl.money/seo_img.png',
         width: 1200,
         height: 630,
         alt: 'autoHODL Preview',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'autoHODL',
     description: 'Save while you spend. Automatically round up your transactions and save the spare change.',
-    images: ['/hero.landing.png'],
+    images: ['https://www.autohodl.money/seo_img.png'],
   },
   appleWebApp: {
     title: 'autoHODL',

@@ -8,10 +8,13 @@ import UserOnboarding from '@/components/view/UserOnboarding';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import Loading from '@/app/loading';
 import { Footer } from '@/components/subcomponents/Footer';
+import { trackWalletConnected } from '@/hooks/trackWalletConnected';
 
 export default function Home() {
   const { isConnected, isConnecting, isReconnecting } = useAccount();
   const { loading, config, accounts } = useAutoHodl();
+
+  trackWalletConnected();
 
   if (loading || isConnecting || isReconnecting || (isConnected && !accounts.length)) {
     return <Loading />;

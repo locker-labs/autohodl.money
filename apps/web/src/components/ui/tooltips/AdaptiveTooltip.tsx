@@ -6,8 +6,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 // Adaptive component that uses Popover on touch devices, Tooltip on non-touch
 interface AdaptiveTooltipProps {
-  children: React.ReactNode;
-  content: React.ReactNode;
+  children: React.JSX.Element | string;
+  content: React.JSX.Element | string;
   side?: 'top' | 'right' | 'bottom' | 'left';
   contentClassName?: string;
   triggerClassName?: string;
@@ -39,9 +39,7 @@ const AdaptiveTooltip: React.FC<AdaptiveTooltipProps> = ({
   if (isTouchDevice) {
     return (
       <Popover>
-        <PopoverTrigger asChild className={triggerClassName}>
-          {children}
-        </PopoverTrigger>
+        <PopoverTrigger className={triggerClassName}>{children}</PopoverTrigger>
         <PopoverContent side={side} className={contentClassName}>
           {content}
         </PopoverContent>
@@ -52,9 +50,7 @@ const AdaptiveTooltip: React.FC<AdaptiveTooltipProps> = ({
   return (
     <TooltipProvider>
       <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild className={triggerClassName}>
-          {children}
-        </TooltipTrigger>
+        <TooltipTrigger className={triggerClassName}>{children}</TooltipTrigger>
         <TooltipContent side={side} className={contentClassName}>
           {content}
         </TooltipContent>

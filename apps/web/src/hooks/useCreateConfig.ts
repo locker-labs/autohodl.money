@@ -7,6 +7,7 @@ import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib
 import { viemPublicClient } from '@/lib/clients/client';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { extraDataParams, type SavingsMode } from '@/types/autohodl';
+import { useAnalytics } from './useAnalytics';
 
 type CreateConfigParams = {
   active: boolean;
@@ -22,13 +23,19 @@ type UseCreateConfigReturn = {
   handleCreateConfig: (params: CreateConfigParams) => Promise<void>;
   loading: boolean;
   waitingForConfirmation: boolean;
+  isConfirmed: boolean;
+  txHash: Hex | null;
 };
 
 const useCreateConfig = (): UseCreateConfigReturn => {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [txHash, setTxHash] = useState<Hex | null>(null);
+
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { setRefetchFlag } = useAutoHodl();
+  const { trackConfigSetEvent } = useAnalytics();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +69,10 @@ const useCreateConfig = (): UseCreateConfigReturn => {
 
     setLoading(true);
     setError(null);
+    setWaitingForConfirmation(false);
+    setIsConfirmed(false);
+    setTxHash(null);
+
     try {
       const extraData = encodeAbiParameters(extraDataParams, [mode]);
 
@@ -85,6 +96,10 @@ const useCreateConfig = (): UseCreateConfigReturn => {
       setWaitingForConfirmation(true);
       await viemPublicClient.waitForTransactionReceipt({ hash: tx, confirmations: 1 });
       setWaitingForConfirmation(false);
+      setIsConfirmed(true);
+      setTxHash(tx);
+
+      await trackConfigSetEvent(tx);
 
       setRefetchFlag((flag) => !flag);
     } catch (e) {
@@ -101,6 +116,8 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     handleCreateConfig,
     loading,
     waitingForConfirmation,
+    isConfirmed,
+    txHash,
   };
 };
 

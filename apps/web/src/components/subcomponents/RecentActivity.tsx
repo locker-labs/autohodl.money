@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSavingsTxs } from '@/hooks/useSavingsTxs';
 import { getTransactionLink } from '@/lib/blockExplorer';
 import { TOKEN_DECIMALS } from '@/lib/constants';
-import { roundOff } from '@/lib/math';
+import { formatAmount } from '@/lib/math';
 import { timeAgoFromHex } from '@/lib/time';
 import Image from 'next/image';
 import { useWithdrawalTxs } from '@/hooks/useWithdrawalTxs';
@@ -46,7 +46,7 @@ export function RecentActivity(): React.JSX.Element {
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
-    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-full group/container'>
+    <Card className='w-full m-0 py-5 pl-5 pr-1.5 h-fit group/container'>
       <CardContent className='m-0 p-0'>
         <div>
           <h2 className='font-medium text-black text-2xl'>Recent Activity</h2>
@@ -54,11 +54,11 @@ export function RecentActivity(): React.JSX.Element {
         </div>
 
         {allTxs.length === 0 ? (
-          <div className={'mt-[15px] min-h-[380px] w-full h-fit flex justify-center items-center'}>
+          <div className={'mt-[15px] min-h-[530px] w-full h-fit flex justify-center items-center'}>
             {loading ? (
               <Loader2 className={'animate-spin'} color={'#78E76E'} />
             ) : (
-              <div>
+              <div className='pr-3.5'>
                 <Image
                   className='mx-auto max-w-[128px] max-h-[128px]'
                   src={'/no-savings.png'}
@@ -121,7 +121,7 @@ export function RecentActivity(): React.JSX.Element {
                         )}
                         <div>
                           <p className='font-semibold text-black text-base text-left'>
-                            ${roundOff(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS), 2)}
+                            {formatAmount(formatUnits(BigInt(tx.value ?? 0), TOKEN_DECIMALS))}
                           </p>
                           <p className='font-normal text-left'>
                             {isSelfWithdrawal
@@ -140,7 +140,7 @@ export function RecentActivity(): React.JSX.Element {
                         <p className='font-normal text-[#0f0f0f] text-base text-right'>
                           {isWithdrawalTx
                             ? null
-                            : `purchase - $${roundOff(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS), 2)}`}
+                            : `purchase - ${formatAmount(formatUnits(BigInt(tx.purchaseValue), TOKEN_DECIMALS))}`}
                         </p>
                       </div>
                     </div>
