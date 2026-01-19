@@ -1,9 +1,4 @@
-import RudderAnalytics from '@rudderstack/rudder-sdk-node';
-import { secrets } from './secrets';
-
-const rudderanalytics = new RudderAnalytics(secrets.rudderstackWriteKey, {
-  dataPlaneUrl: secrets.rudderstackDataPlaneUrl,
-});
+import { rudderanalytics as client } from './client';
 
 export type TTrackEventProperties = {
   twclid?: string;
@@ -15,7 +10,7 @@ export type TTrackEventProperties = {
   userAgent?: string;
 };
 
-export function trackEvent(event: string, properties: TTrackEventProperties) {
+export async function trackEvent(event: string, properties: TTrackEventProperties) {
   try {
     const params: {
       event: string;
@@ -47,9 +42,12 @@ export function trackEvent(event: string, properties: TTrackEventProperties) {
       params.properties.twclid = properties.twclid;
     }
 
-    rudderanalytics.track(params);
+    client.track(params);
     console.log(`${event} event tracked:`, params);
+
+    await client.flush();
+    console.log(`${event} event flushed successfully`);
   } catch (error) {
-    console.error(`${event} event tracking failed:`, error);
+    console.error(`${event} event tracking/flushing failed:`, error);
   }
 }

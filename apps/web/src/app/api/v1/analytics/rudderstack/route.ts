@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unknown eventType' }, { status: 400 });
     }
 
-    trackEvent(eventType, trackingProperties);
+    await trackEvent(eventType, trackingProperties);
 
     return NextResponse.json({ message: 'Event tracked successfully' });
   } catch (error) {
