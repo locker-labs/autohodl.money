@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type EChainId, SupportedAccounts } from '@/lib/constants';
+import { type EChainId, SupportedAccounts, TokenTickerMap } from '@/lib/constants';
 import Button from './Button';
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { isAddress, type Address } from 'viem';
@@ -296,7 +296,7 @@ export default function SetSavingConfig() {
                 {/* Savings limit input */}
                 <div className='flex flex-col gap-2'>
                   <label htmlFor={'savingsCap'} className='text-sm font-medium text-black'>
-                    Savings limit (USDC)
+                    Savings Limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]})
                   </label>
                   <input
                     id={'savingsCap'}

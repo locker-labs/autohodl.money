@@ -5,6 +5,7 @@ import Button from './Button';
 import { Edit3, X } from 'lucide-react';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { getAutoHodlAddressByChain, getUsdcAddressByChain } from '@/lib/helpers';
+import { TokenTickerMap } from '@/lib/constants';
 
 const SavingsLimit = () => {
   const { address: userAddress } = useConnection();
@@ -54,7 +55,7 @@ const SavingsLimit = () => {
         <div className='flex flex-col gap-1'>
           <div className='flex items-center justify-between w-full'>
             <label htmlFor={'savingsCap'} className='py-[6px] text-sm font-medium text-black'>
-              Savings limit (USDC):
+              Savings limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}):
             </label>
             <button
               type='button'
@@ -106,7 +107,9 @@ const SavingsLimit = () => {
           aria-label='Edit savings limit'
         >
           <div className='w-full flex items-center justify-between'>
-            <div className='py-1 text-sm font-medium text-black'>Savings Limit (USDC):</div>
+            <div className='py-1 text-sm font-medium text-black'>
+              Savings Limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}):
+            </div>
             <div className='flex items-center justify-center gap-2'>
               <div className='py-1 text-base font-medium text-black'>{allowanceFormatted}</div>
               <div className='hidden group-hover:block group-hover:bg-gray-100 hover:bg-gray-200 p-1 rounded-md'>

@@ -8,6 +8,7 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useERC20Transfer } from '@/hooks/useERC20Token';
 import { getSusdcAddressByChain } from '@/lib/helpers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { TokenTickerMap } from '@/lib/constants';
 
 export const WithdrawSavings = (): React.JSX.Element => {
   const { address, sToken, savingsChainId } = useAutoHodl();
@@ -67,6 +68,8 @@ export const WithdrawSavings = (): React.JSX.Element => {
     }
   };
 
+  const savingsTokenTicker = TokenTickerMap[getSusdcAddressByChain(savingsChainId)];
+
   return (
     <>
       <Button
@@ -89,7 +92,7 @@ export const WithdrawSavings = (): React.JSX.Element => {
             {/* Amount Input */}
             <div className='flex flex-col gap-2'>
               <label htmlFor='withdrawAmount' className='text-sm font-medium text-black'>
-                Amount (sUSDC)
+                Amount ({savingsTokenTicker})
               </label>
               <div className='relative flex items-center'>
                 <input
@@ -112,9 +115,13 @@ export const WithdrawSavings = (): React.JSX.Element => {
                 </button>
               </div>
               {isAmountExceedsBalance && (
-                <p className='text-xs text-red-500'>Amount exceeds available balance ({maxBalance} sUSDC)</p>
+                <p className='text-xs text-red-500'>
+                  Amount exceeds available balance ({maxBalance} {savingsTokenTicker})
+                </p>
               )}
-              <p className='text-xs text-gray-500'>Available: {maxBalance} sUSDC</p>
+              <p className='text-xs text-gray-500'>
+                Available: {maxBalance} {savingsTokenTicker}
+              </p>
             </div>
 
             {/* Withdraw Button */}

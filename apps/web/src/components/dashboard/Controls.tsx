@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { SupportedAccounts } from '@/lib/constants';
+import { SupportedAccounts, TokenTickerMap } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
 import { useConnection } from 'wagmi';
 import { CopyContentButton } from '@/components/feature/CopyContentButton';
@@ -159,7 +159,9 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
                   {!token.isReady ? (
                     <PriceSkeleton />
                   ) : (
-                    <p className='whitespace-nowrap'>{formatAmount(token.balanceFormatted, '')} USDC</p>
+                    <p className='whitespace-nowrap'>
+                      {formatAmount(token.balanceFormatted, '')} {TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}
+                    </p>
                   )}
                 </div>
               </div>
