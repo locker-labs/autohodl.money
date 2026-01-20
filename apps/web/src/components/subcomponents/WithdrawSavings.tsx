@@ -128,11 +128,11 @@ export const WithdrawSavings = (): React.JSX.Element => {
             <Button
               title='Withdraw'
               className='w-full h-[40px]'
-              disabled={!isValidAmount || isPending || isConfirming}
+              disabled={!isValidAmount}
               onAction={handleWithdraw}
               loading={isPending || isConfirming}
             >
-              <span>{isConfirming ? 'Confirming...' : isPending ? 'Processing...' : 'Withdraw'}</span>
+              <span>{isConfirming ? 'Confirming' : isPending ? 'Processing' : 'Withdraw'}</span>
             </Button>
           </div>
         </DialogContent>

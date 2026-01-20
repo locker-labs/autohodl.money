@@ -45,6 +45,16 @@ const SavingsLimit = () => {
     }
   }, [isConfirmingAllowance]);
 
+  const handleCancel = () => {
+    setIsEditing(false);
+    setSavingsCap(allowanceFormatted);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setTimeout(() => document.getElementById('savingsCap')?.focus(), 0);
+  };
+
   const handleApprove = () => {
     approve();
   };
@@ -55,11 +65,11 @@ const SavingsLimit = () => {
         <div className='flex flex-col gap-1'>
           <div className='flex items-center justify-between w-full'>
             <label htmlFor={'savingsCap'} className='py-[6px] text-sm font-medium text-black'>
-              Savings limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}):
+              Savings Limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}):
             </label>
             <button
               type='button'
-              onClick={() => setIsEditing(false)}
+              onClick={handleCancel}
               className={`text-[#4D4A4A]
                       bg-gray-100
                       hover:bg-gray-200
@@ -93,17 +103,18 @@ const SavingsLimit = () => {
               title={'Add token allowance'}
               onAction={handleApprove}
               disabled={!savingsCap}
+              loading={isConfirmingAllowance || isPending}
             >
-              {isConfirmingAllowance ? 'Confirming...' : isPending ? 'Processing...' : 'Set Limit'}
+              {isConfirmingAllowance ? 'Confirming' : isPending ? 'Processing' : 'Set limit'}
             </Button>
           </div>
         </div>
       ) : (
         <button
           type='button'
-          className='group w-full flex items-center justify-between rounded-md transition-colors cursor-pointer'
-          onClick={() => setIsEditing(true)}
-          onKeyDown={(e) => e.key === 'Enter' && setIsEditing(true)}
+          className='group w-full flex items-center justify-between rounded-md transition-colors cursor-pointer hover:bg-gray-100'
+          onClick={handleEdit}
+          onKeyDown={(e) => e.key === 'Enter' && handleEdit()}
           aria-label='Edit savings limit'
         >
           <div className='w-full flex items-center justify-between'>
@@ -112,7 +123,7 @@ const SavingsLimit = () => {
             </div>
             <div className='flex items-center justify-center gap-2'>
               <div className='py-1 text-base font-medium text-black'>{allowanceFormatted}</div>
-              <div className='hidden group-hover:block group-hover:bg-gray-100 hover:bg-gray-200 p-1 rounded-md'>
+              <div className='hidden group-hover:block p-1 rounded-md'>
                 <div
                   className={`text-[#4D4A4A]
                       hover:bg-gray-200

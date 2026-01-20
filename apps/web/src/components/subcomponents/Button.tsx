@@ -45,7 +45,7 @@ export default function Button({
     <button
       type={type}
       onClick={onAction}
-      disabled={disabled}
+      disabled={disabled || loading}
       aria-disabled={disabled}
       className={[
         'active:scale-97',

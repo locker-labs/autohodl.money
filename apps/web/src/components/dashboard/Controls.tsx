@@ -138,7 +138,7 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
             </div>
 
             {/* Source of Funds */}
-            <div className='mt-2 w-full'>
+            <div className='mt-4 w-full'>
               <p className='text-sm font-medium'>Source of Funds</p>
 
               <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
@@ -217,12 +217,12 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
               </div>
             </div>
 
-            <div className='mt-2'>
+            <div className='mt-4'>
               <SavingsLimit />
             </div>
 
             {/* Savings Chain */}
-            <div className='mt-2'>
+            <div className='mt-4'>
               <div className='w-full flex items-center justify-between gap-2 my-1'>
                 <p className='text-sm font-medium'>Savings Chain</p>
                 <ChainSelector />

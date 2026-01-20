@@ -50,10 +50,10 @@ const ActiveSwitch = () => {
     <div className='flex items-center justify-between gap-2'>
       <div>
         <div className='flex items-center justify-start gap-2'>
-          <p className='text-sm font-medium'>Enable autoHODL</p>
+          <p className='text-sm font-medium leading-[20px]'>Enable autoHODL</p>
           {isPending && <LoaderSecondary />}
         </div>
-        <p className='text-[#4D4A4A] text-sm'>{config?.active ? 'Active' : 'Paused'}</p>
+        <p className='text-[#4D4A4A] text-sm leading-[20px]'>{config?.active ? 'Active' : 'Paused'}</p>
       </div>
 
       <Switch

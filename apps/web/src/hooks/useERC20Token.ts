@@ -29,7 +29,9 @@ export function useErc20Allowance(params: {
     args: owner && params.spender ? [owner, params.spender] : undefined,
     query: {
       enabled,
-      staleTime: 15_000,
+      refetchInterval: ERefetchInterval.FAST,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: true,
     },
   });
 
