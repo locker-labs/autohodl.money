@@ -51,7 +51,7 @@ async function handleSavingsExecution(
   // For now, we will support only USDC savings transfers.
 
   // For debugging
-  console.debug(JSON.stringify({ from, to, sourceToken, sourceTxHash, value: erc20Transfer.value, chainId }));
+  console.debug(JSON.stringify({ from, to, sourceToken, sourceTxHash, value: erc20Transfer.value }));
 
   // 1. Validate source chain id
   if (!isValidSourceChain(Number(chainId))) {

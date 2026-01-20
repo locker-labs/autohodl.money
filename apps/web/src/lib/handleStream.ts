@@ -1,6 +1,6 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
-import { type EChainId, SavingConfigSetEventSigHash } from '@/lib/constants';
+import { type EChainId, SavingConfigSetEventSigHash, ViemChainNameMap } from '@/lib/constants';
 import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
 import { verifySignature } from '@/lib/moralis';
 import { handleSavingConfigSetEvent } from './handleSavingConfigSetEvent';
@@ -27,7 +27,8 @@ export async function handleStream(body: string, signature: string, webhookSecre
 
   // Log incoming webhook for debugging
   console.log('Received Moralis webhook:', {
-    chainId: payload.chainId,
+    sourceChainId: Number(payload.chainId),
+    sourceChainName: ViemChainNameMap[Number(payload.chainId) as EChainId],
     streamId: payload.streamId,
     tag: payload.tag,
     confirmed: payload.confirmed,
