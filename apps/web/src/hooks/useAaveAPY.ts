@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAutoHodl } from '@/context/AutoHodlContext';
-import { AaveApyConfig } from '@/lib/constants';
+import { AaveApyConfig, ERefetchInterval } from '@/lib/constants';
 import { getViemPublicClientByChain } from '@/lib/helpers';
 
 // Simple Pool ABI for getting reserve data
@@ -78,11 +78,11 @@ export function useAaveAPY() {
   }
 
   return useQuery({
-    queryKey: ['aave-apy', savingsChainId],
-    queryFn: fetchAaveAPY,
-    enabled: true,
+    enabled: !!savingsChainId,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    refetchInterval: 15000, // 15 seconds
+    refetchInterval: ERefetchInterval.SLOW,
+    queryKey: ['aave-apy', savingsChainId],
+    queryFn: fetchAaveAPY,
   });
 }

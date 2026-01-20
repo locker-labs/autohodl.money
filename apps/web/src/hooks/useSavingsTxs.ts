@@ -7,15 +7,19 @@ import { fetchSourceTxInfoInBatch } from '@/lib/data/fetchSourceTxInfoInBatch';
 import type { SourceTxInfo } from '@/types/autohodl';
 import { EAutoHodlTxType } from '@/enums';
 import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
-import type { EChainId } from '@/lib/constants';
+import { ERefetchInterval, type EChainId } from '@/lib/constants';
 import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
 import type { ISavingsTx } from '@/types/tx';
 import { sortByTimestampDesc } from '@/lib/helpers/sort';
 
 export function useSavingsTxs() {
-  const { address, isConnected } = useConnection();
+  const { address } = useConnection();
 
   const { data, isLoading, error, isFetched } = useQuery({
+    enabled: !!address,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: ERefetchInterval.FAST,
     queryKey: ['savings-txs', address],
     queryFn: async () => {
       const allTransfers: ISavingsTx[] = [];
@@ -68,10 +72,6 @@ export function useSavingsTxs() {
 
       return allTransfers.sort(sortByTimestampDesc);
     },
-    enabled: isConnected && !!address,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchInterval: 5000, // 5 seconds
   });
 
   return {

@@ -262,6 +262,11 @@ const ChainToMoralisStreamIdMap = {
  */
 
 export const verboseLogs = secrets.VerboseLogs;
+enum ERefetchInterval {
+  FAST = 5000, // 5 seconds
+  MEDIUM = 15000, // 15 seconds
+  SLOW = 60000, // 60 seconds
+}
 
 export {
   AaveAdapterAddressMap,
@@ -296,6 +301,7 @@ export {
   TokenTickerMap,
   EMoralisStreamId,
   ChainToMoralisStreamIdMap,
+  ERefetchInterval,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

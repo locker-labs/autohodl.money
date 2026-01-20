@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { erc20Abi, formatUnits } from 'viem';
 import { chains } from '@/config';
-import { type EChainId, TokenDecimalMap } from '@/lib/constants';
+import { type EChainId, ERefetchInterval, TokenDecimalMap } from '@/lib/constants';
 import { getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
 import { useConnection } from 'wagmi';
@@ -16,6 +16,10 @@ export type TokenBalancesMap = Map<EChainId, TokenBalance>;
 export function useTokenBalances() {
   const { address } = useConnection();
   return useQuery({
+    enabled: !!address,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: ERefetchInterval.FAST,
     queryKey: ['token-balances', address],
     queryFn: async () => {
       const balances: TokenBalancesMap = new Map();
@@ -67,6 +71,5 @@ export function useTokenBalances() {
 
       return balances;
     },
-    enabled: !!address,
   });
 }

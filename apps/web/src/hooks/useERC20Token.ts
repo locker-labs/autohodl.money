@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { erc20Abi, formatUnits, parseUnits, type Address } from 'viem';
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { type EChainId, TokenDecimalMap, type TTokenAddress } from '@/lib/constants';
+import { type EChainId, ERefetchInterval, TokenDecimalMap, type TTokenAddress } from '@/lib/constants';
 import { roundOff } from '@/lib/math';
 import { useAppKitAccount } from '@reown/appkit/react';
 
@@ -137,7 +137,7 @@ export function useERC20BalanceOf(params: {
       enabled: params.enabled ?? Boolean(params.address && params.chainId),
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 5000,
+      refetchInterval: ERefetchInterval.FAST,
     },
   });
 

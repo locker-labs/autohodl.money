@@ -4,7 +4,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useConnection } from 'wagmi';
 import { chains } from '@/config';
-import type { EChainId } from '@/lib/constants';
+import { ERefetchInterval, type EChainId } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
@@ -12,9 +12,13 @@ import { roundOff } from '@/lib/math';
 export type LifetimeSavingsMap = Map<EChainId, number>;
 
 export function useLifetimeSavings() {
-  const { address, isConnected } = useConnection();
+  const { address } = useConnection();
 
   const { data, isLoading, error, isFetched, isFetching } = useQuery({
+    enabled: !!address,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: ERefetchInterval.FAST,
     queryKey: ['lifetime-savings', address],
     queryFn: async () => {
       const savingsMap: LifetimeSavingsMap = new Map();
@@ -55,10 +59,6 @@ export function useLifetimeSavings() {
 
       return savingsMap;
     },
-    enabled: isConnected && !!address,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchInterval: 5000,
   });
 
   return { data, isLoading, isFetched, isFetching, error, isReady: isFetched && !isLoading };

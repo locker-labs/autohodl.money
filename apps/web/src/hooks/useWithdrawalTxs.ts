@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useConnection } from 'wagmi';
 import { chains } from '@/config';
-import { SusdcAddressMap, type EChainId } from '@/lib/constants';
+import { ERefetchInterval, SusdcAddressMap, type EChainId } from '@/lib/constants';
 import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
 import { type Hex, parseUnits, zeroAddress } from 'viem';
 import { EAutoHodlTxType } from '@/enums';
@@ -10,9 +10,13 @@ import type { IWithdrawalTx } from '@/types/tx';
 import { sortByTimestampDesc } from '@/lib/helpers/sort';
 
 export function useWithdrawalTxs() {
-  const { address, isConnected } = useConnection();
+  const { address } = useConnection();
 
   const { data, isLoading, error, isFetched } = useQuery({
+    enabled: !!address,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: ERefetchInterval.FAST,
     queryKey: ['withdrawal-txs', address],
     queryFn: async () => {
       const allTransfers: IWithdrawalTx[] = [];
@@ -60,10 +64,6 @@ export function useWithdrawalTxs() {
 
       return allTransfers.sort(sortByTimestampDesc);
     },
-    enabled: isConnected && !!address,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchInterval: 5000, // 5 seconds
   });
 
   const allTxs = data || [];

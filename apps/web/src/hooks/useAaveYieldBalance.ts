@@ -2,7 +2,7 @@ import { formatUnits } from 'viem';
 import { useConnection, useReadContract } from 'wagmi';
 import { abi } from '@/abis/AaveUiPoolDataProvider';
 import { useAutoHodl } from '@/context/AutoHodlContext';
-import type { EChainId } from '@/lib/constants';
+import { ERefetchInterval, type EChainId } from '@/lib/constants';
 import {
   getAavePoolAddressesProviderByChain,
   getAaveUiPoolDataProviderByChain,
@@ -51,7 +51,7 @@ export const useAaveYieldBalance = () => {
       enabled: isConnected && !!userAddress,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 5000,
+      refetchInterval: ERefetchInterval.FAST,
     },
   });
 
