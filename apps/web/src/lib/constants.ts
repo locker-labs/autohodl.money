@@ -36,7 +36,7 @@ const ViemChainNameMap: Record<EChainId, string> = {
 };
 
 const ViemChainImageMap: Record<EChainId, string> = {
-  [EChainId.Base]: '/base-logo.jpeg',
+  [EChainId.Base]: '/base-logo.svg',
   [EChainId.Linea]: '/LineaLogomarkBlueBG.svg',
   [EChainId.Sepolia]: '/ethereum-eth.svg',
   [EChainId.ArcTestnet]: '/arc-logo.png',
