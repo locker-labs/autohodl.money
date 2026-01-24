@@ -11,11 +11,13 @@ function createPublicClientForChain(chainId: EChainId) {
   });
 }
 
+const baseClient = createPublicClientForChain(EChainId.Base);
 const arcTestnetClient = createPublicClientForChain(EChainId.ArcTestnet);
 const lineaClient = createPublicClientForChain(EChainId.Linea);
 const sepoliaClient = createPublicClientForChain(EChainId.Sepolia);
 
 export const ViemPublicClientMap: Record<EChainId, PublicClient> = {
+  [EChainId.Base]: baseClient,
   [EChainId.ArcTestnet]: arcTestnetClient,
   [EChainId.Linea]: lineaClient,
   [EChainId.Sepolia]: sepoliaClient,
