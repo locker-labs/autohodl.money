@@ -17,11 +17,13 @@ function createWalletClientForChain(chainId: EChainId) {
   });
 }
 
+const baseClient = createWalletClientForChain(EChainId.Base);
 const arcTestnetClient = createWalletClientForChain(EChainId.ArcTestnet);
 const lineaClient = createWalletClientForChain(EChainId.Linea);
 const sepoliaClient = createWalletClientForChain(EChainId.Sepolia);
 
 export const ViemWalletClientMap: Record<EChainId, WalletClient> = {
+  [EChainId.Base]: baseClient,
   [EChainId.ArcTestnet]: arcTestnetClient,
   [EChainId.Linea]: lineaClient,
   [EChainId.Sepolia]: sepoliaClient,

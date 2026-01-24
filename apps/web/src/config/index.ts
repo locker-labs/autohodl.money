@@ -1,16 +1,11 @@
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import {
   // defineChain,
+  base as baseAppKit,
   linea as lineaAppKit,
-  sepolia as sepoliaAppKit,
 } from '@reown/appkit/networks';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import {
-  // arcTestnet as arcTestnetViem,
-  type Chain,
-  linea,
-  sepolia,
-} from 'viem/chains';
+import { type Chain, base, linea } from 'viem/chains';
 import { secrets } from '@/lib/secrets';
 import { SavingsMode } from '@/types/autohodl';
 
@@ -27,8 +22,8 @@ import { SavingsMode } from '@/types/autohodl';
 // });
 
 // ['production', 'staging'].includes(secrets.env) ? linea : sepolia;
-export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [lineaAppKit, sepoliaAppKit];
-export const chains: Chain[] = [linea, sepolia];
+export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [baseAppKit, lineaAppKit];
+export const chains: Chain[] = [base, linea];
 
 // Get projectId from https://dashboard.reown.com
 export const projectId = secrets.reownProjectId;
