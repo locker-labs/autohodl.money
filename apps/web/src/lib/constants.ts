@@ -254,14 +254,6 @@ const AaveApyConfig = {
  * Moralis Streams constants
  */
 
-// Supported tokens to Moralis Stream ID map
-const TokenToTransferStreamIdMap: Record<TUsdcAddress, string> = {
-  [UsdcAddressMap[EChainId.Base]]: secrets.MoralisStreamIdEoaTransferBase,
-  [UsdcAddressMap[EChainId.ArcTestnet]]: secrets.MoralisStreamIdEoaTransferArcTestnet,
-  [UsdcAddressMap[EChainId.Sepolia]]: secrets.MoralisStreamIdEoaTransferSepolia,
-  [UsdcAddressMap[EChainId.Linea]]: secrets.MoralisStreamIdEoaTransferLinea,
-};
-
 enum EMoralisStreamId {
   EoaTransfer = 'EoaTransfer',
   MmcWithdrawal = 'MmcWithdrawal',
@@ -298,7 +290,6 @@ const chainIdToBlockExplorer: Record<EChainId, string> = {
  * App settings
  */
 
-export const verboseLogs = secrets.VerboseLogs;
 enum ERefetchInterval {
   FAST = 5000, // 5 seconds
   MEDIUM = 15000, // 15 seconds
@@ -318,7 +309,6 @@ export {
   USDC_ADDRESS_SET,
   UsdcAddressMap,
   TokenDecimalMap,
-  TokenToTransferStreamIdMap,
   TransferEventSig,
   SUSDC_ADDRESS_SET,
   SavingConfigSetEventSigHash,

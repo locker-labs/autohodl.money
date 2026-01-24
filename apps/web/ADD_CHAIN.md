@@ -67,11 +67,10 @@ Add entries to **all** of the following maps:
 | `AaveYieldTokenAddressMap` | Aave yield token (aToken) address |
 | `AaveApyConfig` | USDC address and Aave pool for APY calculations |
 
-### 1.7 Update Moralis Stream Maps
+### 1.7 Update Moralis Stream Map
 
 | Map | Description |
 |-----|-------------|
-| `TokenToTransferStreamIdMap` | Maps USDC address to Moralis stream ID |
 | `ChainToMoralisStreamIdMap` | Maps chain to `EoaTransfer` and `MmcWithdrawal` stream IDs |
 
 ### 1.8 Update Block Explorer

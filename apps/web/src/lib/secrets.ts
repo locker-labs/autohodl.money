@@ -4,7 +4,6 @@ export const secrets = {
   env: process.env.NEXT_PUBLIC_ENV || 'development',
   reownProjectId: process.env.NEXT_PUBLIC_PROJECT_ID || '',
   privateKeyExecutor: process.env.PRIVATE_KEY_EXECUTOR || '',
-  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || '',
   savingsFrom: process.env.SAVINGS_FROM_ADDRESS || '',
   alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || '',
   MoralisStreamIdEoaTransferArcTestnet: process.env.MORALIS_STREAM_ID_EOA_TRANSFER_ARC_TESTNET || '',
@@ -15,7 +14,6 @@ export const secrets = {
   MoralisStreamIdMmcWithdrawalBase: process.env.MORALIS_STREAM_ID_MMC_WITHDRAWAL_BASE || '',
   MoralisStreamIdMmcWithdrawalLinea: process.env.MORALIS_STREAM_ID_MMC_WITHDRAWAL_LINEA || '',
   MoralisStreamIdMmcWithdrawalSepolia: process.env.MORALIS_STREAM_ID_MMC_WITHDRAWAL_SEPOLIA || '',
-  VerboseLogs: process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' || false,
   rudderstackWriteKey: process.env.RUDDERSTACK_WRITE_KEY || '',
   rudderstackDataPlaneUrl: process.env.RUDDERSTACK_DATAPLANE_URL || '',
 };
