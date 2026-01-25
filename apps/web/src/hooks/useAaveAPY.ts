@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { linea, sepolia } from 'viem/chains';
-import { AaveV3Linea, AaveV3Sepolia } from '@bgd-labs/aave-address-book';
-import { chain } from '@/config';
-import { viemPublicClient } from '@/lib/clients/client';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { AaveApyConfig, ERefetchInterval } from '@/lib/constants';
+import { getViemPublicClientByChain } from '@/lib/helpers';
 
 // Simple Pool ABI for getting reserve data
 const simplePoolAbi = [
@@ -37,22 +36,23 @@ const simplePoolAbi = [
   },
 ] as const;
 
-// Chain configurations
-const CHAIN_CONFIGS = {
-  [linea.id]: {
-    usdcAddress: AaveV3Linea.ASSETS.USDC.UNDERLYING,
-    aavePoolAddress: AaveV3Linea.POOL,
-  },
-  [sepolia.id]: {
-    usdcAddress: AaveV3Sepolia.ASSETS.USDC.UNDERLYING,
-    aavePoolAddress: AaveV3Sepolia.POOL,
-  },
-} as const;
-
 export function useAaveAPY() {
+  const { savingsChainId } = useAutoHodl();
+
   async function fetchAaveAPY() {
     try {
-      const config = CHAIN_CONFIGS[chain.id];
+      if (!savingsChainId) {
+        console.error('No savings chain ID found');
+        return;
+      }
+
+      const viemPublicClient = getViemPublicClientByChain(savingsChainId);
+
+      const config = AaveApyConfig[savingsChainId as keyof typeof AaveApyConfig];
+      if (!config) {
+        console.error('No config found for chain ID', savingsChainId);
+        return;
+      }
 
       // Call getReserveData directly on the Pool contract for USDC
       const reserveData = await viemPublicClient.readContract({
@@ -78,11 +78,11 @@ export function useAaveAPY() {
   }
 
   return useQuery({
-    queryKey: ['aave-apy', chain.id],
-    queryFn: fetchAaveAPY,
-    enabled: true,
+    enabled: !!savingsChainId,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    refetchInterval: 15000, // 15 seconds
+    refetchInterval: ERefetchInterval.SLOW,
+    queryKey: ['aave-apy', savingsChainId],
+    queryFn: fetchAaveAPY,
   });
 }

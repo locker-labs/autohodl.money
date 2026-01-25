@@ -14,7 +14,7 @@ type Props = {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
-  btnStyle?: 'primary' | 'secondary';
+  btnStyle?: 'primary' | 'secondary' | 'primary-compact' | 'secondary-compact';
 };
 
 export default function Button({
@@ -29,17 +29,23 @@ export default function Button({
 }: Props) {
   let classes = '';
 
-  if (btnStyle === 'primary') {
-    classes = 'bg-[#78E76E] active:bg-gray-200/10';
-  } else if (btnStyle === 'secondary') {
-    classes = 'border border-[#78E76E] active:bg-gray-200/10';
+  const btnStyles = btnStyle.split('-');
+
+  if (btnStyles.includes('primary')) {
+    classes += ' bg-[#78E76E] active:bg-gray-200/10';
+  }
+  if (btnStyles.includes('secondary')) {
+    classes += ' border border-[#78E76E] active:bg-gray-200/10';
+  }
+  if (btnStyles.includes('compact')) {
+    classes += ' w-[124px] h-[38px] rounded-[8px] font-bold';
   }
 
   return (
     <button
       type={type}
       onClick={onAction}
-      disabled={disabled}
+      disabled={disabled || loading}
       aria-disabled={disabled}
       className={[
         'active:scale-97',

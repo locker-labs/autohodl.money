@@ -1,50 +1,92 @@
-import { Lock } from 'lucide-react';
+import { Lock, ChevronDown, Check } from 'lucide-react';
 import type React from 'react';
+import { useState } from 'react';
 import ActiveSwitch from '@/components/subcomponents/ActiveSwitch';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
 import SavingsModeSelector from '@/components/subcomponents/SavingsModeSelector';
 import { WithdrawSavings } from '@/components/subcomponents/WithdrawSavings';
 import YieldSwitch from '@/components/subcomponents/YieldSwitch';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useAaveAPY } from '@/hooks/useAaveAPY';
-import { SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { SupportedAccounts, TokenTickerMap } from '@/lib/constants';
 import { formatAddress } from '@/lib/string';
-import { useAccount } from 'wagmi';
-import { CopyContentButton } from '../feature/CopyContentButton';
-import { PriceSkeleton } from './PriceSkeleton';
+import { useConnection } from 'wagmi';
+import { CopyContentButton } from '@/components/feature/CopyContentButton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { useERC20BalanceOf } from '@/hooks/useERC20Token';
 import Image from 'next/image';
-import SavingsLimit from './SavingsLimit';
+import SavingsLimit from '@/components/subcomponents/SavingsLimit';
 import { formatAmount } from '@/lib/math';
+import { getUsdcAddressByChain } from '@/lib/helpers';
+import { ChainSelector } from '@/components/feature/ChainSelector';
+
+enum SectionId {
+  AccountDetails = 'account-details',
+  RoundupSettings = 'roundup-settings',
+  AdvancedOptions = 'advanced-options',
+}
+
+const sections: { id: SectionId; label: string }[] = [
+  { id: SectionId.AccountDetails, label: 'Account Details' },
+  { id: SectionId.RoundupSettings, label: 'Round-up Settings' },
+  // { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
+];
 
 export function Controls(): React.JSX.Element {
-  const title = `Controls`;
+  const [selectedSection, setSelectedSection] = useState<SectionId>(SectionId.AccountDetails);
+
+  const currentSection = sections.find((s) => s.id === selectedSection);
 
   return (
-    <Card className='w-full m-0 p-5 h-full'>
+    <Card className={`w-full m-0 py-5 pl-5 pr-2.5 h-full lg:min-h-[600px] lg:h-[600px] lg:max-h-[600px]`}>
       <CardContent className='m-0 p-0'>
-        <div>
-          <h2 className='font-medium text-black text-2xl'>{title}</h2>
+        <div className='pr-2.5'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type='button'
+                className='group flex items-center gap-2 font-medium text-black text-2xl hover:bg-gray-100 rounded-md cursor-pointer outline-none'
+              >
+                <span>{currentSection?.label}</span>
+                <ChevronDown className='w-5 h-5 group-hover:text-[#0a0a0a] text-[#6b6b6b] transition-colors' />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='start' className='w-56'>
+              {sections.map((section) => (
+                <DropdownMenuItem
+                  key={section.id}
+                  onClick={() => setSelectedSection(section.id)}
+                  className='flex items-center justify-between cursor-pointer'
+                >
+                  <span>{section.label}</span>
+                  {selectedSection === section.id && <Check className='w-4 h-4 text-green-600' />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        {/* <div className='mt-4'>
-          <p className='mt-2 text-[#4D4A4A] text-sm'>
-            Each purchase rounds up to the nearest $
-            {formatUnits(BigInt(config?.roundUp || 0), TokenDecimalMap[USDC_ADDRESS])}
-          </p>
-        </div> */}
         <div className='mt-4'>
-          <ControlsMobile />
+          <ControlsInner selectedSection={selectedSection} />
         </div>
       </CardContent>
     </Card>
   );
 }
 
-export function ControlsMobile(): React.JSX.Element {
-  const { address: userAddress } = useAccount();
-  const { accounts, config, token } = useAutoHodl();
+interface ControlsInnerProps {
+  selectedSection: SectionId;
+}
+
+export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JSX.Element {
+  const { address: userAddress } = useConnection();
+  const { accounts, config, token, savingsChainId } = useAutoHodl();
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
   const hasMetaMaskCard: boolean = accounts.some((acc) => acc === SupportedAccounts.MetaMask);
 
@@ -67,19 +109,36 @@ export function ControlsMobile(): React.JSX.Element {
       };
 
   const savingsAddressToken = useERC20BalanceOf({
-    token: USDC_ADDRESS,
+    token: getUsdcAddressByChain(savingsChainId),
+    chainId: savingsChainId,
     address: config?.savingAddress,
     enabled: !!config?.savingAddress && !config?.toYield,
   });
 
   return (
-    <div>
-      <Accordion type='multiple' defaultValue={['account-details']}>
-        <AccordionItem value='account-details' className='border-b-0'>
-          <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>Account Details</AccordionTrigger>
-          <AccordionContent className='mt-4 px-6 py-4 border border-gray-300 rounded-lg'>
+    <div className='group/container'>
+      <div
+        className={`lg:min-h-[454px] lg:h-[454px] lg:max-h-[454px] 
+        overflow-y-scroll 
+        scrollbar-thin 
+        scrollbar-track-transparent 
+        scrollbar-thumb-transparent 
+        scrollbar-thumb-rounded-full 
+        scrollbar-hover:scrollbar-thumb-[#AAAAAA] 
+        group-hover/container:scrollbar-thumb-[#BBBBBB] 
+        group-hover/container:scrollbar-track-transparent
+        pr-[6px]
+        `}
+      >
+        {/* Account Details Section */}
+        {selectedSection === SectionId.AccountDetails && (
+          <div>
+            <div className=''>
+              <ActiveSwitch />
+            </div>
+
             {/* Source of Funds */}
-            <div className='w-full'>
+            <div className='mt-4 w-full'>
               <p className='text-sm font-medium'>Source of Funds</p>
 
               <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
@@ -95,12 +154,14 @@ export function ControlsMobile(): React.JSX.Element {
                   </div>
                 </div>
 
-                <div className='flex flex-wrap items-center justify-end gap-1 px-3'>
+                <div className='flex flex-wrap items-center justify-end gap-1'>
                   <p>Balance: </p>
                   {!token.isReady ? (
                     <PriceSkeleton />
                   ) : (
-                    <p className='whitespace-nowrap'>{formatAmount(token.balanceFormatted, '')} USDC</p>
+                    <p className='whitespace-nowrap'>
+                      {formatAmount(token.balanceFormatted, '')} {TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}
+                    </p>
                   )}
                 </div>
               </div>
@@ -155,14 +216,24 @@ export function ControlsMobile(): React.JSX.Element {
                 )}
               </div>
             </div>
-          </AccordionContent>
-        </AccordionItem>
 
-        <AccordionItem value='roundup-config' className='border-b-0'>
-          <AccordionTrigger className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
-            Round-up Settings
-          </AccordionTrigger>
-          <AccordionContent className='mt-4 px-6 py-4 border border-gray-300 rounded-lg'>
+            <div className='mt-4'>
+              <SavingsLimit />
+            </div>
+
+            {/* Savings Chain */}
+            <div className='mt-4'>
+              <div className='w-full flex items-center justify-between gap-2 my-1'>
+                <p className='text-sm font-medium'>Savings Chain</p>
+                <ChainSelector />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Round-up Settings Section */}
+        {selectedSection === SectionId.RoundupSettings && (
+          <div>
             <div className='mt-1'>
               <RoundupAmountSelector />
             </div>
@@ -174,14 +245,12 @@ export function ControlsMobile(): React.JSX.Element {
             <div className='mt-4 mb-1'>
               <YieldSwitch />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        )}
 
-        <AccordionItem value='advanced-options'>
-          <AccordionTrigger className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
-            Advanced Options
-          </AccordionTrigger>
-          <AccordionContent className='mt-4 px-6 py-4 border border-gray-300 rounded-lg'>
+        {/* Advanced Options Section */}
+        {selectedSection === SectionId.AdvancedOptions && (
+          <div>
             <div className='mt-1'>
               <ActiveSwitch />
             </div>
@@ -189,10 +258,10 @@ export function ControlsMobile(): React.JSX.Element {
             <div className='mt-2'>
               <SavingsLimit />
             </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      <div className='mt-4'>
+          </div>
+        )}
+      </div>
+      <div className='mt-4 mr-2.5'>
         <WithdrawSavings />
       </div>
     </div>

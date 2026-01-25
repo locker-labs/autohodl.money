@@ -1,16 +1,19 @@
-import { useAccount, useReadContract } from 'wagmi';
 import { formatUnits } from 'viem';
+import { useConnection, useReadContract } from 'wagmi';
 import { abi } from '@/abis/AaveUiPoolDataProvider';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { ERefetchInterval, type EChainId } from '@/lib/constants';
 import {
-  AAVE_POOL_ADDRESSES_PROVIDER,
-  AAVE_UI_POOL_DATA_PROVIDER,
-  TOKEN_ADDRESS,
-  TOKEN_DECIMALS,
-} from '@/lib/constants';
-import { chain } from '@/config';
+  getAavePoolAddressesProviderByChain,
+  getAaveUiPoolDataProviderByChain,
+  getTokenDecimalsByAddress,
+  getUsdcAddressByChain,
+} from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
 
-const chainId = chain.id;
+// Right now this component returns the aave yield balance of the user on a single chain
+// TODO: make it work for multiple chains
+// For now, we will use the savings chain id to get the yield balance
 
 type TUserReserveDataObject = {
   underlyingAsset: string;
@@ -26,7 +29,10 @@ export interface IUserReserveData {
 
 // uses env configured chain id
 export const useAaveYieldBalance = () => {
-  const { isConnected, address: userAddress } = useAccount();
+  const { isConnected, address: userAddress } = useConnection();
+  const { savingsChainId } = useAutoHodl();
+
+  const usdc = getUsdcAddressByChain(savingsChainId);
 
   const {
     data: raw,
@@ -37,15 +43,15 @@ export const useAaveYieldBalance = () => {
     isLoadingError,
   } = useReadContract({
     abi,
-    address: AAVE_UI_POOL_DATA_PROVIDER,
+    address: getAaveUiPoolDataProviderByChain(savingsChainId),
     functionName: 'getUserReservesData',
-    args: [AAVE_POOL_ADDRESSES_PROVIDER, userAddress],
-    chainId,
+    args: [getAavePoolAddressesProviderByChain(savingsChainId), userAddress],
+    chainId: savingsChainId as EChainId,
     query: {
       enabled: isConnected && !!userAddress,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchInterval: 5000,
+      refetchInterval: ERefetchInterval.FAST,
     },
   });
 
@@ -54,11 +60,14 @@ export const useAaveYieldBalance = () => {
   if (raw) {
     const data = raw as IUserReserveData;
 
-    const tokenData = data[0].filter((reserve: TUserReserveDataObject) => reserve.underlyingAsset === TOKEN_ADDRESS);
+    const tokenData = data[0].filter((reserve: TUserReserveDataObject) => reserve.underlyingAsset === usdc);
 
     const balance = tokenData[0].scaledATokenBalance;
 
-    balanceData = { balance, balanceFormatted: roundOff(formatUnits(balance, TOKEN_DECIMALS), 2) };
+    balanceData = {
+      balance,
+      balanceFormatted: roundOff(formatUnits(balance, getTokenDecimalsByAddress(usdc)), 2),
+    };
   }
 
   return {

@@ -46,4 +46,4 @@ export function parseSavingsConfig(arr: SavingsConfigArray | Readonly<SavingsCon
   };
 }
 
-export type SourceTxInfo = { sourceTxHash: Hex; purchaseAmount: bigint };
+export type SourceTxInfo = { sourceTxHash: Hex; purchaseAmount: bigint; sourceChainId: number };

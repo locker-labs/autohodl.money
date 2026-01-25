@@ -1,12 +1,9 @@
-import type React from 'react';
-import { SavingsInfoCards } from '@/components/feature/SavingsInfoCards';
-import { Controls, ControlsMobile } from '@/components/subcomponents/Controls';
-import { RecentActivity } from '@/components/subcomponents/RecentActivity';
-import useIsMobile from '@/hooks/useIsMobile';
 import Loading from '@/app/loading';
+import { Controls, RecentActivity, SavingsInfoCards } from '@/components/dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import useIsMobile from '@/hooks/useIsMobile';
 
-const Dashboard = (): React.JSX.Element => {
+const Dashboard = () => {
   const { isMobile, isLoading } = useIsMobile();
 
   if (isLoading) return <Loading />;
@@ -41,7 +38,7 @@ const Dashboard = (): React.JSX.Element => {
             <div className='w-full gap-5 grid lg:grid-cols-12'>
               {/* 5 - Controls Card */}
               <div className='w-full lg:col-span-6'>
-                <ControlsMobile />
+                <Controls />
               </div>
             </div>
           </div>

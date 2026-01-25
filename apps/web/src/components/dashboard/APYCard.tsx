@@ -1,28 +1,27 @@
 import { TrendingUp } from 'lucide-react';
-import { PriceSkeleton } from '@/components/subcomponents/PriceSkeleton';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { useAaveAPY } from '@/hooks/useAaveAPY';
 
-export function APYCard({
-  loading,
-  value,
-  showWarning = false,
-}: {
-  loading: boolean;
-  value: string | undefined;
-  showWarning?: boolean;
-}) {
+export function APYCard() {
+  const { config } = useAutoHodl();
+  const { data: apy, isLoading: loading } = useAaveAPY();
+
+  const showWarning = (!!config && !config.toYield) || false;
+
   return (
     <Card
-      className={`flex items-center justify-start rounded-xl border 
+      className={`py-4 px-5 flex items-center justify-start rounded-xl border 
     ${showWarning ? 'border-red-500' : 'border-app-green'}`}
     >
       <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
         {/* Icon */}
         <TrendingUp
-          className={`min-w-10 min-h-10
+          className={`min-w-6 min-h-6
           ${showWarning ? 'text-red-500' : 'text-[#1CB01C]'}`}
-          size={40}
+          size={24}
           strokeWidth={1}
           // color='#1CB01C'
         />
@@ -31,7 +30,7 @@ export function APYCard({
             <div
               className={`leading-none font-bold ${showWarning ? 'text-red-500' : 'text-[#78E76E]'} text-2xl text-left sm:text-center md:text-left`}
             >
-              {loading ? <PriceSkeleton /> : <p>{value ? `${value}%` : '-'}</p>}
+              {loading ? <PriceSkeleton /> : <p>{apy ? `${apy}%` : '-'}</p>}
             </div>
           </div>
 
@@ -45,7 +44,7 @@ export function APYCard({
               </p>
             </div>
           ) : (
-            <div className='mt-2 flex items-center justify-start gap-2'>
+            <div className='mt-1 flex items-center justify-start gap-2'>
               <p className='text-black text-lg text-left sm:text-center md:text-left'>Current APY</p>
               <AdaptiveInfoTooltip content={'Yield is based on the current APY of the Aave pool.'} />
             </div>

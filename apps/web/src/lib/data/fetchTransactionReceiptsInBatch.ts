@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ALCHEMY_API_URL } from '@/lib/constants';
+import { AlchemyApiUrlMap, type EChainId } from '@/lib/constants';
 import type { ITransactionReceipt } from '@/types/alchemy';
 import type { IJsonRpcRequest, IJsonRpcResponse } from '@/types/json-rpc';
 
@@ -8,7 +8,10 @@ import type { IJsonRpcRequest, IJsonRpcResponse } from '@/types/json-rpc';
  * @param transactionHashes - An array of transaction hashes to fetch receipts for.
  * @returns A promise that resolves to an array of transaction receipts.
  */
-export async function fetchTransactionReceiptsInBatch(transactionHashes: string[]): Promise<ITransactionReceipt[]> {
+export async function fetchTransactionReceiptsInBatch(
+  transactionHashes: string[],
+  chainId: EChainId,
+): Promise<ITransactionReceipt[]> {
   const requests: IJsonRpcRequest[] = transactionHashes.map((hash, index) => ({
     jsonrpc: '2.0',
     method: 'eth_getTransactionReceipt',
@@ -17,7 +20,7 @@ export async function fetchTransactionReceiptsInBatch(transactionHashes: string[
   }));
 
   try {
-    const { data } = await axios.post<IJsonRpcResponse<ITransactionReceipt>[]>(ALCHEMY_API_URL, requests, {
+    const { data } = await axios.post<IJsonRpcResponse<ITransactionReceipt>[]>(AlchemyApiUrlMap[chainId], requests, {
       headers: {
         'Content-Type': 'application/json',
       },

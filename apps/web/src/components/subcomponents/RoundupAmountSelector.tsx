@@ -1,28 +1,26 @@
 import useCreateConfig from '@/hooks/useCreateConfig';
-import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
+import { TokenDecimalMap } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
 import { formatUnits, parseUnits } from 'viem';
 import { LoaderSecondary } from '@/components/ui/loader';
-
-const savingOptions = [
-  { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
-  { label: '$10', value: 10, purchase: '$35', savings: '$5' },
-  { label: '$100', value: 100, purchase: '$850', savings: '$50' },
-];
+import { savingOptions } from '@/config';
+import { getUsdcAddressByChain } from '@/lib/helpers';
 
 const RoundupAmountSelector = () => {
   const [roundUpLocal, setRoundUpLocal] = useState(savingOptions[0].value);
-  const { config, setConfig } = useAutoHodl();
+  const { config, setConfig, savingsChainId } = useAutoHodl();
   //   TODO: add error toast
   const { createConfig } = useCreateConfig();
+
+  const USDC_ADDRESS = getUsdcAddressByChain(savingsChainId);
 
   const roundUp = Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS]));
   const isPending = roundUp !== roundUpLocal;
 
   useEffect(() => {
     async function iife() {
-      if (!config?.savingAddress || !config?.roundUp) return;
+      if (!config?.savingAddress || !config?.roundUp || !savingsChainId) return;
 
       if (roundUp !== roundUpLocal) {
         try {
@@ -32,6 +30,7 @@ const RoundupAmountSelector = () => {
             mode: config.mode,
             active: config.active,
             toYield: config.toYield,
+            savingsChainId: savingsChainId,
           });
           setConfig((prev) =>
             prev ? { ...prev, roundUp: parseUnits(roundUpLocal.toString(), TokenDecimalMap[USDC_ADDRESS]) } : prev,

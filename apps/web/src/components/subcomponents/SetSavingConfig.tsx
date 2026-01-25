@@ -1,27 +1,25 @@
 import { useEffect, useState } from 'react';
-import { SupportedAccounts } from '@/lib/constants';
+import { type EChainId, SupportedAccounts, TokenTickerMap } from '@/lib/constants';
 import Button from './Button';
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { isAddress, type Address } from 'viem';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
-import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
-import { toastCustom } from '../ui/toast';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { SavingsMode } from '@/types/autohodl';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import ChainSelector from './ChainSelector';
+import { useConnection } from 'wagmi';
+import { getSavingsModes, savingOptions, yieldOptions } from '@/config';
+import { getAutoHodlAddressByChain, getUsdcAddressByChain } from '@/lib/helpers';
+import { toastCustom } from '@/components/ui/toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
-const savingOptions = [
-  { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
-  { label: '$10', value: 10, purchase: '$35', savings: '$5' },
-  { label: '$100', value: 100, purchase: '$850', savings: '$50' },
-];
-
 export default function SetSavingConfig() {
-  const { address, accounts } = useAutoHodl();
+  const { address, accountsMap } = useAutoHodl();
+
   const [mode, setMode] = useState<SavingsMode>(SavingsMode.All);
   const [roundUp, setRoundUp] = useState(savingOptions[0].value);
   const [toYield, setToYield] = useState(true);
@@ -29,48 +27,23 @@ export default function SetSavingConfig() {
   const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
   const [isApprovalNeeded, setIsApprovalNeeded] = useState<boolean | null>(null);
 
+  const { chain } = useConnection();
+
+  const savingsChainId = chain?.id as EChainId;
+  const accounts = accountsMap?.get(savingsChainId) || [];
+
+  const [autohodl, usdc] = [getAutoHodlAddressByChain(savingsChainId), getUsdcAddressByChain(savingsChainId)];
+
   const hasMetaMaskCard = accounts.includes(SupportedAccounts.MetaMask);
-
-  const savingsModes = [
-    {
-      label: 'MetaMask Card only',
-      value: SavingsMode.MetamaskCard,
-      disabled: !hasMetaMaskCard,
-      imgSrc: '/mmc.webp',
-      info: 'Only save your spare change when you use your MetaMask Card.',
-    },
-    {
-      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
-      value: SavingsMode.All,
-      disabled: false,
-      imgSrc: '/USDCToken.svg',
-      info: `Save your spare change, anytime you transfer USDC, regardless of its with the MetaMask Card or not.`,
-      imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
-    },
-  ];
-
-  const yieldOptions = [
-    {
-      label: 'Earn yield',
-      value: true,
-      imgSrc: '/grow.svg',
-      info: 'The change you save will be deposited to Aave and automatically earn yield',
-    },
-    {
-      label: 'Idle savings',
-      value: false,
-      disabled: false,
-      imgSrc: '/save.png',
-      info: `The change you save will be deposited into an account of your choice but won't earn any yield`,
-    },
-  ];
+  const savingsModes = getSavingsModes(hasMetaMaskCard);
 
   const { trackAllowanceSetEvent } = useAnalytics();
 
   const { allowanceFormatted } = useErc20Allowance({
-    owner: address as Address,
-    token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS,
+    chainId: savingsChainId,
+    owner: address,
+    token: usdc,
+    spender: autohodl,
   });
 
   const {
@@ -79,8 +52,9 @@ export default function SetSavingConfig() {
     isConfirming: isConfirmingAllowance,
     isConfirmed,
   } = useERC20Approve({
-    token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS,
+    chainId: savingsChainId,
+    token: usdc,
+    spender: autohodl,
     amount: savingsCap ?? 0,
   });
 
@@ -116,6 +90,7 @@ export default function SetSavingConfig() {
       toYield,
       mode,
       active: true,
+      savingsChainId,
     });
   };
 
@@ -142,6 +117,8 @@ export default function SetSavingConfig() {
     };
     continuteSetupIfApproved();
   }, [isConfirmed]);
+
+  if (!chain) return null;
 
   const title = `Setup Round-Up Savings`;
 
@@ -181,7 +158,6 @@ export default function SetSavingConfig() {
               ))}
             </div>
           </div>
-
           {/* Mode */}
           <div className='flex flex-col gap-1'>
             <label htmlFor={String(roundUp)} className='text-sm font-medium text-black'>
@@ -241,7 +217,6 @@ export default function SetSavingConfig() {
               </div>
             )}
           </div>
-
           {/* Yield */}
           <div className='flex flex-col gap-1'>
             <label htmlFor={String(roundUp)} className='text-sm font-medium text-black'>
@@ -283,7 +258,6 @@ export default function SetSavingConfig() {
               ))}
             </div>
           </div>
-
           {/* Savings Address Input */}
           <AnimatePresence>
             {!toYield && (
@@ -313,17 +287,23 @@ export default function SetSavingConfig() {
             )}
           </AnimatePresence>
 
+          {/* Select savings chain */}
+          <div className='mt-2 w-full flex items-center justify-between gap-4'>
+            <div className='text-sm font-semibold'>Choose your savings chain:</div>
+            <ChainSelector defaultChainId={chain.id} />
+          </div>
+
           {/* Advanced Options */}
           <Accordion className='mt-2' type='single' collapsible>
             <AccordionItem value='item-1'>
               <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>
                 Advanced Options
               </AccordionTrigger>
-              <AccordionContent className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
+              <AccordionContent>
                 {/* Savings limit input */}
                 <div className='flex flex-col gap-2'>
                   <label htmlFor={'savingsCap'} className='text-sm font-medium text-black'>
-                    Savings limit (USDC)
+                    Savings Limit ({TokenTickerMap[getUsdcAddressByChain(savingsChainId)]})
                   </label>
                   <input
                     id={'savingsCap'}
