@@ -16,10 +16,20 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react';
 export type ChainSwitchFlow = 'has-config' | 'no-config';
 
 export type ChainSwitchState = {
-  step: 'idle' | 'checking' | 'confirming' | 'deactivating' | 'switching' | 'activating' | 'complete' | 'error';
+  step:
+    | 'idle'
+    | 'checking'
+    | 'confirming'
+    | 'deactivating'
+    | 'switching'
+    | 'approving'
+    | 'activating'
+    | 'complete'
+    | 'error';
   error: string | null;
   targetChainId: EChainId | null;
   flow: ChainSwitchFlow | null;
+  needsAllowanceApproval?: boolean;
 };
 
 interface ChainSwitchModalProps {
@@ -42,13 +52,14 @@ export function ChainSwitchModal({
   onCancel,
 }: ChainSwitchModalProps) {
   const targetChainName = targetChainId ? ViemChainNameMap[targetChainId] : null;
-  const isExecuting = ['deactivating', 'switching', 'activating'].includes(state.step);
+  const isExecuting = ['deactivating', 'switching', 'approving', 'activating'].includes(state.step);
   const isComplete = state.step === 'complete';
   const isError = state.step === 'error';
+  const needsAllowanceApproval = state.needsAllowanceApproval ?? false;
 
-  const getStepStatus = (step: 'deactivating' | 'switching' | 'activating') => {
+  const getStepStatus = (step: 'deactivating' | 'switching' | 'approving' | 'activating') => {
     if (state.step === step) return 'current';
-    const stepOrder = ['deactivating', 'switching', 'activating'];
+    const stepOrder = ['deactivating', 'switching', 'approving', 'activating'];
     const currentIndex = stepOrder.indexOf(state.step);
     const stepIndex = stepOrder.indexOf(step);
     if (currentIndex > stepIndex) return 'complete';
@@ -87,6 +98,7 @@ export function ChainSwitchModal({
                 <ol className='text-sm text-app-green-dark/80 space-y-1 ml-4 list-decimal'>
                   <li>Mark current savings chain&apos;s config as inactive</li>
                   <li>Switch to {targetChainName}</li>
+                  <li>Approve USDC spending allowance (if needed)</li>
                   <li>
                     {flow === 'has-config'
                       ? `Mark the ${targetChainName} config as active`
@@ -128,6 +140,18 @@ export function ChainSwitchModal({
                     )}
                     <p className='text-sm'>Switching to {targetChainName}</p>
                   </div>
+                  {needsAllowanceApproval && (
+                    <div className='flex items-center gap-3'>
+                      {getStepStatus('approving') === 'complete' ? (
+                        <CheckCircle2 className='w-5 h-5 text-green-600' />
+                      ) : getStepStatus('approving') === 'current' ? (
+                        <LoaderSecondary />
+                      ) : (
+                        <div className='w-5 h-5 rounded-full border-2 border-gray-300' />
+                      )}
+                      <p className='text-sm'>Approving USDC allowance</p>
+                    </div>
+                  )}
                   <div className='flex items-center gap-3'>
                     {getStepStatus('activating') === 'complete' ? (
                       <CheckCircle2 className='w-5 h-5 text-green-600' />

@@ -2,14 +2,15 @@
 'use client';
 
 import { createContext, useContext, useState, type FC, type ReactNode } from 'react';
-import { useConnection } from 'wagmi';
-import { formatUnits, parseUnits, zeroAddress } from 'viem';
+import { useConnection, useWalletClient } from 'wagmi';
+import { erc20Abi, formatUnits, parseUnits, zeroAddress } from 'viem';
 import { switchChain } from '@wagmi/core';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import useCreateConfig from '@/hooks/useCreateConfig';
-import { TokenDecimalMap, type EChainId } from '@/lib/constants';
+import { TokenDecimalMap, ViemChainMap, type EChainId } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
-import { getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
+import { getAutoHodlAddressByChain, getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
+import { fetchAllowance } from '@/lib/erc20/allowance';
 import { toastCustom } from '@/components/ui/toast';
 import type { SavingsConfig } from '@/types/autohodl';
 import { config as wagmiConfig } from '@/config';
@@ -51,6 +52,7 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
   const { address, isConnected } = useConnection();
   const { config, setConfig, savingsChainId, setRefetchFlag } = useAutoHodl();
   const { createConfig } = useCreateConfig();
+  const { data: walletClient } = useWalletClient();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [state, setState] = useState<ChainSwitchState>({
@@ -58,6 +60,7 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
     error: null,
     targetChainId: null,
     flow: null,
+    needsAllowanceApproval: false,
   });
 
   const resetState = () => {
@@ -66,6 +69,7 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
       error: null,
       targetChainId: null,
       flow: null,
+      needsAllowanceApproval: false,
     });
   };
 
@@ -104,18 +108,37 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
       return null;
     }
 
-    setState({ step: 'checking', error: null, targetChainId, flow: null });
+    setState((prev) => ({ ...prev, step: 'checking', error: null, targetChainId, flow: null }));
 
     try {
       const { exists } = await checkConfigExists(targetChainId);
       const flow: ChainSwitchFlow = exists ? 'has-config' : 'no-config';
 
-      setState({ step: 'confirming', error: null, targetChainId, flow });
+      // Step 0: Check and add USDC allowance on destination chain if zero
+      const targetUsdc = getUsdcAddressByChain(targetChainId);
+      const targetAutohodl = getAutoHodlAddressByChain(targetChainId);
+      const targetViemPublicClient = getViemPublicClientByChain(targetChainId);
+
+      const currentAllowance = await fetchAllowance({
+        publicClient: targetViemPublicClient,
+        tokenAddress: targetUsdc,
+        owner: address,
+        spender: targetAutohodl,
+      });
+
+      if (currentAllowance === BigInt(0)) {
+        setState((prev) => ({ ...prev, needsAllowanceApproval: true }));
+        if (!walletClient) {
+          throw new Error('Wallet client not initialized');
+        }
+      }
+
+      setState((prev) => ({ ...prev, step: 'confirming', error: null, targetChainId, flow }));
       return flow;
     } catch (error) {
       const toastErrMsg = error instanceof Error ? error.message?.split('.')[0] : 'Failed to switch chain';
       const errMsg = error instanceof Error ? error.message : 'Failed to check target chain config';
-      setState({ step: 'error', error: errMsg, targetChainId, flow: null });
+      setState((prev) => ({ ...prev, step: 'error', error: errMsg, targetChainId, flow: null }));
       toastCustom(toastErrMsg);
       return null;
     }
@@ -136,7 +159,7 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
       await switchChain(wagmiConfig, { chainId: savingsChainId });
 
       // Step 1: Mark current config as inactive
-      setState({ step: 'deactivating', error: null, targetChainId, flow });
+      setState((prev) => ({ ...prev, step: 'deactivating', error: null, targetChainId, flow }));
       if (config.active) {
         await createConfig({
           active: false,
@@ -149,12 +172,39 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
       }
 
       // Step 2: Switch to the new chain
-      setState({ step: 'switching', error: null, targetChainId, flow });
+      setState((prev) => ({ ...prev, step: 'switching', error: null, targetChainId, flow }));
       await switchChain(wagmiConfig, { chainId: targetChainId });
       //   console.log('switchChain result', res);
 
+      // Step 2.5: Check and add USDC allowance on destination chain if zero
+
+      if (state.needsAllowanceApproval) {
+        // Set state to show approving step
+        setState((prev) => ({
+          ...prev,
+          step: 'approving',
+          error: null,
+        }));
+
+        const targetUsdc = getUsdcAddressByChain(targetChainId);
+        const targetAutohodl = getAutoHodlAddressByChain(targetChainId);
+        const targetViemPublicClient = getViemPublicClientByChain(targetChainId);
+
+        // Approve 100 USDC
+        const approveAmount = parseUnits('100', TokenDecimalMap[targetUsdc]);
+        const approveTx = await walletClient.writeContract({
+          chain: ViemChainMap[targetChainId],
+          address: targetUsdc,
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [targetAutohodl, approveAmount],
+        });
+        await targetViemPublicClient.waitForTransactionReceipt({ hash: approveTx, confirmations: 1 });
+        setState((prev) => ({ ...prev, error: null, needsAllowanceApproval: false }));
+      }
+
       // Step 3: Activate or create config on new chain
-      setState({ step: 'activating', error: null, targetChainId, flow });
+      setState((prev) => ({ ...prev, step: 'activating', error: null, targetChainId, flow }));
 
       if (flow === 'has-config') {
         // Mark existing config as active
@@ -207,13 +257,12 @@ export const ChainSwitchProvider: FC<Props> = ({ children }) => {
         );
       }
 
-      setState({ step: 'complete', error: null, targetChainId, flow });
+      setState((prev) => ({ ...prev, step: 'complete', error: null, targetChainId, flow }));
       setRefetchFlag((flag) => !flag);
-      toastCustom('Successfully switched savings chain!');
     } catch (error) {
       const toastErrMsg = error instanceof Error ? error.message?.split('.')[0] : 'Failed to switch chain';
       const errMsg = error instanceof Error ? error.message : 'Failed to switch chain';
-      setState({ step: 'error', error: errMsg, targetChainId, flow });
+      setState((prev) => ({ ...prev, step: 'error', error: errMsg, targetChainId, flow }));
       toastCustom(toastErrMsg);
     }
   };

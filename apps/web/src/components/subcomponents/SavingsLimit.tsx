@@ -102,7 +102,7 @@ const SavingsLimit = () => {
               className='rounded-lg w-full'
               title={'Add token allowance'}
               onAction={handleApprove}
-              disabled={!savingsCap}
+              disabled={savingsCap === null}
               loading={isConfirmingAllowance || isPending}
             >
               {isConfirmingAllowance ? 'Confirming' : isPending ? 'Processing' : 'Set limit'}
