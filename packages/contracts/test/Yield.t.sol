@@ -10,9 +10,11 @@ import {AAVEAdapter} from "../src/yield/adapters/AAVEAdapter.sol";
 
 contract MockAAVEPool {
     YIELDTOKEN public yieldToken;
+
     constructor(address _yieldToken) {
         yieldToken = YIELDTOKEN(_yieldToken);
     }
+
     function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external {
         IERC20(asset).transferFrom(msg.sender, address(this), amount);
 
@@ -28,8 +30,6 @@ contract MockAAVEPool {
     }
 }
 
-
-
 contract ERC20TOKEN is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
 
@@ -44,6 +44,7 @@ contract YIELDTOKEN is ERC20 {
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }
+
     function burn(address from, uint256 amount) external {
         _burn(from, amount);
     }
@@ -164,9 +165,9 @@ contract RouterSetupTest is Test {
         vm.stopPrank();
         assertEq(syt.balanceOfSYT(userA), depositAmount);
         assertEq(syt.balanceOf(userA), depositAmount + yieldAmount); // userA's balance should includes yield
-        assertLt(syt.balanceOfSYT(userB), depositAmount); // userB's SYT balance should be less 
-        assertEq(syt.balanceOf(userB), depositAmount - 1); // -1 for floor in math. 
-    
+        assertLt(syt.balanceOfSYT(userB), depositAmount); // userB's SYT balance should be less
+        assertEq(syt.balanceOf(userB), depositAmount - 1);
+
         // Increase yield and check if the yield is distributed correctly
         yieldToken.mint(address(aaveAdapter), yieldAmount); // 10% original yield
 
@@ -185,14 +186,14 @@ contract RouterSetupTest is Test {
         vm.stopPrank();
         // Simulate yield accrual by minting yield tokens to adapter
         yieldToken.mint(address(aaveAdapter), yieldAmount); // 10% yield
-        token.mint(address(mockAAVEPool),yieldAmount);
+        token.mint(address(mockAAVEPool), yieldAmount);
 
         vm.startPrank(userA);
         syt.transfer(userB, depositAmount + yieldAmount);
         vm.stopPrank();
 
         assertEq(token.balanceOf(userB), depositAmount + yieldAmount);
-        assertEq(syt.balanceOfSYT(userA),0);
+        assertEq(syt.balanceOfSYT(userA), 0);
         assertEq(yieldToken.balanceOf(address(aaveAdapter)), 0);
     }
 }

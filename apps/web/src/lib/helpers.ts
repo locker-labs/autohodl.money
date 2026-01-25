@@ -1,23 +1,30 @@
-import type { Address } from 'viem';
-import { erc20Abi } from 'viem';
-import { viemPublicClient } from '@/lib/clients/server';
+import { type Address, getAddress } from 'viem';
+import { AUTOHODL_SUPPORTED_TOKENS } from '@/lib/constants';
 
-export async function fetchAllowance({
-  tokenAddress,
-  owner,
-  spender,
-}: {
-  tokenAddress: Address;
-  owner: Address;
-  spender: Address;
-}): Promise<bigint> {
-  const allowance: bigint = await viemPublicClient.readContract({
-    address: tokenAddress,
-    abi: erc20Abi,
-    functionName: 'allowance',
-    args: [owner, spender],
-  });
+function computeRoundUpAndSavings(
+  transferAmount: bigint,
+  roundUpTo: bigint,
+): { roundUpAmount: bigint; savingsAmount: bigint } {
+  if (roundUpTo <= BigInt(0)) {
+    throw new Error('roundUpTo must be > 0');
+  }
+  // Equivalent to: ((transferAmount + roundUpTo - 1) / roundUpTo) * roundUpTo
+  const roundUpAmount = ((transferAmount + roundUpTo - BigInt(1)) / roundUpTo) * roundUpTo;
 
-  console.log('Current allowance:', allowance);
-  return allowance;
+  const savingsAmount = roundUpAmount - transferAmount;
+
+  return { roundUpAmount, savingsAmount };
 }
+
+function isAutoHodlSupportedToken(token: Address): boolean {
+  let isTokenSupported = false;
+  for (const supportedToken of AUTOHODL_SUPPORTED_TOKENS) {
+    if (getAddress(supportedToken) === getAddress(token)) {
+      isTokenSupported = true;
+      break;
+    }
+  }
+  return isTokenSupported;
+}
+
+export { computeRoundUpAndSavings, isAutoHodlSupportedToken };

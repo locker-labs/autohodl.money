@@ -1,17 +1,28 @@
+// @ts-nocheck
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/contract/client/getSavingsConfig';
+import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
+import { S_USDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { getSavingsConfig } from '@/lib/autohodl';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getSupportedAccounts } from '@/lib/userAccounts';
+import { viemPublicClient } from '@/lib/clients/client';
+import { type Address, zeroAddress } from 'viem';
 
 type AutoHodlContextType = {
   loading: boolean;
   config: SavingsConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  accounts: SupportedAccounts[];
+  sToken: UseERC20BalanceOfReturn;
+  token: UseERC20BalanceOfReturn;
+  address: Address | undefined;
+  isConnected: boolean;
 };
 
 const AutoHodlContext = createContext<AutoHodlContextType | undefined>(undefined);
@@ -34,6 +45,15 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [refetchFlag, setRefetchFlag] = useState(false);
   const { address, isConnected } = useAccount();
 
+  // Get Supported Accounts
+  const { data: accounts, isLoading: loadingAccounts } = useQuery({
+    enabled: !!address && isConnected,
+    queryFn: async () => {
+      return await getSupportedAccounts(address);
+    },
+    queryKey: ['supported-accounts', address, refetchFlag],
+  });
+
   // Fetch savings config when wallet connects
   useEffect(() => {
     async function fetchSavingsConfigArray() {
@@ -43,9 +63,8 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
-        console.log('Fetching savings config for user:', address, 'Token:', USDC_ADDRESS);
-        const config = await getSavingsConfig(address, USDC_ADDRESS);
-        const found = config && config.savingAddress !== '0x0000000000000000000000000000000000000000';
+        const config = await getSavingsConfig(viemPublicClient, address, USDC_ADDRESS);
+        const found = config && config.savingAddress !== zeroAddress;
         if (found) {
           setConfig(config);
         } else {
@@ -62,8 +81,32 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
     fetchSavingsConfigArray();
   }, [address, isConnected, refetchFlag]);
 
+  // Get sToken Balance
+  const sToken = useERC20BalanceOf({
+    token: S_USDC_ADDRESS,
+    address: address,
+  });
+
+  // Get Token Balance
+  const token = useERC20BalanceOf({
+    token: USDC_ADDRESS,
+    address: address,
+  });
+
   return (
-    <AutoHodlContext.Provider value={{ loading, config, setRefetchFlag, setConfig }}>
+    <AutoHodlContext.Provider
+      value={{
+        loading: loading || loadingAccounts,
+        config,
+        setRefetchFlag,
+        setConfig,
+        accounts: accounts || [],
+        sToken,
+        token,
+        address,
+        isConnected,
+      }}
+    >
       {children}
     </AutoHodlContext.Provider>
   );

@@ -10,7 +10,7 @@ contract MMCardDelegate is IDelegate, Ownable {
 
     event SavingDelegated(bytes data);
 
-    constructor(address _autoHodl) Ownable(msg.sender) {
+    constructor(address _autoHodl, address owner) Ownable(owner) {
         autoHodl = _autoHodl;
     }
 
@@ -19,7 +19,11 @@ contract MMCardDelegate is IDelegate, Ownable {
         autoHodl = _autoHodl;
     }
 
-    function delegateSaving(address user,address asset,uint256 value, bytes calldata data) external override {
+    function delegateSaving(address user, address asset, uint256 value, bytes calldata data)
+        external
+        override
+        onlyOwner
+    {
         AutoHodl(autoHodl).executeSavingsTx(user, asset, value);
         emit SavingDelegated(data);
     }
@@ -28,5 +32,4 @@ contract MMCardDelegate is IDelegate, Ownable {
     function verifyRegisteration(address user, bytes calldata extraData) external view override returns (bool) {
         return false;
     }
-
 }

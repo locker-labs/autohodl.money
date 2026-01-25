@@ -1,201 +1,369 @@
-// components/ActionInput.tsx
-import { useEffect, useState } from "react";
-import type { SupportedAccounts } from "@/lib/constants";
-import { paths } from "@/lib/paths";
-import Button from "./Button";
-import useCreateConfig from "@/hooks/useCreateConfig";
-import { useAccount } from "wagmi";
-import { isAddress, type Address } from "viem";
-import { useErc20Allowance, useERC20Approve } from "@/hooks/useERC20Token";
-import { AUTOHODL_ADDRESS, USDC_ADDRESS } from "@/lib/constants";
-
-type Props = {
-  account: SupportedAccounts;
-};
+import { useEffect, useState } from 'react';
+import { SupportedAccounts } from '@/lib/constants';
+import Button from './Button';
+import useCreateConfig from '@/hooks/useCreateConfig';
+import { isAddress, type Address } from 'viem';
+import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
+import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
+import { toastCustom } from '../ui/toast';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { SavingsMode } from '@/types/autohodl';
+import Image from 'next/image';
+import { AnimatePresence, motion } from 'motion/react';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 const savingOptions = [
-  { label: "$1 (Small saver)", value: 1, purchase: "$3.56", savings: "$0.44" },
-  { label: "$10 (Medium saver)", value: 10, purchase: "$35", savings: "$5" },
-  { label: "$100 (Large saver)", value: 100, purchase: "$850", savings: "$50" },
+  { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
+  { label: '$10', value: 10, purchase: '$35', savings: '$5' },
+  { label: '$100', value: 100, purchase: '$850', savings: '$50' },
 ];
 
-export default function SetSavingConfig({ account }: Props) {
-  const { address } = useAccount();
+export default function SetSavingConfig() {
+  const { address, accounts } = useAutoHodl();
+  const [mode, setMode] = useState<SavingsMode>(SavingsMode.All);
   const [roundUp, setRoundUp] = useState(savingOptions[0].value);
   const [toYield, setToYield] = useState(true);
-  const [savingsAddress, setSavingsAddress] = useState("");
-  const [savingCap, setSavingCap] = useState(100); // default 100 USDC
-  const [isApprovalNeeded, setIsApprovalNeeded] = useState<boolean | null>(
-    null
-  );
+  const [savingsAddress, setSavingsAddress] = useState('');
+  const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
+  const [isApprovalNeeded, setIsApprovalNeeded] = useState<boolean | null>(null);
+
+  const hasMetaMaskCard = accounts.includes(SupportedAccounts.MetaMask);
+
+  const savingsModes = [
+    {
+      label: 'MetaMask Card only',
+      value: SavingsMode.MetamaskCard,
+      disabled: !hasMetaMaskCard,
+      imgSrc: '/mmc.webp',
+      info: 'Only save your spare change when you use your MetaMask Card.',
+    },
+    {
+      label: hasMetaMaskCard ? 'All USDC transfers from Wallet and Card' : 'All USDC transfers',
+      value: SavingsMode.All,
+      disabled: false,
+      imgSrc: '/USDCToken.svg',
+      info: `Save your spare change, anytime you transfer USDC, regardless of its with the MetaMask Card or not.`,
+      imgSrc2: hasMetaMaskCard ? '/mmc.webp' : null,
+    },
+  ];
+
+  const yieldOptions = [
+    {
+      label: 'Earn yield',
+      value: true,
+      imgSrc: '/grow.svg',
+      info: 'The change you save will be deposited to Aave and automatically earn yield',
+    },
+    {
+      label: 'Idle savings',
+      value: false,
+      disabled: false,
+      imgSrc: '/save.png',
+      info: `The change you save will be deposited into an account of your choice but won't earn any yield`,
+    },
+  ];
+
+  const { trackAllowanceSetEvent } = useAnalytics();
+
   const { allowanceFormatted } = useErc20Allowance({
     owner: address as Address,
     token: USDC_ADDRESS,
     spender: AUTOHODL_ADDRESS,
   });
 
-  const { approve, isPending, isConfirming, isConfirmed } = useERC20Approve({
+  const {
+    approve,
+    isPending,
+    isConfirming: isConfirmingAllowance,
+    isConfirmed,
+  } = useERC20Approve({
     token: USDC_ADDRESS,
     spender: AUTOHODL_ADDRESS,
-    amount: savingCap, //
+    amount: savingsCap ?? 0,
   });
 
-  const disabled = !!savingsAddress && isAddress(savingsAddress) === false;
+  const handleApprove = () => {
+    if (!toYield && isAddress(savingsAddress) === false) {
+      toastCustom('Please enter a valid savings address');
+      return;
+    }
+    approve();
+  };
 
   const {
     handleCreateConfig,
     loading,
     // TODO: add error toast
     // error,
-    waitingForConfirmation,
+    waitingForConfirmation: isConfirmingConfig,
   } = useCreateConfig();
-  const handleButtonClick = () => {
+
+  const handleFinishSetup = () => {
+    if (!toYield && isAddress(savingsAddress) === false) {
+      toastCustom('Please enter a valid savings address');
+      return;
+    }
+    if (!savingsCap) {
+      toastCustom('Please enter a valid savings limit');
+      return;
+    }
+
     handleCreateConfig({
       roundUp: roundUp,
-      savingsAddress: (savingsAddress as Address) || (address as Address),
+      savingsAddress: toYield ? (address as Address) : (savingsAddress as Address),
       toYield,
+      mode,
+      active: true,
     });
   };
+
+  // Effect to check if approval is needed
   useEffect(() => {
-    console.log({ allowanceFormatted, savingCap });
-    if (allowanceFormatted !== undefined && allowanceFormatted < savingCap) {
+    if (allowanceFormatted !== undefined && allowanceFormatted < (savingsCap ?? 0)) {
       setIsApprovalNeeded(true);
-    }
-  }, [allowanceFormatted, savingCap]);
-  useEffect(() => {
-    if (isConfirmed && isApprovalNeeded) {
+    } else {
       setIsApprovalNeeded(false);
     }
-  }, [isConfirmed]);
-  console.log({ isApprovalNeeded });
+  }, [allowanceFormatted, savingsCap]);
 
-  const title = `Setup Savings for ${account}`;
-  const selectedOption = savingOptions.find((opt) => opt.value === roundUp);
+  // Effect to continue setup if approval is confirmed
+  useEffect(() => {
+    const continuteSetupIfApproved = async () => {
+      if (isConfirmed) {
+        setIsApprovalNeeded(false);
+        if (savingsCap) {
+          await trackAllowanceSetEvent(savingsCap);
+        }
+
+        handleFinishSetup();
+      }
+    };
+    continuteSetupIfApproved();
+  }, [isConfirmed]);
+
+  const title = `Setup Round-Up Savings`;
+
+  const disabled = !!savingsAddress && isAddress(savingsAddress) === false;
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      <fieldset className="w-full rounded-lg p-6 shadow-smdisabled:opacity-60">
-        {title ? (
-          <legend className="px-1 text-xl font-bold text-center text-gray-700">
-            {title}
-          </legend>
-        ) : null}
+    <div className='flex flex-col items-center max-w-md'>
+      <fieldset className='w-full py-6 disabled:opacity-60'>
+        {title ? <legend className='px-1 text-xl font-bold text-center text-gray-700'>{title}</legend> : null}
 
-        <div className="flex flex-col gap-6 mt-4">
+        <div className='flex flex-col gap-4'>
           {/* Choose Roundup amount */}
           {/* Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label
-              htmlFor={String(roundUp)}
-              className="text-xs font-medium text-gray-600"
-            >
-              Round-up amount
+          <div className='flex flex-col gap-1'>
+            <label htmlFor={String(roundUp)} className='text-sm font-medium text-black'>
+              Choose round-up amount:
             </label>
-            <select
-              id={String(roundUp)}
-              value={roundUp}
-              onChange={(e) => setRoundUp(Number(e.target.value))}
-              className="h-10 rounded-md border border-gray-300 px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-            >
+            <div className='w-full grid grid-cols-3 gap-2'>
               {savingOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <button
+                  type='button'
+                  onClick={() => setRoundUp(Number(opt.value))}
+                  className={`border rounded-lg px-2 py-2 text-center
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${
+                opt.value === roundUp
+                  ? isPending
+                    ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold animate-pulse'
+                    : 'border-[#78E76E] bg-[#78E76E]/50 font-semibold'
+                  : 'border-gray-300'
+              }
+              `}
+                  key={String(opt.value)}
+                >
                   {opt.label}
-                </option>
+                </button>
               ))}
-            </select>
-            <p className="">
-              Your {selectedOption?.purchase} purchase will help you save{" "}
-              <strong>{selectedOption?.savings}</strong>!
-            </p>
-          </div>
-
-          {/* Checkbox */}
-          <div className="flex items-center gap-2">
-            <input
-              id={"toYield"}
-              type="checkbox"
-              checked={toYield}
-              onChange={(e) => setToYield(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-            />
-            <label htmlFor={"toYield"} className="text-sm text-gray-700">
-              Yield savings (Earn yield on your savings.{" "}
-              <a
-                href={paths.LearnMoreYieldSavings}
-                className="text-blue-500 hover:underline hover:underline-offset-1 transition-colors"
-                target="_blank"
-              >
-                Learn more
-              </a>
-              )
-            </label>
-          </div>
-
-          {/* Address input */}
-          {!toYield && (
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor={savingsAddress}
-                className="text-xs font-medium text-gray-600"
-              >
-                Saving Address
-              </label>
-              <input
-                id={savingsAddress}
-                type="text"
-                inputMode="text"
-                autoComplete="off"
-                spellCheck={false}
-                placeholder="0x..."
-                value={savingsAddress}
-                onChange={(e) => setSavingsAddress(e.target.value)}
-                className="h-10 rounded-md border border-gray-300 px-3 font-mono text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-              />
             </div>
-          )}
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor={String(roundUp)}
-              className="text-xs font-medium text-gray-600"
-            >
-              Saving Cap (USDC)
-            </label>
-            <input
-              id={"savingCap"}
-              type="number"
-              value={savingCap}
-              onChange={(e) => setSavingCap(Number(e.target.value))}
-              className="h-10 rounded-md border border-gray-300 px-3 font-mono text-xs md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-            />
           </div>
+
+          {/* Mode */}
+          <div className='flex flex-col gap-1'>
+            <label htmlFor={String(roundUp)} className='text-sm font-medium text-black'>
+              Enable round-ups on:
+            </label>
+            <div className='w-full grid grid-cols-2 gap-2'>
+              {savingsModes.map((opt) => (
+                <button
+                  type='button'
+                  onClick={() => {
+                    if (opt.disabled) {
+                      return;
+                    }
+                    setMode(opt.value);
+                  }}
+                  disabled={opt.disabled}
+                  className={`flex flex-col items-center gap-4
+                    border rounded-lg px-4 py-4 text-center
+                    disabled:opacity-60
+                    max-w-[250px]
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${opt.value === mode ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold' : 'border-gray-300'}
+              `}
+                  key={String(opt.value)}
+                >
+                  <div className='max-w-[64px] max-h-[64px] h-[64px] flex items-center justify-center gap-2'>
+                    <Image
+                      className='h-[64px] w-auto aspect-auto'
+                      src={opt.imgSrc}
+                      alt={'img'}
+                      width={64}
+                      height={64}
+                      fetchPriority='high'
+                    />
+                    {opt.imgSrc2 ? <p>+</p> : null}
+                    {opt.imgSrc2 ? (
+                      <Image
+                        className='h-[64px] w-auto aspect-auto'
+                        src={opt.imgSrc2}
+                        alt={'img'}
+                        width={64}
+                        height={64}
+                        fetchPriority='high'
+                      />
+                    ) : null}
+                  </div>
+                  <div className='h-full flex items-center justify-center gap-2'>
+                    {opt.label}
+                    <AdaptiveInfoTooltip content={opt.info} />
+                  </div>
+                </button>
+              ))}
+            </div>
+            {hasMetaMaskCard ? null : (
+              <div className='text-sm text-gray-700'>
+                Since you don't have a metamask card, round-ups will be enabled only on your USDC transfers.
+              </div>
+            )}
+          </div>
+
+          {/* Yield */}
+          <div className='flex flex-col gap-1'>
+            <label htmlFor={String(roundUp)} className='text-sm font-medium text-black'>
+              What to do with savings:
+            </label>
+            <div className='w-full grid grid-cols-2 gap-2'>
+              {yieldOptions.map((opt) => (
+                <button
+                  type='button'
+                  onClick={() => {
+                    if (opt.disabled) {
+                      return;
+                    }
+                    setToYield(opt.value);
+                  }}
+                  disabled={opt.disabled}
+                  className={`flex flex-col items-center gap-4
+                    border rounded-lg px-4 py-4 text-center
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${opt.value === toYield ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold' : 'border-gray-300'}
+              `}
+                  key={String(opt.value)}
+                >
+                  <div className='max-h-[64px] max-w-[64px] h-[64px] flex items-center justify-center gap-2'>
+                    <Image
+                      className='h-[64px] w-auto aspect-auto'
+                      src={opt.imgSrc}
+                      alt={'img'}
+                      width={64}
+                      height={64}
+                      fetchPriority='high'
+                    />
+                  </div>
+                  <div className='flex items-center justify-center gap-2'>
+                    {opt.label}
+                    <AdaptiveInfoTooltip content={opt.info} />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Savings Address Input */}
+          <AnimatePresence>
+            {!toYield && (
+              <motion.div
+                initial={{ height: 0, opacity: 0, y: -40 }}
+                animate={{ height: 'auto', opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -40 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                style={{ transformOrigin: 'top' }}
+                className={'mt-2 flex flex-col gap-1'}
+              >
+                <label htmlFor={'savingsAddress'} className='text-sm font-medium text-black'>
+                  Savings address
+                </label>
+                <input
+                  id={'savingsAddress'}
+                  type='text'
+                  inputMode='text'
+                  autoComplete='off'
+                  spellCheck={false}
+                  placeholder='0x...'
+                  value={savingsAddress}
+                  onChange={(e) => setSavingsAddress(e.target.value)}
+                  className='h-10 rounded-md border border-gray-300 px-3 text-base md:text-base focus-visible:outline-none focus-visible:border-app-green-dark transition-colors'
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Advanced Options */}
+          <Accordion className='mt-2' type='single' collapsible>
+            <AccordionItem value='item-1'>
+              <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>
+                Advanced Options
+              </AccordionTrigger>
+              <AccordionContent className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
+                {/* Savings limit input */}
+                <div className='flex flex-col gap-2'>
+                  <label htmlFor={'savingsCap'} className='text-sm font-medium text-black'>
+                    Savings limit (USDC)
+                  </label>
+                  <input
+                    id={'savingsCap'}
+                    type='text'
+                    value={savingsCap !== null ? savingsCap : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const num = Number(val);
+                      if (val === '') {
+                        setSavingsCap(null);
+                      } else if (!Number.isNaN(num) && num >= 0) {
+                        setSavingsCap(num);
+                      }
+                    }}
+                    className='h-10 rounded-md border border-gray-300 px-3 text-base md:text-base focus-visible:outline-none focus-visible:border-app-green-dark transition-colors'
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </fieldset>
-      {isApprovalNeeded ? (
+      {isApprovalNeeded === true ? (
         <Button
-          title={"Add token allowance"}
-          onAction={approve}
+          className='rounded-lg w-full'
+          title={'Approve spending allowance in wallet'}
+          onAction={handleApprove}
           disabled={disabled}
         >
-          {isConfirming
-            ? "Confirming..."
-            : isPending
-            ? "Allowing AutoHodl..."
-            : "Allow AutoHodl to save for you"}
+          {isConfirmingAllowance ? 'Confirming...' : isPending ? 'Processing...' : 'Continue'}
         </Button>
-      ) : null}
-      {isApprovalNeeded === false ? (
-        <Button
-          title={"Finish Setup"}
-          onAction={handleButtonClick}
-          disabled={disabled}
-        >
-          {waitingForConfirmation
-            ? "Confirming..."
-            : loading
-            ? "Setting up..."
-            : "Finish Setup"}
+      ) : isApprovalNeeded === false ? (
+        <Button className='rounded-lg w-full' title={'Start saving'} onAction={handleFinishSetup} disabled={disabled}>
+          {isConfirmingConfig ? 'Confirming...' : loading ? 'Setting up...' : 'Start saving'}
         </Button>
-      ) : null}
+      ) : (
+        <Button className='rounded-lg w-full' title={'Loading'} onAction={() => {}} disabled={true}>
+          {'Loading'}
+        </Button>
+      )}
     </div>
   );
 }

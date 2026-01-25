@@ -1,40 +1,40 @@
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useEffect, useState } from 'react';
-import { formatUnits } from 'viem';
-import { Loader2 } from 'lucide-react';
+import { formatUnits, parseUnits } from 'viem';
+import { LoaderSecondary } from '@/components/ui/loader';
 
 const savingOptions = [
-  { label: '$1 (Small saver)', value: 1, purchase: '$3.56', savings: '$0.44' },
-  { label: '$10 (Medium saver)', value: 10, purchase: '$35', savings: '$5' },
-  { label: '$100 (Large saver)', value: 100, purchase: '$850', savings: '$50' },
+  { label: '$1', value: 1, purchase: '$3.56', savings: '$0.44' },
+  { label: '$10', value: 10, purchase: '$35', savings: '$5' },
+  { label: '$100', value: 100, purchase: '$850', savings: '$50' },
 ];
 
 const RoundupAmountSelector = () => {
   const [roundUpLocal, setRoundUpLocal] = useState(savingOptions[0].value);
-  const selectedOption = savingOptions.find((opt) => opt.value === roundUpLocal);
-
   const { config, setConfig } = useAutoHodl();
-
   //   TODO: add error toast
   const { createConfig } = useCreateConfig();
+
+  const roundUp = Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS]));
+  const isPending = roundUp !== roundUpLocal;
 
   useEffect(() => {
     async function iife() {
       if (!config?.savingAddress || !config?.roundUp) return;
-
-      const roundUp = Number(formatUnits(config.roundUp, TokenDecimalMap[USDC_ADDRESS]));
 
       if (roundUp !== roundUpLocal) {
         try {
           await createConfig({
             roundUp: roundUpLocal,
             savingsAddress: config.savingAddress,
+            mode: config.mode,
+            active: config.active,
+            toYield: config.toYield,
           });
           setConfig((prev) =>
-            prev ? { ...prev, roundUp: BigInt(roundUpLocal * 10 ** TokenDecimalMap[USDC_ADDRESS]) } : prev,
+            prev ? { ...prev, roundUp: parseUnits(roundUpLocal.toString(), TokenDecimalMap[USDC_ADDRESS]) } : prev,
           );
         } catch {
           setRoundUpLocal(roundUp);
@@ -42,30 +42,41 @@ const RoundupAmountSelector = () => {
       }
     }
     iife();
-  }, [roundUpLocal, config?.savingAddress, createConfig]);
+  }, [roundUpLocal]);
 
   return (
     <div className='flex flex-col gap-1'>
-      <label htmlFor={String(roundUpLocal)} className='text-lg flex items-center gap-2'>
-        <span>Round-up Amount</span>
+      <label htmlFor={String(roundUpLocal)} className='text-sm font-medium text-black flex items-center gap-2'>
+        <span>Choose Round-up Amount:</span>
         <span className='text-sm text-gray-500 block'>
           {roundUpLocal !== Number(formatUnits(config?.roundUp || BigInt(0), TokenDecimalMap[USDC_ADDRESS])) && (
-            <Loader2 className={`animate-spin size-5`} color={'#000000'} />
+            <LoaderSecondary />
           )}
         </span>
       </label>
-      <Select value={String(roundUpLocal)} onValueChange={(value) => setRoundUpLocal(Number(value))}>
-        <SelectTrigger className='w-full h-10'>
-          <SelectValue placeholder={selectedOption?.label} />
-        </SelectTrigger>
-        <SelectContent>
-          {savingOptions.map((opt) => (
-            <SelectItem key={String(opt.value)} value={String(opt.value)}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className='w-full grid grid-cols-3 gap-2'>
+        {savingOptions.map((opt) => (
+          <button
+            type='button'
+            onClick={() => {
+              if (isPending) return;
+              setRoundUpLocal(Number(opt.value));
+            }}
+            className={`border rounded-lg px-2 py-2 text-center
+              ${isPending ? 'cursor-progress' : 'cursor-pointer disabled:cursor-not-allowed'}
+              ${
+                opt.value === roundUpLocal
+                  ? isPending
+                    ? 'border-[#78E76E] bg-[#78E76E]/50 font-semibold animate-pulse'
+                    : 'border-[#78E76E] bg-[#78E76E]/50 font-semibold'
+                  : 'border-gray-300'
+              }`}
+            key={String(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

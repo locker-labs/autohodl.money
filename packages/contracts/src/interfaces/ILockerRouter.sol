@@ -58,7 +58,7 @@ interface ILockerRouter {
     /// @notice Send underlying to a recipient by burning caller’s SYT (instant-or-revert).
     function sendUnderlying(address asset, address from, address to, uint256 amount)
         external
-        returns (uint256 sharesNeeded,address routeTo);
+        returns (uint256 sharesNeeded, address routeTo);
 
     /// @notice Transfer a portion of caller's claim (SYT + per-venue shares) to the Instant Pool without redeeming underlying.
     /// @dev After this, the pool accrues the future yield on the transferred position.
@@ -89,7 +89,8 @@ interface ILockerRouter {
      *        GETTERS              *
      *=============================*/
 
-    function navAcrossAdapters(address asset) external view returns (uint256);
+    function navAcrossAdapters(address[] memory adapters, address asset) external view returns (uint256);
+    function getDefaultAllocation(address asset) external view returns (Allocation memory);
     // function sytFor(address asset) external view returns (address); // SYT ERC20 for asset
     // function pool() external view returns (address); // Instant Pool (multi-asset)
     // function treasury() external view returns (address); // protocol fee sink (if any)

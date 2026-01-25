@@ -1,7 +1,9 @@
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { NextResponse } from 'next/server';
-import { verifySignature } from './moralis';
-import { handleSavingsExecution } from './handleSavingsExecution';
+import { SavingConfigSetEventSigHash } from '@/lib/constants';
+import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
+import { verifySignature } from '@/lib/moralis';
+import { handleSavingConfigSetEvent } from './handleSavingConfigSetEvent';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -32,10 +34,21 @@ export async function handleStream(body: string, signature: string, webhookSecre
     transferCount: payload.erc20Transfers.length,
   });
 
-  // Only process confirmed transactions
-  if (!payload.confirmed) {
-    console.log('Skipping unconfirmed transaction.');
-    return NextResponse.json({ message: 'Unconfirmed transactions are ignored.' });
+  // Only process unconfirmed transactions
+  // TODO: Handle only confirmed transactions for production
+  if (payload.confirmed) {
+    console.log('Skipping confirmed transaction.');
+    return NextResponse.json({ message: 'Confirmed transactions are ignored.' });
+  }
+
+  /**
+   * Handle SavingConfigSet events, if any
+   */
+  if (payload.logs.length) {
+    const configSetLogs = payload.logs.filter((log) => log.topic0 === SavingConfigSetEventSigHash);
+    if (configSetLogs.length) {
+      return await handleSavingConfigSetEvent(configSetLogs);
+    }
   }
 
   // Process ERC20 transfers
@@ -47,8 +60,17 @@ export async function handleStream(body: string, signature: string, webhookSecre
   let processedTransfers = 0;
 
   for (const transfer of payload.erc20Transfers) {
-    console.log(`Processing ERC20 transfer: ${transfer.transactionHash}`);
-    const txHash = await handleSavingsExecution(transfer);
+    console.log(`Processing ERC20 transfer with txHash: ${transfer.transactionHash}`);
+    let txHash: string | undefined;
+
+    try {
+      txHash = await handleSavingsExecution(transfer, { streamId: payload.streamId, chainId: payload.chainId });
+    } catch (error) {
+      console.error(
+        `Error processing savings execution for transfer with txHash ${transfer.transactionHash}:`,
+        error instanceof Error ? error.message : error,
+      );
+    }
 
     if (txHash) {
       processedTransfers++;

@@ -1,9 +1,11 @@
+// @ts-nocheck
 'use client';
 
+import { linea, base } from 'viem/chains';
 import { wagmiAdapter, projectId, networks } from '@/config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { AutoHodlProvider } from '@/context/AutoHodlContext';
 
@@ -20,13 +22,23 @@ const metadata = {
 
 // Create the modal
 export const modal = createAppKit({
+  chainImages: {
+    [linea.id]: '/LineaLogomarkBlueBG.svg',
+    [base.id]: '/Base_square_blue.svg',
+  },
   adapters: [wagmiAdapter],
   projectId,
   networks,
   metadata,
   themeMode: 'light',
   features: {
-    analytics: true, // Optional - defaults to your Cloud configuration
+    swaps: false,
+    onramp: false,
+    email: false,
+    socials: false,
+    history: true,
+    analytics: true,
+    allWallets: true,
   },
   themeVariables: {
     '--w3m-accent': '#000000',

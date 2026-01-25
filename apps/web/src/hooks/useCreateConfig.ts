@@ -1,24 +1,20 @@
 import { useState } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
+import { encodeAbiParameters, parseUnits } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
-import { AUTOHODL_ADDRESS, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { secrets } from '@/lib/secrets';
+import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
 import { viemPublicClient } from '@/lib/clients/client';
 import { useAutoHodl } from '@/context/AutoHodlContext';
-
-const defaultConfig = {
-  active: true,
-  toYield: false,
-  extraData: '0x' as Hex,
-};
+import { extraDataParams, type SavingsMode } from '@/types/autohodl';
+import { useAnalytics } from './useAnalytics';
 
 type CreateConfigParams = {
-  active?: boolean;
-  toYield?: boolean;
+  active: boolean;
+  toYield: boolean;
   roundUp: number;
   savingsAddress: Address;
-  extraData?: Hex;
+  mode: SavingsMode;
 };
 
 type UseCreateConfigReturn = {
@@ -27,37 +23,32 @@ type UseCreateConfigReturn = {
   handleCreateConfig: (params: CreateConfigParams) => Promise<void>;
   loading: boolean;
   waitingForConfirmation: boolean;
+  isConfirmed: boolean;
+  txHash: Hex | null;
 };
 
 const useCreateConfig = (): UseCreateConfigReturn => {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [txHash, setTxHash] = useState<Hex | null>(null);
+
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { setRefetchFlag } = useAutoHodl();
+  const { trackConfigSetEvent } = useAnalytics();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createConfig = async ({
-    roundUp,
-    savingsAddress,
-    active = defaultConfig.active,
-    toYield = defaultConfig.toYield,
-    extraData = defaultConfig.extraData,
-  }: {
-    active?: boolean;
-    toYield?: boolean;
-    roundUp: number;
-    savingsAddress: Address;
-    extraData?: Hex;
-  }) => {
+  const createConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
     if (!walletClient) throw new Error('WalletClient not initialized');
 
+    const extraData = encodeAbiParameters(extraDataParams, [mode]);
     const args = [
       USDC_ADDRESS,
       savingsAddress as Address,
-      secrets.delegate as Address,
-      BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+      DELEGATE,
+      parseUnits(roundUp.toString(), TokenDecimalMap[USDC_ADDRESS]),
       active,
       toYield,
       extraData,
@@ -73,30 +64,24 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     return tx;
   };
 
-  const handleCreateConfig = async ({
-    roundUp,
-    savingsAddress,
-    active = defaultConfig.active,
-    toYield = defaultConfig.toYield,
-    extraData = defaultConfig.extraData,
-  }: {
-    active?: boolean;
-    toYield?: boolean;
-    roundUp: number;
-    savingsAddress: Address;
-    extraData?: Hex;
-  }) => {
+  const handleCreateConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
     if (!isConnected || !address || !walletClient) return;
 
     setLoading(true);
     setError(null);
+    setWaitingForConfirmation(false);
+    setIsConfirmed(false);
+    setTxHash(null);
+
     try {
+      const extraData = encodeAbiParameters(extraDataParams, [mode]);
+
       // Ensure types for contract call
       const args = [
         USDC_ADDRESS,
-        savingsAddress as Address,
-        secrets.delegate as Address,
-        BigInt(roundUp * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+        savingsAddress,
+        DELEGATE,
+        parseUnits(roundUp.toString(), TokenDecimalMap[USDC_ADDRESS]),
         active,
         toYield,
         extraData,
@@ -111,6 +96,10 @@ const useCreateConfig = (): UseCreateConfigReturn => {
       setWaitingForConfirmation(true);
       await viemPublicClient.waitForTransactionReceipt({ hash: tx, confirmations: 1 });
       setWaitingForConfirmation(false);
+      setIsConfirmed(true);
+      setTxHash(tx);
+
+      await trackConfigSetEvent(tx);
 
       setRefetchFlag((flag) => !flag);
     } catch (e) {
@@ -127,6 +116,8 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     handleCreateConfig,
     loading,
     waitingForConfirmation,
+    isConfirmed,
+    txHash,
   };
 };
 

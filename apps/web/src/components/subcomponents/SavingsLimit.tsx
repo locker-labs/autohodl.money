@@ -1,0 +1,127 @@
+import { useEffect, useState } from 'react';
+import type { Address } from 'viem';
+import { AUTOHODL_ADDRESS, USDC_ADDRESS } from '@/lib/constants';
+import { useAccount } from 'wagmi';
+import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
+import Button from './Button';
+import { Edit3, X } from 'lucide-react';
+
+const SavingsLimit = () => {
+  const { address: userAddress } = useAccount();
+  const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
+  const [isEditing, setIsEditing] = useState(false); // State to toggle between view-only and edit modes
+
+  const { allowanceFormatted, isLoading: isLoadingAllowance } = useErc20Allowance({
+    owner: userAddress as Address,
+    token: USDC_ADDRESS,
+    spender: AUTOHODL_ADDRESS,
+  });
+
+  useEffect(() => {
+    if (!isLoadingAllowance) {
+      setSavingsCap(allowanceFormatted);
+    }
+  }, [isLoadingAllowance, allowanceFormatted]);
+
+  const {
+    approve,
+    isPending,
+    isConfirming: isConfirmingAllowance,
+  } = useERC20Approve({
+    token: USDC_ADDRESS,
+    spender: AUTOHODL_ADDRESS,
+    amount: savingsCap ?? 0,
+  });
+
+  useEffect(() => {
+    if (!isConfirmingAllowance) {
+      setIsEditing(false);
+    }
+  }, [isConfirmingAllowance]);
+
+  const handleApprove = () => {
+    approve();
+  };
+
+  return (
+    <div>
+      {isEditing ? (
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center justify-between w-full'>
+            <label htmlFor={'savingsCap'} className='py-[6px] text-sm font-medium text-black'>
+              Savings limit (USDC):
+            </label>
+            <button
+              type='button'
+              onClick={() => setIsEditing(false)}
+              className={`text-[#4D4A4A]
+                      bg-gray-100
+                      hover:bg-gray-200
+                      px-0.5 py-0.5 rounded-md
+                      transition-colors
+                      duration-150
+                      cursor-pointer`}
+              aria-label='Cancel editing'
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <input
+            id={'savingsCap'}
+            type='text'
+            value={savingsCap !== null ? savingsCap : ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              const num = Number(val);
+              if (val === '') {
+                setSavingsCap(null);
+              } else if (!Number.isNaN(num) && num >= 0) {
+                setSavingsCap(num);
+              }
+            }}
+            className='h-10 rounded-md border border-gray-300 px-3 text-base md:text-base focus-visible:outline-none focus-visible:border-app-green-dark transition-colors'
+          />
+          <div className='mt-2 flex items-center gap-2'>
+            <Button
+              className='rounded-lg w-full'
+              title={'Add token allowance'}
+              onAction={handleApprove}
+              disabled={!savingsCap}
+            >
+              {isConfirmingAllowance ? 'Confirming...' : isPending ? 'Processing...' : 'Set Limit'}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type='button'
+          className='group w-full flex items-center justify-between rounded-md transition-colors cursor-pointer'
+          onClick={() => setIsEditing(true)}
+          onKeyDown={(e) => e.key === 'Enter' && setIsEditing(true)}
+          aria-label='Edit savings limit'
+        >
+          <div className='w-full flex items-center justify-between'>
+            <div className='py-1 text-sm font-medium text-black'>Savings limit (USDC):</div>
+            <div className='flex items-center justify-center gap-2'>
+              <div className='py-1 text-base font-medium text-black'>{allowanceFormatted}</div>
+              <div className='hidden group-hover:block group-hover:bg-gray-100 hover:bg-gray-200 p-1 rounded-md'>
+                <div
+                  className={`text-[#4D4A4A]
+                      hover:bg-gray-200
+                      px-0.5 py-0.5 rounded-md
+                      transition-colors
+                      duration-150
+                      cursor-pointer`}
+                >
+                  <Edit3 size={13} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default SavingsLimit;

@@ -3,7 +3,11 @@ import { viemPublicClient } from '@/lib/clients/client';
 import { MetaMaskCard, SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
 import { fetchAllowance } from '@/lib/erc20/allowance';
 
-async function getSupportedAccounts(address: Address) {
+async function getSupportedAccounts(address: Address | undefined): Promise<SupportedAccounts[]> {
+  if (!address) return [];
+
+  const accounts: SupportedAccounts[] = [SupportedAccounts.EOA];
+
   // Write logic to determine supported accounts
 
   // For MetaMask Card
@@ -25,10 +29,10 @@ async function getSupportedAccounts(address: Address) {
   const [allowanceMMUS, allowanceMMIntl] = await Promise.all([allowanceMMUSPromise, allowanceMMIntlPromise]);
 
   if (allowanceMMUS > BigInt(0) || allowanceMMIntl > BigInt(0)) {
-    return [SupportedAccounts.MetaMask];
+    accounts.push(SupportedAccounts.MetaMask);
   }
 
-  return [SupportedAccounts.EOA];
+  return accounts;
 }
 
 export { getSupportedAccounts };

@@ -1,7 +1,7 @@
 import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { USDC_ADDRESS, AUTOHODL_ADDRESS, TokenDecimalMap } from '@/lib/constants';
+import { USDC_ADDRESS, AUTOHODL_ADDRESS } from '@/lib/constants';
 import { useErc20Allowance, useERC20Approve } from '@/hooks/useERC20Token';
 import { chain } from '@/config';
 import { getTransactionLink } from '@/lib/blockExplorer';
@@ -17,16 +17,15 @@ export default function USDCApprovalChecker() {
     refetch: refetchAllowance,
   } = useErc20Allowance({
     token: USDC_ADDRESS,
-    owner: address as `0x${string}` | undefined,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
-    decimals: TokenDecimalMap[USDC_ADDRESS],
+    owner: address,
+    spender: AUTOHODL_ADDRESS,
     enabled: isConnected,
   });
 
   const { approve, isPending, isConfirming, isConfirmed, writeError, hash } = useERC20Approve({
     token: USDC_ADDRESS,
-    spender: AUTOHODL_ADDRESS as `0x${string}` | undefined,
-    amount: BigInt(autohodlAllowance * 10 ** TokenDecimalMap[USDC_ADDRESS]),
+    spender: AUTOHODL_ADDRESS,
+    amount: autohodlAllowance,
     enabled: isConnected,
   });
 
@@ -74,7 +73,7 @@ export default function USDCApprovalChecker() {
 
         <div>
           <label className='block text-sm font-medium text-gray-700 mb-1'>
-            AutoHodl Allowance (USDC)
+            autoHODL Allowance (USDC)
             <input
               type='number'
               value={autohodlAllowance}
@@ -124,7 +123,7 @@ export default function USDCApprovalChecker() {
         {allowance !== undefined && !needsApproval && AUTOHODL_ADDRESS && (
           <div className='flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-md'>
             <CheckCircle className='w-5 h-5' />
-            <p className='font-medium'>AutoHodl can now save up to {autohodlAllowance} USDC</p>
+            <p className='font-medium'>autoHODL can now save up to {autohodlAllowance} USDC</p>
           </div>
         )}
 
