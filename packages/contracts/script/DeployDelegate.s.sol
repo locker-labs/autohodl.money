@@ -8,8 +8,8 @@ contract DeployDelegate is Script {
     MMCardDelegate public delegate;
     uint256 pk = vm.envUint("PRIVATE_KEY");
 
-    address public autoHodl = vm.envAddress("AUTO_HODL"); // LockerRouter address
-    address public delegateAddress = vm.envAddress("DELEGATE"); // USDC on Ethereum Mainnet
+    address public autoHodl = vm.envAddress("AUTO_HODL"); // Autohodl contract address
+    address public delegateAddress = vm.envAddress("DELEGATE"); // Delegate wallet address (wallet for executing savings txs)
 
     function run() public {
         vm.startBroadcast(pk);

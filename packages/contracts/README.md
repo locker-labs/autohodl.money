@@ -1,66 +1,149 @@
-## Foundry
+# 📦 `@autohodl.money/contracts`
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This package contains the **smart contracts** that power the **autoHODL** protocol.
 
-Foundry consists of:
+---
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## 📁 Project Structure
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```
+packages/contracts/
+├── src/
+│   ├── AutoHodl.sol
+│   ├── delegates/
+│   │   └── MMCardDelegate.sol
+│   ├── interfaces/
+│   │   ├── IDelegate.sol
+│   │   ├── IERC20.sol
+│   │   ├── ILockerPool.sol
+│   │   ├── ILockerRouter.sol
+│   │   └── IVenueAdapter.sol
+│   └── yield/
+│       ├── LockerRouter.sol
+│       ├── LockerSYT.sol
+│       └── adapters/
+│           └── AAVEAdapter.sol
+├── script/
+├── test/
+├── lib/
+├── foundry.toml
+└── package.json
 ```
 
-### Test
+---
 
-```shell
-$ forge test
+## 🛠️ Getting Started
+
+### Requirements
+
+- [Foundry](https://book.getfoundry.sh/) (forge, cast, anvil)
+- Node.js (>= 16.x) for TypeScript tooling
+- `.env` file with RPC keys and private key for deployment
+
+### Install Dependencies
+
+```sh
+cd packages/contracts
+forge install
 ```
 
-### Format
+---
 
-```shell
-$ forge fmt
+## 📘 Build
+
+```sh
+forge build
 ```
 
-### Gas Snapshots
+---
 
-```shell
-$ forge snapshot
+## 🧪 Testing
+
+```sh
+forge test
 ```
 
-### Anvil
+Run with verbosity for detailed output:
 
-```shell
-$ anvil
+```sh
+forge test -vvv
 ```
 
-### Deploy
+---
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+## 📝 Formatting
+
+Format Solidity files:
+
+```sh
+forge fmt
 ```
 
-### Cast
+---
 
-```shell
-$ cast <subcommand>
+## 🚀 Deployment
+
+### Deploy AutoHodl Contract
+
+```sh
+forge script script/DeployAutoHodl.s.sol:DeployAutoHodl \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast \
+  --etherscan-api-key <your_etherscan_api_key> \
+  --verify
 ```
 
-### Help
+### Deploy MMCardDelegate Contract
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```sh
+forge script script/DeployDelegate.s.sol:DeployDelegate \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast \
+  --etherscan-api-key <your_etherscan_api_key> \
+  --verify
 ```
+
+### Deploy LockerRouter
+
+```sh
+forge script script/LockerRouter.s.sol:LockerRouterScript \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast \
+  --etherscan-api-key <your_etherscan_api_key> \
+  --verify
+```
+
+### Setup Adapter
+
+```sh
+forge script script/SetupAdapter.s.sol:SetupAdapterScript \
+  --rpc-url <your_rpc_url> \
+  --private-key <your_private_key> \
+  --broadcast \
+  --etherscan-api-key <your_etherscan_api_key> \
+  --verify
+```
+
+---
+
+## 📁 Deployment Scripts
+
+| Script | Description |
+|--------|-------------|
+| `DeployAutoHodl.s.sol` | Deploys the main AutoHodl contract |
+| `DeployDelegate.s.sol` | Deploys and verifies MMCardDelegate |
+| `LockerRouter.s.sol` | Deploys the LockerRouter |
+| `SetupAdapter.s.sol` | Sets up yield adapter configuration |
+| `SetupSYT.s.sol` | Sets up SYT token for an asset |
+| `Deposit.s.sol` | Test deposit script |
+
+---
+
+## 📜 License
+
+UNLICENSED
+
+---
