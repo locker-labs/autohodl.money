@@ -9,19 +9,21 @@ contract MMCardDelegate is IDelegate, Ownable {
     address public autoHodl;
 
     event SavingDelegated(bytes data);
-    
+
     constructor(address _autoHodl, address owner) Ownable(owner) {
         autoHodl = _autoHodl;
     }
-
-
 
     // Admin function to set autoHodl address
     function setAutoHodl(address _autoHodl) external onlyOwner {
         autoHodl = _autoHodl;
     }
 
-    function delegateSaving(address user, address asset, uint256 value, bytes calldata data) external override onlyOwner {
+    function delegateSaving(address user, address asset, uint256 value, bytes calldata data)
+        external
+        override
+        onlyOwner
+    {
         AutoHodl(autoHodl).executeSavingsTx(user, asset, value);
         emit SavingDelegated(data);
     }

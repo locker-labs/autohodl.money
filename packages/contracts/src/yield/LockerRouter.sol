@@ -51,7 +51,7 @@ contract LockerRouter is ILockerRouter, Ownable {
         require(totalShares > 0 && totalAssets > 0, "INVALID_STATE");
         uint256 userSYTBalance = syt.balanceOfSYT(from);
         uint256 assetsMax = Math.mulDiv(userSYTBalance, totalAssets, totalShares, Math.Rounding.Floor);
-        if(amount > assetsMax) {
+        if (amount > assetsMax) {
             amount = assetsMax;
         }
         sharesNeeded = Math.mulDiv(amount, totalShares, totalAssets, Math.Rounding.Ceil);
@@ -180,5 +180,4 @@ contract LockerRouter is ILockerRouter, Ownable {
             emit DefaultAllocSet(assets[i]);
         }
     }
-
 }

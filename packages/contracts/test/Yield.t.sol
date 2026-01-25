@@ -166,16 +166,16 @@ contract RouterSetupTest is Test {
         assertEq(syt.balanceOfSYT(userA), depositAmount);
         assertEq(syt.balanceOf(userA), depositAmount + yieldAmount); // userA's balance should includes yield
         assertLt(syt.balanceOfSYT(userB), depositAmount); // userB's SYT balance should be less
-        assertEq(syt.balanceOf(userB), depositAmount -1); 
+        assertEq(syt.balanceOf(userB), depositAmount - 1);
 
         // Increase yield and check if the yield is distributed correctly
         yieldToken.mint(address(aaveAdapter), yieldAmount); // 10% original yield
 
         vm.startPrank(userA);
         syt.transfer(userB, syt.balanceOf(userA)); // userA cannot transfer more than balance
-            // True with scaling
-            // assertEq(syt.balanceOf(userA), depositAmount + (3*yieldAmount)/2);
-            // assertEq(syt.balanceOf(userB), depositAmount - 1 + yieldAmount/2);
+        // True with scaling
+        // assertEq(syt.balanceOf(userA), depositAmount + (3*yieldAmount)/2);
+        // assertEq(syt.balanceOf(userB), depositAmount - 1 + yieldAmount/2);
     }
 
     function test_sendYieldGained() public {

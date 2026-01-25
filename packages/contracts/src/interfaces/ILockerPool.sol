@@ -94,9 +94,7 @@ interface ILockerPool {
 
     function deposit(address asset, uint256 assets, address receiver) external returns (uint256 shares);
 
-    function withdraw(address asset, uint256 shares, address receiver, address owner)
-        external
-        returns (uint256 assets);
+    function withdraw(address asset, uint256 shares, address receiver, address owner) external returns (uint256 assets);
 
     /*=============================*
      *       ROUTER-ONLY HOOKS     *
