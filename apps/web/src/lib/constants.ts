@@ -175,7 +175,7 @@ const AutoHodlAddressMap = {
  */
 
 const MMCardDelegateAddressMap = {
-  [EChainId.Base]: '0x391F3E72C62B382e3724694dC3f04366a5922953',
+  [EChainId.Base]: '0x5c2eB01DB0D531Ecd2fDEb526F0892f364317e52',
   [EChainId.ArcTestnet]: '0xccb62b9449574bbda504709081919be5af34d1d0',
   [EChainId.Linea]: '0xB6848Bc4953870c796032fc860dbc8a14794C5B7',
   [EChainId.Sepolia]: '0xd247D46BC01067EcB5b94FC3Cb73A18A38Db5C33',
