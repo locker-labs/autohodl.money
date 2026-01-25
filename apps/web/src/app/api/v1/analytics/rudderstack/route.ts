@@ -8,15 +8,15 @@ import { EAnalyticsEvent } from '@/types/analytics';
 export async function POST(request: NextRequest) {
   console.log('Received POST request to Rudderstack analytics endpoint');
   try {
-    const cookieStore = await cookies();
-    const twclid = cookieStore.get('x_attr_id')?.value;
-
-    if (!twclid) {
-      console.error('No x_attr_id cookie found');
-      return NextResponse.json({ error: 'Missing tracking cookie' }, { status: 400 });
+    const userAgent = request.headers.get('user-agent');
+    const ip = request.headers.get('x-forwarded-for');
+    if (!userAgent || !ip) {
+      console.error('Missing userAgent or ip in headers', { userAgent, ip });
+      return NextResponse.json({ error: 'Missing userAgent or ip in headers' }, { status: 400 });
     }
 
-    console.log('twclid from cookie:', twclid);
+    const cookieStore = await cookies();
+    const twclid = cookieStore.get('x_attr_id')?.value;
 
     // Get the raw body as json
     if (request.headers.get('content-type') !== 'application/json') {
@@ -36,12 +36,17 @@ export async function POST(request: NextRequest) {
       console.error('No walletAddress provided in body');
       return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
     }
+    if (!body.savingsChainId) {
+      console.error('No savingsChainId provided in body');
+      return NextResponse.json({ error: 'Missing savingsChainId in body' }, { status: 400 });
+    }
 
     const trackingProperties: TTrackEventProperties = {
       twclid,
       walletAddress: body.walletAddress,
-      userAgent: request.headers.get('user-agent') ?? undefined,
-      ip: request.headers.get('x-forwarded-for') ?? undefined,
+      savingsChainId: body.savingsChainId,
+      userAgent: userAgent,
+      ip: ip,
     };
 
     switch (eventType) {
@@ -66,7 +71,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unknown eventType' }, { status: 400 });
     }
 
-    trackEvent(eventType, trackingProperties);
+    await trackEvent(eventType, trackingProperties);
 
     return NextResponse.json({ message: 'Event tracked successfully' });
   } catch (error) {

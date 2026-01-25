@@ -32,7 +32,6 @@ export function useErc20Allowance(params: {
       staleTime: 15_000,
     },
   });
-  console.log({owner, spender: params.spender, token: params.token, data});
 
   const allowance = data as bigint | undefined;
   const allowanceFormatted = useMemo(

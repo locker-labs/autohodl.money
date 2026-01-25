@@ -92,13 +92,6 @@ async function handleSavingsExecution(
     );
     return;
   }
-  const roundUpAmount = savingsConfig[2];
-  const savingsAmountBigInt = computeRoundUpAndSavings(BigInt(transferAmount), roundUpAmount).savingsAmount;
-  if (allowance < savingsAmountBigInt) {
-    console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmountBigInt}`);
-    // TODO: add a user notification when allowance is less
-    return;
-  }
 
   // If toYield = false, and to = savingsAddress, skip execution
   if (savingsConfig.toYield === false && getAddress(to) === getAddress(savingsConfig.savingAddress)) {

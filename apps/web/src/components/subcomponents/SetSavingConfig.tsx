@@ -118,18 +118,6 @@ export default function SetSavingConfig() {
       active: true,
     });
   };
-  useEffect(() => {
-    console.log({ allowanceFormatted, savingCap });
-    if (allowanceFormatted !== undefined && allowanceFormatted < savingCap) {
-      setIsApprovalNeeded(true);
-    }
-  }, [allowanceFormatted, savingCap]);
-  useEffect(() => {
-    if (isConfirmed && isApprovalNeeded) {
-      setIsApprovalNeeded(false);
-    }
-  }, [isConfirmed]);
-  console.log({ isApprovalNeeded });
 
   // Effect to check if approval is needed
   useEffect(() => {
