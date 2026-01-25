@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useConnection, useWalletClient } from 'wagmi';
+import { useConnection, useSwitchChain, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
 import { encodeAbiParameters, parseUnits } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
@@ -44,6 +44,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
   const { setRefetchFlag, setSavingsChainId } = useAutoHodl();
   const { address, isConnected } = useConnection();
   const { data: walletClient } = useWalletClient();
+  const switchChain = useSwitchChain();
 
   const { trackConfigSetEvent } = useAnalytics();
 
@@ -56,6 +57,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     savingsChainId,
   }: CreateConfigParams) => {
     if (!walletClient) throw new Error('WalletClient not initialized');
+    await switchChain.mutateAsync({ chainId: savingsChainId });
 
     const viemPublicClient = getViemPublicClientByChain(savingsChainId);
 
@@ -105,6 +107,7 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     setTxHash(null);
 
     try {
+      await switchChain.mutateAsync({ chainId: savingsChainId });
       const viemPublicClient = getViemPublicClientByChain(savingsChainId);
 
       const [delegate, autohodl, usdc] = [

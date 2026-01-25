@@ -8,9 +8,11 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useERC20Transfer } from '@/hooks/useERC20Token';
 import { getSusdcAddressByChain } from '@/lib/helpers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { TokenTickerMap } from '@/lib/constants';
+import { TokenTickerMap, ViemChainNameMap } from '@/lib/constants';
+import { useSwitchChain } from 'wagmi';
 
 export const WithdrawSavings = (): React.JSX.Element => {
+  const switchChain = useSwitchChain();
   const { address, sToken, savingsChainId } = useAutoHodl();
   const [isOpen, setIsOpen] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
@@ -62,8 +64,9 @@ export const WithdrawSavings = (): React.JSX.Element => {
     setWithdrawAmount(maxBalance.toString());
   };
 
-  const handleWithdraw = () => {
-    if (isValidAmount) {
+  const handleWithdraw = async () => {
+    if (isValidAmount && savingsChainId) {
+      await switchChain.mutateAsync({ chainId: savingsChainId });
       transfer();
     }
   };
@@ -73,18 +76,18 @@ export const WithdrawSavings = (): React.JSX.Element => {
   return (
     <>
       <Button
-        title={'Withdraw Savings'}
+        title={'Withdraw savings'}
         className='w-full h-[40px]'
         disabled={!sToken.isReady || !sToken.balanceFormatted}
         onAction={() => setIsOpen(true)}
       >
-        <span>Withdraw Savings</span>
+        <span>Withdraw savings</span>
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className='bg-white'>
           <DialogHeader>
-            <DialogTitle className='text-black'>Withdraw Savings</DialogTitle>
+            <DialogTitle className='text-black'>Withdraw savings on {ViemChainNameMap[savingsChainId!]}</DialogTitle>
             <DialogDescription>Enter the amount you want to withdraw from your savings.</DialogDescription>
           </DialogHeader>
 
@@ -120,7 +123,7 @@ export const WithdrawSavings = (): React.JSX.Element => {
                 </p>
               )}
               <p className='text-xs text-gray-500'>
-                Available: {maxBalance} {savingsTokenTicker}
+                Available savings: {maxBalance} {savingsTokenTicker}
               </p>
             </div>
 

@@ -286,13 +286,20 @@ export default function SetSavingConfig() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Select savings chain */}
+          <div className='mt-2 w-full flex items-center justify-between gap-4'>
+            <div className='text-sm font-semibold'>Choose your savings chain:</div>
+            <ChainSelector defaultChainId={chain.id} />
+          </div>
+
           {/* Advanced Options */}
           <Accordion className='mt-2' type='single' collapsible>
             <AccordionItem value='item-1'>
               <AccordionTrigger className='px-6 py-4 border border-gray-300 rounded-lg'>
                 Advanced Options
               </AccordionTrigger>
-              <AccordionContent className='mt-6 px-6 py-4 border border-gray-300 rounded-lg'>
+              <AccordionContent>
                 {/* Savings limit input */}
                 <div className='flex flex-col gap-2'>
                   <label htmlFor={'savingsCap'} className='text-sm font-medium text-black'>
@@ -317,12 +324,6 @@ export default function SetSavingConfig() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-
-          {/* Select savings chain */}
-          <div className='w-full flex items-center justify-between gap-4'>
-            <div className='text-sm font-semibold'>Choose your savings chain:</div>
-            <ChainSelector defaultChainId={chain.id} />
-          </div>
         </div>
       </fieldset>
       {isApprovalNeeded === true ? (

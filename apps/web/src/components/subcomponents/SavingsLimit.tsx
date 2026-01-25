@@ -6,12 +6,14 @@ import { Edit3, X } from 'lucide-react';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { getAutoHodlAddressByChain, getUsdcAddressByChain } from '@/lib/helpers';
 import { TokenTickerMap } from '@/lib/constants';
+import { useSwitchChain } from 'wagmi';
 
 const SavingsLimit = () => {
-  const { address: userAddress } = useConnection();
+  const { address: userAddress, chainId: currentChainId } = useConnection();
   const { savingsChainId } = useAutoHodl();
   const [savingsCap, setSavingsCap] = useState<number | null>(100); // default 100 USDC
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view-only and edit modes
+  const switchChain = useSwitchChain();
 
   const [usdc, autohodl] = [getUsdcAddressByChain(savingsChainId), getAutoHodlAddressByChain(savingsChainId)];
 
@@ -55,7 +57,11 @@ const SavingsLimit = () => {
     setTimeout(() => document.getElementById('savingsCap')?.focus(), 0);
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
+    if (savingsChainId && currentChainId && currentChainId !== savingsChainId) {
+      await switchChain.mutateAsync({ chainId: savingsChainId });
+    }
+
     approve();
   };
 
