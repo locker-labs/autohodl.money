@@ -103,7 +103,6 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
             if (config.active) {
               setConfig(config);
               setSavingsChainId(chainId);
-              await switchChain(chainId);
               return;
             }
           }
@@ -113,7 +112,6 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
         if (fallbackConfig && fallbackChainId) {
           setConfig(fallbackConfig);
           setSavingsChainId(fallbackChainId);
-          await switchChain(fallbackChainId);
           return;
         }
 
