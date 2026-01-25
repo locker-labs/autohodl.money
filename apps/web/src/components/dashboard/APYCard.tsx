@@ -1,0 +1,56 @@
+import { TrendingUp } from 'lucide-react';
+import { PriceSkeleton } from '@/components/ui/skeletons/PriceSkeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import AdaptiveInfoTooltip from '@/components/ui/tooltips/AdaptiveInfoTooltip';
+import { useAutoHodl } from '@/context/AutoHodlContext';
+import { useAaveAPY } from '@/hooks/useAaveAPY';
+
+export function APYCard() {
+  const { config } = useAutoHodl();
+  const { data: apy, isLoading: loading } = useAaveAPY();
+
+  const showWarning = (!!config && !config.toYield) || false;
+
+  return (
+    <Card
+      className={`py-4 px-5 flex items-center justify-start rounded-xl border 
+    ${showWarning ? 'border-red-500' : 'border-app-green'}`}
+    >
+      <CardContent className='h-full w-full flex flex-row sm:flex-col items-start gap-3'>
+        {/* Icon */}
+        <TrendingUp
+          className={`min-w-6 min-h-6
+          ${showWarning ? 'text-red-500' : 'text-[#1CB01C]'}`}
+          size={24}
+          strokeWidth={1}
+          // color='#1CB01C'
+        />
+        <div>
+          <div className='flex items-end gap-1'>
+            <div
+              className={`leading-none font-bold ${showWarning ? 'text-red-500' : 'text-[#78E76E]'} text-2xl text-left sm:text-center md:text-left`}
+            >
+              {loading ? <PriceSkeleton /> : <p>{apy ? `${apy}%` : '-'}</p>}
+            </div>
+          </div>
+
+          {showWarning ? (
+            <div className='mt-2'>
+              <p className='text-lg font-semibold text-left sm:text-center md:text-left text-red-500'>
+                You are missing out on yield!
+              </p>
+              <p className='text-base text-left sm:text-center md:text-left text-red-500'>
+                Enable yield to maximize your savings
+              </p>
+            </div>
+          ) : (
+            <div className='mt-1 flex items-center justify-start gap-2'>
+              <p className='text-black text-lg text-left sm:text-center md:text-left'>Current APY</p>
+              <AdaptiveInfoTooltip content={'Yield is based on the current APY of the Aave pool.'} />
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

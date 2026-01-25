@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Hex } from 'viem';
-import { ALCHEMY_API_URL } from '@/lib/constants';
+import { AlchemyApiUrlMap, type EChainId } from '@/lib/constants';
 import type { IBlock } from '@/types/alchemy';
 import type { IJsonRpcRequest, IJsonRpcResponse } from '@/types/json-rpc';
 
@@ -9,7 +9,7 @@ import type { IJsonRpcRequest, IJsonRpcResponse } from '@/types/json-rpc';
  * @param blockNumbers - An array of block numbers (in hex string format) to fetch blocks for.
  * @returns A promise that resolves to an array of blocks.
  */
-export async function fetchBlockByNumberInBatch(blockNumbers: Hex[]): Promise<IBlock[]> {
+export async function fetchBlockByNumberInBatch(blockNumbers: Hex[], chainId: EChainId): Promise<IBlock[]> {
   const requests: IJsonRpcRequest[] = blockNumbers.map((blockNumber, index) => ({
     jsonrpc: '2.0',
     method: 'eth_getBlockByNumber',
@@ -18,7 +18,7 @@ export async function fetchBlockByNumberInBatch(blockNumbers: Hex[]): Promise<IB
   }));
 
   try {
-    const { data } = await axios.post<IJsonRpcResponse<IBlock>[]>(ALCHEMY_API_URL, requests, {
+    const { data } = await axios.post<IJsonRpcResponse<IBlock>[]>(AlchemyApiUrlMap[chainId], requests, {
       headers: {
         'Content-Type': 'application/json',
       },

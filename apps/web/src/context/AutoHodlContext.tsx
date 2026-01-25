@@ -2,27 +2,32 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useConnection, useSwitchChain } from 'wagmi';
 import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
-import { S_USDC_ADDRESS, type SupportedAccounts, USDC_ADDRESS } from '@/lib/constants';
+import { type EChainId, mockDefaultChainId, type SupportedAccounts } from '@/lib/constants';
 import { getSavingsConfig } from '@/lib/autohodl';
 import type { SavingsConfig } from '@/types/autohodl';
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
-import { viemPublicClient } from '@/lib/clients/client';
 import { type Address, zeroAddress } from 'viem';
+import { chains } from '@/config';
+import { getSusdcAddressByChain, getUsdcAddressByChain, getViemPublicClientByChain } from '@/lib/helpers';
 
 type AutoHodlContextType = {
   loading: boolean;
   config: SavingsConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  accountsMap?: Map<EChainId, SupportedAccounts[]>;
   accounts: SupportedAccounts[];
   sToken: UseERC20BalanceOfReturn;
   token: UseERC20BalanceOfReturn;
   address: Address | undefined;
   isConnected: boolean;
+  savingsChainId: EChainId | null;
+  setSavingsChainId: React.Dispatch<React.SetStateAction<EChainId | null>>;
+  switchChain: (chainId: EChainId) => Promise<void>;
 };
 
 const AutoHodlContext = createContext<AutoHodlContextType | undefined>(undefined);
@@ -43,16 +48,30 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState<SavingsConfig | null>(null);
   const [refetchFlag, setRefetchFlag] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useConnection();
+  const [savingsChainId, setSavingsChainId] = useState<EChainId | null>(null);
+
+  const switchChainFn = useSwitchChain();
+
+  async function switchChain(chainId: EChainId) {
+    const chainToSwitch = chains.find((c) => c.id === chainId);
+    if (chainToSwitch) {
+      await switchChainFn.mutateAsync({ chainId: chainToSwitch.id });
+    } else {
+      console.error('Chain to switch not found');
+    }
+  }
 
   // Get Supported Accounts
-  const { data: accounts, isLoading: loadingAccounts } = useQuery({
+  const { data: accountsMap, isLoading: loadingAccounts } = useQuery({
     enabled: !!address && isConnected,
     queryFn: async () => {
       return await getSupportedAccounts(address);
     },
     queryKey: ['supported-accounts', address, refetchFlag],
   });
+
+  const accounts = savingsChainId ? accountsMap?.get(savingsChainId) || [] : [];
 
   // Fetch savings config when wallet connects
   useEffect(() => {
@@ -63,16 +82,45 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
 
       try {
         setLoading(true);
-        const config = await getSavingsConfig(viemPublicClient, address, USDC_ADDRESS);
-        const found = config && config.savingAddress !== zeroAddress;
-        if (found) {
-          setConfig(config);
-        } else {
-          setConfig(null);
+        let fallbackConfig: SavingsConfig | null = null;
+        let fallbackChainId: EChainId | null = null;
+
+        for (const chain of chains) {
+          const chainId = chain.id as EChainId;
+          const config = await getSavingsConfig(
+            getViemPublicClientByChain(chainId),
+            address,
+            getUsdcAddressByChain(chainId),
+            chainId,
+          );
+
+          if (config && config.delegate !== zeroAddress) {
+            if (!fallbackConfig && !fallbackChainId) {
+              fallbackConfig = config;
+              fallbackChainId = chainId;
+            }
+
+            if (config.active) {
+              setConfig(config);
+              setSavingsChainId(chainId);
+              return;
+            }
+          }
         }
+
+        // if no config is active, set first config found as fallback
+        if (fallbackConfig && fallbackChainId) {
+          setConfig(fallbackConfig);
+          setSavingsChainId(fallbackChainId);
+          return;
+        }
+
+        setConfig(null);
+        setSavingsChainId(null);
       } catch (error) {
         console.error('Error fetching savings config:', error);
         setConfig(null);
+        setSavingsChainId(null);
       } finally {
         setLoading(false);
       }
@@ -81,15 +129,19 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
     fetchSavingsConfigArray();
   }, [address, isConnected, refetchFlag]);
 
+  // TODO: check autoHODL config in all supported chains and set savingsChain accordingly
+
   // Get sToken Balance
   const sToken = useERC20BalanceOf({
-    token: S_USDC_ADDRESS,
+    chainId: savingsChainId,
+    token: getSusdcAddressByChain(savingsChainId || mockDefaultChainId),
     address: address,
   });
 
   // Get Token Balance
   const token = useERC20BalanceOf({
-    token: USDC_ADDRESS,
+    chainId: savingsChainId,
+    token: getUsdcAddressByChain(savingsChainId || mockDefaultChainId),
     address: address,
   });
 
@@ -100,11 +152,15 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
         config,
         setRefetchFlag,
         setConfig,
-        accounts: accounts || [],
+        accountsMap,
+        accounts,
         sToken,
         token,
         address,
         isConnected,
+        savingsChainId,
+        setSavingsChainId,
+        switchChain,
       }}
     >
       {children}

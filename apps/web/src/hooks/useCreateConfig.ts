@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useConnection, useSwitchChain, useWalletClient } from 'wagmi';
 import type { Address, Hex } from 'viem';
 import { encodeAbiParameters, parseUnits } from 'viem';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
-import { AUTOHODL_ADDRESS, DELEGATE, TokenDecimalMap, USDC_ADDRESS } from '@/lib/constants';
-import { viemPublicClient } from '@/lib/clients/client';
+import { type EChainId, TokenDecimalMap, ViemChainMap } from '@/lib/constants';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { extraDataParams, type SavingsMode } from '@/types/autohodl';
 import { useAnalytics } from './useAnalytics';
+import {
+  getAutoHodlAddressByChain,
+  getDelegateAddressByChain,
+  getUsdcAddressByChain,
+  getViemPublicClientByChain,
+} from '@/lib/helpers';
+import { toastCustom } from '@/components/ui/toast';
 
 type CreateConfigParams = {
   active: boolean;
@@ -15,6 +21,7 @@ type CreateConfigParams = {
   roundUp: number;
   savingsAddress: Address;
   mode: SavingsMode;
+  savingsChainId: EChainId;
 };
 
 type UseCreateConfigReturn = {
@@ -31,40 +38,66 @@ const useCreateConfig = (): UseCreateConfigReturn => {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [txHash, setTxHash] = useState<Hex | null>(null);
-
-  const { address, isConnected } = useAccount();
-  const { data: walletClient } = useWalletClient();
-  const { setRefetchFlag } = useAutoHodl();
-  const { trackConfigSetEvent } = useAnalytics();
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
+  const { setRefetchFlag, setSavingsChainId } = useAutoHodl();
+  const { address, isConnected } = useConnection();
+  const { data: walletClient } = useWalletClient();
+  const switchChain = useSwitchChain();
+
+  const { trackConfigSetEvent } = useAnalytics();
+
+  const createConfig = async ({
+    roundUp,
+    savingsAddress,
+    active,
+    toYield,
+    mode,
+    savingsChainId,
+  }: CreateConfigParams) => {
     if (!walletClient) throw new Error('WalletClient not initialized');
+    await switchChain.mutateAsync({ chainId: savingsChainId });
+
+    const viemPublicClient = getViemPublicClientByChain(savingsChainId);
+
+    const [delegate, autohodl, usdc] = [
+      getDelegateAddressByChain(savingsChainId),
+      getAutoHodlAddressByChain(savingsChainId),
+      getUsdcAddressByChain(savingsChainId),
+    ];
 
     const extraData = encodeAbiParameters(extraDataParams, [mode]);
     const args = [
-      USDC_ADDRESS,
+      usdc,
       savingsAddress as Address,
-      DELEGATE,
-      parseUnits(roundUp.toString(), TokenDecimalMap[USDC_ADDRESS]),
+      delegate,
+      parseUnits(roundUp.toString(), TokenDecimalMap[usdc]),
       active,
       toYield,
       extraData,
     ] as const;
     const tx = await walletClient.writeContract({
-      address: AUTOHODL_ADDRESS,
+      chain: ViemChainMap[savingsChainId],
+      address: autohodl,
       abi: AutoHodlAbi,
       functionName: 'setSavingConfig',
       args,
     });
     await viemPublicClient.waitForTransactionReceipt({ hash: tx, confirmations: 1 });
     setRefetchFlag((flag) => !flag);
+    setSavingsChainId(savingsChainId);
     return tx;
   };
 
-  const handleCreateConfig = async ({ roundUp, savingsAddress, active, toYield, mode }: CreateConfigParams) => {
+  const handleCreateConfig = async ({
+    roundUp,
+    savingsAddress,
+    active,
+    toYield,
+    mode,
+    savingsChainId,
+  }: CreateConfigParams) => {
     if (!isConnected || !address || !walletClient) return;
 
     setLoading(true);
@@ -74,20 +107,29 @@ const useCreateConfig = (): UseCreateConfigReturn => {
     setTxHash(null);
 
     try {
+      await switchChain.mutateAsync({ chainId: savingsChainId });
+      const viemPublicClient = getViemPublicClientByChain(savingsChainId);
+
+      const [delegate, autohodl, usdc] = [
+        getDelegateAddressByChain(savingsChainId),
+        getAutoHodlAddressByChain(savingsChainId),
+        getUsdcAddressByChain(savingsChainId),
+      ];
       const extraData = encodeAbiParameters(extraDataParams, [mode]);
 
       // Ensure types for contract call
       const args = [
-        USDC_ADDRESS,
+        usdc,
         savingsAddress,
-        DELEGATE,
-        parseUnits(roundUp.toString(), TokenDecimalMap[USDC_ADDRESS]),
+        delegate,
+        parseUnits(roundUp.toString(), TokenDecimalMap[usdc]),
         active,
         toYield,
         extraData,
       ] as const;
       const tx = await walletClient.writeContract({
-        address: AUTOHODL_ADDRESS,
+        chain: ViemChainMap[savingsChainId],
+        address: autohodl,
         abi: AutoHodlAbi,
         functionName: 'setSavingConfig',
         args,
@@ -102,8 +144,12 @@ const useCreateConfig = (): UseCreateConfigReturn => {
       await trackConfigSetEvent(tx);
 
       setRefetchFlag((flag) => !flag);
+      setSavingsChainId(savingsChainId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create config');
+      const errMsg = e instanceof Error ? e.message : 'Failed to create config';
+      console.error(errMsg);
+      toastCustom(errMsg);
+      setError(errMsg);
     } finally {
       setLoading(false);
       setWaitingForConfirmation(false);
