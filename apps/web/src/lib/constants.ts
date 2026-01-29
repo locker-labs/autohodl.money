@@ -46,8 +46,11 @@ const ViemChainImageMap: Record<EChainId, string> = {
  * MetaMask Card addresses
  */
 
-const MetaMaskCardAddressMap: Record<EChainId, { US: Address; International: Address } | null> = {
-  [EChainId.Base]: null,
+const MetaMaskCardAddressMap: Record<EChainId, { US: Address | null; International: Address | null } | null> = {
+  [EChainId.Base]: {
+    US: null,
+    International: '0xDaBDaFC43B2BC1c7D10C2BBce950A8CAd4a367F8',
+  },
   [EChainId.Linea]: {
     US: '0xA90b298d05C2667dDC64e2A4e17111357c215dD2',
     International: '0x9dd23A4a0845f10d65D293776B792af1131c7B30',
