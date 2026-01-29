@@ -3,8 +3,14 @@ import { encodeAbiParameters } from 'viem';
 import { MMCardDelegateAbi } from '@/lib/abis';
 import { account, getViemWalletClientByChain } from '@/lib/clients/server';
 import type { EChainId } from '@/lib/constants';
-import { getDelegateAddressByChain, getViemChain } from '@/lib/helpers';
+import {
+  getDelegateAddressByChain,
+  getViemChain,
+  getViemPublicClientByChain,
+} from "@/lib/helpers";
 import type { SourceTxInfo } from '@/types/autohodl';
+
+const GAS_BUFFER_PERCENT = BigInt(40); 
 
 /**
  * Executes a savings transaction on the MMCardDelegate contract.
@@ -27,21 +33,39 @@ export async function delegateSaving({
   data: SourceTxInfo;
   chainId: EChainId;
 }): Promise<Hex> {
-  console.log('Delegate Saving called with:', { user, asset, value, data });
+  console.log("Delegate Saving called with:", { user, asset, value, data });
 
   const walletClient = getViemWalletClientByChain(chainId);
-  if (!walletClient) throw new Error('No wallet client found for chain');
+  const publicClient = getViemPublicClientByChain(chainId);
+  if (!walletClient) throw new Error("No wallet client found for chain");
+  if (!publicClient) throw new Error("No public client found for chain");
+  
+  const params = [
+    { type: "bytes32" },
+    { type: "uint256" },
+    { type: "uint256" },
+  ];
+  const encoded = encodeAbiParameters(params, [
+    data.sourceTxHash,
+    data.purchaseAmount,
+    BigInt(data.sourceChainId),
+  ]);
+  console.log("encoded:", encoded);
 
-  const params = [{ type: 'bytes32' }, { type: 'uint256' }, { type: 'uint256' }];
-  const encoded = encodeAbiParameters(params, [data.sourceTxHash, data.purchaseAmount, BigInt(data.sourceChainId)]);
-  console.log('encoded:', encoded);
-
-  return walletClient.writeContract({
+  const contractConfig = {
     address: getDelegateAddressByChain(chainId),
     abi: MMCardDelegateAbi,
-    functionName: 'delegateSaving',
+    functionName: "delegateSaving" as const,
     args: [user, asset, value, encoded],
-    chain: getViemChain(chainId),
     account,
+  };
+  const estimatedGas = await publicClient.estimateContractGas(contractConfig);
+  const gasWithBuffer =
+    estimatedGas + (estimatedGas * GAS_BUFFER_PERCENT) / BigInt(100);
+
+  return walletClient.writeContract({
+    ...contractConfig,
+    chain: getViemChain(chainId),
+    gas: gasWithBuffer,
   });
 }
