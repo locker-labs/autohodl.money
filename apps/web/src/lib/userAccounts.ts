@@ -28,28 +28,33 @@ async function getSupportedAccounts(address: Address | undefined): Promise<Map<E
     const viemPublicClient = getViemPublicClientByChain(chainId);
     const usdc = getUsdcAddressByChain(chainId);
 
-    const allowanceMMUSPromise = fetchAllowance({
-      publicClient: viemPublicClient,
-      tokenAddress: usdc,
-      owner: address,
-      spender: mmc.International,
-    });
+    if (mmc.International) {
+      const allowanceMMIntl = await fetchAllowance({
+        publicClient: viemPublicClient,
+        tokenAddress: usdc,
+        owner: address,
+        spender: mmc.International,
+      });
 
-    const allowanceMMIntlPromise = fetchAllowance({
-      publicClient: viemPublicClient,
-      tokenAddress: usdc,
-      owner: address,
-      spender: mmc.US,
-    });
-
-    const [allowanceMMUS, allowanceMMIntl] = await Promise.all([allowanceMMUSPromise, allowanceMMIntlPromise]);
-
-    if (allowanceMMUS > BigInt(0) || allowanceMMIntl > BigInt(0)) {
-      accountsMap.set(chainId, [SupportedAccounts.MetaMask, ...defaultAccounts]);
+      if (allowanceMMIntl > BigInt(0)) {
+        accountsMap.set(chainId, [SupportedAccounts.MetaMask, ...defaultAccounts]);
+        continue;
+      }
     }
-    // else if (chainId === EChainId.Linea) {
-    //   accountsMap.set(chainId, [SupportedAccounts.MetaMask, ...defaultAccounts]);
-    // }
+
+    if (mmc.US) {
+      const allowanceMMUS = await fetchAllowance({
+        publicClient: viemPublicClient,
+        tokenAddress: usdc,
+        owner: address,
+        spender: mmc.US,
+      });
+
+      if (allowanceMMUS > BigInt(0)) {
+        accountsMap.set(chainId, [SupportedAccounts.MetaMask, ...defaultAccounts]);
+        continue;
+      }
+    }
   }
 
   return accountsMap;

@@ -211,6 +211,11 @@ async function handleSavingsExecution(
   const savingsAmount: bigint = computeRoundUpAndSavings(normalizedTransferAmount, roundUpTo).savingsAmount;
   console.log('SAVINGS AMOUNT:', savingsAmount);
 
+  if (savingsAmount === BigInt(0)) {
+    console.info('Savings amount is 0. Skipping savings tx.');
+    return;
+  }
+
   // 10. Check if allowance is sufficient
   if (allowance < savingsAmount) {
     console.warn(`Insufficient allowance. Current allowance: ${allowance}, Required: ${savingsAmount}`);
