@@ -13,4 +13,5 @@ export const links = {
   github: 'https://github.com/locker-labs/autohodl.money',
   contact: 'mailto:hello@autohodl.money',
   docs: 'https://docs.autohodl.money',
+  perch: 'https://perch.bio/autohodl',
 };
