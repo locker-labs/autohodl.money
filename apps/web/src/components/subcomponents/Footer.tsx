@@ -7,7 +7,7 @@ const footerLinks = [
   // { href: links.github, label: 'GitHub' },
   // { href: links.contact, label: 'Email' },
   // { href: links.docs, label: 'Documentation' },
-  { href: links.perch, label: 'Connect' },
+  { href: links.perch, label: 'Bio' },
 ];
 
 export function Footer({ innerClassName = '', className }: { innerClassName?: string; className?: string }) {
