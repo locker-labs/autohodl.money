@@ -1,4 +1,4 @@
-import type { AppKitNetwork } from '@reown/appkit/networks';
+// import type { AppKitNetwork } from '@reown/appkit/networks';
 import {
   // defineChain,
   base as baseAppKit,
@@ -22,7 +22,7 @@ import { SavingsMode } from '@/types/autohodl';
 // });
 
 // ['production', 'staging'].includes(secrets.env) ? linea : sepolia;
-export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [baseAppKit, lineaAppKit];
+export const networks: any = [baseAppKit, lineaAppKit];
 export const chains: Chain[] = [base, linea];
 
 // Get projectId from https://dashboard.reown.com
