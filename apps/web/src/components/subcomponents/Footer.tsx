@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { links } from '@/lib/paths';
 
-export function Footer({ innerClassName = '', className }: { innerClassName?: string; className?: string }) {
-  const footerLinks = [
-    { href: links.telegram, label: 'Telegram' },
-    { href: links.twitter, label: 'Twitter' },
-    { href: links.github, label: 'GitHub' },
-    { href: links.contact, label: 'Email' },
-    { href: links.docs, label: 'Documentation' },
-  ];
+const footerLinks = [
+  // { href: links.telegram, label: 'Telegram' },
+  { href: links.twitter, label: 'Twitter' },
+  // { href: links.github, label: 'GitHub' },
+  // { href: links.contact, label: 'Email' },
+  // { href: links.docs, label: 'Documentation' },
+  { href: links.perch, label: 'Bio' },
+];
 
+export function Footer({ innerClassName = '', className }: { innerClassName?: string; className?: string }) {
   return (
     <div className={className}>
       <hr className='bg-[#D0D0D0] h-[2px] opacity-70' />
