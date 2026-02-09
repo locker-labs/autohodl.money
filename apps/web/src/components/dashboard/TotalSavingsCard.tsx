@@ -12,7 +12,7 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { useSTokenBalances } from '@/hooks/useSTokenBalances';
 import { formatUnits } from 'viem';
 import { useMemo, useState } from 'react';
-import { TokenTickerMap } from '@/lib/constants';
+import { autohodlTokenImageUrl, TokenTickerMap } from '@/lib/constants';
 import { useConnection } from 'wagmi';
 
 const valueLs = 'true';
@@ -55,6 +55,7 @@ export function TotalSavingsCard() {
             address: SUSDC_ADDRESS,
             symbol: ticker,
             decimals: getTokenDecimalsByAddress(SUSDC_ADDRESS),
+            image: autohodlTokenImageUrl,
           },
         },
       });
