@@ -126,7 +126,7 @@ export default function LandingPage() {
               className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
               title={'Connect wallet'}
             >
-              {copy.hero.ctaDesktop}
+              {copy.hero.cta}
             </Button>
           </div>
           <div className='mx-auto mt-[60px] max-w-[480px] w-fit flex items-center justify-center'>
@@ -145,7 +145,7 @@ export default function LandingPage() {
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
               title={'Connect wallet'}
             >
-              {copy.hero.cta}
+              {copy.hero.ctaDesktop}
             </Button>
           </div>
           <div className='w-full flex items-center justify-end'>
