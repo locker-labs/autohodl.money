@@ -38,12 +38,12 @@ const copy = {
     {
       title: 'Auto round-up',
       description: 'We take the spare change and move it into a savings account that only you control.',
-      imgSrc: '/save.png',
+      imgSrc: '/auto-roundup.png',
     },
     {
       title: 'Grow passively',
       description: 'Your savings earn yield while staying fully secure. Or choose idle savings if you prefer.',
-      imgSrc: '/grow.svg',
+      imgSrc: '/grow-passively.png',
     },
   ],
   metaMaskCard: {
@@ -325,7 +325,7 @@ function BorderCard({
     <div
       className={`border border-[#78E76E] rounded-[16px] p-[16px] flex flex-col items-center justify-center ${className}`}
     >
-      <div className='transition-transform duration-500 hover:scale-105 w-[200px] aspect-auto p-4 flex items-center justify-center'>
+      <div className='transition-transform duration-500 hover:scale-105 w-[300px] aspect-auto p-4 flex items-center justify-center'>
         <div className='h-[200px] aspect-auto p-4 flex items-center justify-center'>
           <Image className='aspect-auto' src={imgSrc} alt='img' width={287} height={287} />
         </div>
