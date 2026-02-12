@@ -11,14 +11,71 @@ import Autoplay from 'embla-carousel-autoplay';
 import { useRef } from 'react';
 import { Footer } from '@/components/subcomponents/Footer';
 
-const testimonials = [
-  {
-    idx: 0,
-    text: `“This is what building on open infrastructure looks like. More of this, please!”`,
-    author: 'Alejandro Machado',
-    role: 'MetaMask',
+const copy = {
+  hero: {
+    heading1: 'Grow your crypto passively.',
+    heading2: 'While you spend normally.',
+    description:
+      'Effortlessly save as you spend, earn attractive yields on your savings, and discover even more ways to HODL your assets securely.',
+    cta: 'Get started',
+    ctaDesktop: 'Start saving now',
   },
-];
+  mobile: {
+    cta: 'Start saving',
+  },
+  savings: {
+    heading1: 'Crypto Savings,',
+    heading2: 'Simplified',
+    description:
+      'autoHODL rounds up your all your USDC transfers and crypto card purchases, then deposits the extra into Aave to earn yield.',
+  },
+  cards: [
+    {
+      title: 'Spend normally',
+      description: 'Use your MetaMask card or make USDC transfers for everyday purchases as usual.',
+      imgSrc: '/coins.png',
+    },
+    {
+      title: 'Auto round-up',
+      description: 'We take the spare change and move it into a savings account that only you control.',
+      imgSrc: '/auto-roundup.png',
+    },
+    {
+      title: 'Grow passively',
+      description: 'Your savings earn yield while staying fully secure. Or choose idle savings if you prefer.',
+      imgSrc: '/grow-passively.png',
+    },
+  ],
+  metaMaskCard: {
+    label: 'Support for',
+    heading: 'MetaMask Card',
+    description: '1st place: MetaMask x Circle - Smart Agents & Liquidity Automation',
+    cta: 'Learn more',
+  },
+  spendableYield: {
+    heading: 'Spendable Yield Tokens',
+    description:
+      'AutoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them.They work like normal tokens but grow automatically in your wallet without staking, locking, or claiming.',
+    cta: 'Learn more',
+  },
+  testimonials: [
+    {
+      idx: 0,
+      text: `"This is what building on open infrastructure looks like. More of this, please!"`,
+      author: 'Alejandro Machado',
+      role: 'MetaMask',
+    },
+  ],
+  recognized: {
+    heading: 'Recognized by',
+  },
+  setup: {
+    heading1: 'Setup once.',
+    heading2: 'Save forever.',
+    description: 'Join a worldwide network and start building wealth with every purchase. No effort required.',
+    cta: 'Get started',
+  },
+};
 
 export default function LandingPage() {
   const { open } = useAppKit();
@@ -40,7 +97,7 @@ export default function LandingPage() {
           className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
           title={'Connect wallet'}
         >
-          Get started
+          {copy.mobile.cta}
         </Button>
       </div>
 
@@ -60,18 +117,16 @@ export default function LandingPage() {
 
         {/* Mobile */}
         <div className='mt-[40px] lg:hidden w-full max-w-[1080px]'>
-          <H2>Save your spare change</H2>
-          <Description className='mt-[16px] text-center'>
-            Earn yield on your spare <span className='line-through'>change</span> crypto, earn points while you shop,
-            and more ways to HODL.
-          </Description>
+          <H2 className='text-center'>{copy.hero.heading1}</H2>
+          <H2>{copy.hero.heading2}</H2>
+          <Description className='mt-[16px] text-center'>{copy.hero.description}</Description>
           <div className='mt-[16px] flex justify-center'>
             <Button
               onAction={() => open()}
               className={'w-[124px] h-[38px] font-bold rounded-[8px]'}
               title={'Connect wallet'}
             >
-              Get started
+              {copy.hero.cta}
             </Button>
           </div>
           <div className='mx-auto mt-[60px] max-w-[480px] w-fit flex items-center justify-center'>
@@ -80,19 +135,17 @@ export default function LandingPage() {
         </div>
 
         {/* Desktop */}
-        <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1080px] lg:grid grid-cols-2 items-center justify-between gap-[60px]'>
+        <div className='hidden h-[calc(100vh-120px)] w-full max-w-[1080px] lg:grid grid-cols-2 items-center justify-between gap-[40px]'>
           <div>
-            <H2 className='text-start'>Simple savings and investments.</H2>
-            <Description className='mt-[16px] max-w-[500px]'>
-              Earn yield on your spare <span className='line-through'>change</span> crypto, invest while you spend, and
-              more ways to HODL.
-            </Description>
+            <H2 className='text-start'>{copy.hero.heading1}</H2>
+            <H2 className='text-start'>{copy.hero.heading2}</H2>
+            <Description className='mt-[16px] max-w-[500px]'>{copy.hero.description}</Description>
             <Button
               onAction={() => open()}
               className={'mt-[40px] w-[245px] h-[52px] font-bold rounded-[8px]'}
               title={'Connect wallet'}
             >
-              Get started
+              {copy.hero.ctaDesktop}
             </Button>
           </div>
           <div className='w-full flex items-center justify-end'>
@@ -110,62 +163,32 @@ export default function LandingPage() {
       {/* mobile */}
       <section className='lg:hidden px-[24px] py-[40px] bg-[#ffffff] w-full flex flex-col items-center justify-center'>
         <div className={'max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <H2 className='w-full text-start font-light'>Onchain Savings,</H2>
-          <H2 className='w-full text-start text-[#78E76E]'>Simplified</H2>
-          <Description className='mt-[32px]'>
-            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
-            yield.
-          </Description>
+          <H2 className='w-full text-start font-light'>{copy.savings.heading1}</H2>
+          <H2 className='w-full text-start text-[#78E76E]'>{copy.savings.heading2}</H2>
+          <Description className='mt-[32px]'>{copy.savings.description}</Description>
         </div>
 
         <div className='mt-[40px] mb-4 max-w-[1080px] grid gap-[16px]'>
-          <BorderCard
-            imgSrc='/coins.png'
-            title='Spend normally'
-            description='Use your MetaMask Card for daily purchases'
-          />
-          <BorderCard
-            imgSrc='/save.png'
-            title='Auto round-up'
-            description='Spare change (eg $0.75 on $3.25 purchase) is deposited into Aave'
-          />
-          <BorderCard
-            imgSrc='/grow.svg'
-            title='Grow passively'
-            description='Your savings earn yield while staying fully secure'
-          />
+          {copy.cards.map((card) => (
+            <BorderCard key={card.title} imgSrc={card.imgSrc} title={card.title} description={card.description} />
+          ))}
         </div>
       </section>
       {/* Desktop */}
       <section className='hidden p-[48px] bg-[#ffffff] lg:flex flex-col items-center justify-center'>
         <div className={'mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          {/* <p className='text-[40px] font-medium'>
-            On-chain Savings, <span className='text-[#78E76E]'>Simplified</span>
-          </p> */}
-          <H2 className=''>Onchain Savings,</H2>
-          <H2 className='text-[#78E76E] w-full'>Simplified</H2>
-          <Description className='mt-[16px] max-w-[600px] text-center'>
-            autoHODL automatically rounds up your crypto card purchases and sends the savings to Aave, where they earn
-            passive yield.
-          </Description>
+          <div className='flex items-center justify-center gap-2'>
+            <H2 className='w-fit'>{copy.savings.heading1}</H2>
+            <H2 className='text-[#78E76E] w-fit'>{copy.savings.heading2}</H2>
+          </div>
+
+          <Description className='mt-[16px] max-w-[600px] text-center'>{copy.savings.description}</Description>
         </div>
 
         <div className='max-w-[1080px] grid grid-cols-3 gap-[32px]'>
-          <BorderCard
-            imgSrc='/coins.png'
-            title='Spend normally'
-            description='Use any wallet you already have for daily purchases'
-          />
-          <BorderCard
-            imgSrc='/save.png'
-            title='Auto round-up'
-            description='Payments are rounded up and your spare change is deposited into Aave'
-          />
-          <BorderCard
-            imgSrc='/grow.svg'
-            title='Grow passively'
-            description='Your savings earn yield while staying fully secure'
-          />
+          {copy.cards.map((card) => (
+            <BorderCard key={card.title} imgSrc={card.imgSrc} title={card.title} description={card.description} />
+          ))}
         </div>
       </section>
 
@@ -173,19 +196,18 @@ export default function LandingPage() {
       <section className='lg:px-12 bg-[#f7feec] flex items-center justify-center'>
         <div className={'mb-12 lg:mb-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
-            <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>Launch Partner</p>
-            <H2>MetaMask Card</H2>
+            <p className='mt-12 lg:mt-0 lg:mb-2 text-[24px] font-base'>{copy.metaMaskCard.label}</p>
+            <H2>{copy.metaMaskCard.heading}</H2>
             <Description className='mt-[24px] mb-[24px] lg:mb-[32px] max-w-[500px]'>
-              Save & earn yield on your MetaMask Card transfers. autoHODL ranked #1 by MetaMask in Smart Agents &
-              Liquidity Automation.
+              {copy.metaMaskCard.description}
             </Description>
 
             <Button
               onAction={() => open()}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
-              title={'Start now'}
+              title={copy.metaMaskCard.cta}
             >
-              Start now
+              {copy.metaMaskCard.cta}
             </Button>
           </div>
           <div className='my-8 lg:my-0 transition-transform duration-500 lg:size-[800px] flex items-center justify-center'>
@@ -198,19 +220,18 @@ export default function LandingPage() {
       <section className='lg:px-12 bg-white flex items-center justify-center'>
         <div className={'mt-12 mb-12 lg:mb-0 lg:mt-0 max-w-[1080px] w-full grid lg:grid-cols-2 gap-[32px]'}>
           <div className='px-[24px] lg:px-0 flex flex-col items-start justify-center'>
-            <p className='text-[40px] font-semibold leading-[44px]'>Spendable Yield Tokens</p>
+            <p className='text-[40px] font-semibold leading-[44px]'>{copy.spendableYield.heading}</p>
             <Description className='mt-[20px] mb-[24px] lg:mb-[32px] max-w-[500px]'>
-              autoHODL converts your yield into SYTs tokens that accumulate rewards even while you spend them. They work
-              like normal tokens but grow automatically in your wallet without staking, locking, or claiming.
+              {copy.spendableYield.description}
             </Description>
 
             <Button
               onAction={() => window.open(paths.LearnMoreSYT, '_blank')}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
-              title={'Learn more'}
+              title={copy.spendableYield.cta}
               btnStyle='secondary'
             >
-              Learn more
+              {copy.spendableYield.cta}
             </Button>
           </div>
           <div
@@ -236,7 +257,7 @@ export default function LandingPage() {
           className='mt-4 lg:mt-0 w-full max-w-[1000px]'
         >
           <CarouselContent>
-            {testimonials.map((t) => (
+            {copy.testimonials.map((t) => (
               <CarouselItem key={t.idx}>
                 <div className='items-center justify-center p-0 lg:p-6'>
                   <p className='text-[24px] lg:text-[32px] font-base text-center'>{t.text}</p>
@@ -254,7 +275,7 @@ export default function LandingPage() {
       {/* Recognized by */}
       <section className='py-[48px] px-[24px] bg-[#ffffff] flex flex-col items-center justify-center'>
         <div className={'mb-[40px] lg:mb-[82px] max-w-[1080px] w-full flex flex-col justify-center items-center'}>
-          <H2>Recognized by</H2>
+          <H2>{copy.recognized.heading}</H2>
         </div>
 
         <div className='lg:mb-0 mb-4 max-w-[1080px] grid grid-cols-2 gap-[12px] lg:gap-[32px]'>
@@ -270,18 +291,16 @@ export default function LandingPage() {
         <div className='w-full max-w-[1080px] flex items-center justify-between gap-[60px]'>
           <div className='mt-8 lg:mt-0 mb-12 lg:mb-0'>
             <H2 className='text-start max-w-[600px]'>
-              Setup once. <br className='sm:hidden' />
-              <span className='text-[#78E76E]'>Save forever.</span>
+              {copy.setup.heading1} <br className='sm:hidden' />
+              <span className='text-[#78E76E]'>{copy.setup.heading2}</span>
             </H2>
-            <h4 className='mt-[24px] mb-[40px] text-[24px]'>
-              Join thousands of users who are building wealth every time you spend.
-            </h4>
+            <h4 className='mt-[24px] mb-[40px] text-[24px]'>{copy.setup.description}</h4>
             <Button
               onAction={() => open()}
               className={'w-[140px] lg:w-[245px] h-[44px] lg:h-[52px] font-bold rounded-[8px]'}
-              title={'Get started'}
+              title={copy.setup.cta}
             >
-              Get started
+              {copy.setup.cta}
             </Button>
           </div>
         </div>
@@ -306,7 +325,7 @@ function BorderCard({
     <div
       className={`border border-[#78E76E] rounded-[16px] p-[16px] flex flex-col items-center justify-center ${className}`}
     >
-      <div className='transition-transform duration-500 hover:scale-105 w-[200px] aspect-auto p-4 flex items-center justify-center'>
+      <div className='transition-transform duration-500 hover:scale-105 w-[300px] aspect-auto p-4 flex items-center justify-center'>
         <div className='h-[200px] aspect-auto p-4 flex items-center justify-center'>
           <Image className='aspect-auto' src={imgSrc} alt='img' width={287} height={287} />
         </div>
