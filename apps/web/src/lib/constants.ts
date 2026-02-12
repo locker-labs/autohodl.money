@@ -113,6 +113,8 @@ const USDC_ADDRESS_SET = new Set<TUsdcAddress>(Object.values(UsdcAddressMap));
 
 const SUPPORTED_TOKENS = [...USDC_ADDRESSES];
 
+const autohodlTokenImageUrl = 'https://cdn.jsdelivr.net/gh/locker-labs/autohodl.money/assets/autohodl-token-dark.svg';
+
 /**
  * SUSDC
  */
@@ -333,6 +335,7 @@ export {
   ChainToMoralisStreamIdMap,
   ERefetchInterval,
   chainIdToBlockExplorer,
+  autohodlTokenImageUrl,
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

@@ -4,7 +4,7 @@ export const paths = {
   Arbitrum: 'https://devfolio.co/projects/auto-hodl-e5dd',
   Base: 'https://devfolio.co/projects/auto-hodl-e5dd',
   MetaMask: 'https://x.com/MetaMaskDev/status/1950918297483948491',
-  Circle: 'https://x.com/MetaMaskDev/status/1950918297483948491',
+  Circle: 'https://x.com/BuildOnCircle/status/1985381981748916486',
 };
 
 export const links = {
