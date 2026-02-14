@@ -9,10 +9,20 @@ export async function POST(request: NextRequest) {
   console.log('Received POST request to Rudderstack analytics endpoint');
   try {
     const userAgent = request.headers.get('user-agent');
-    const ip = request.headers.get('x-forwarded-for');
-    if (!userAgent || !ip) {
-      console.error('Missing userAgent or ip in headers', { userAgent, ip });
-      return NextResponse.json({ error: 'Missing userAgent or ip in headers' }, { status: 400 });
+    const rawIp =
+      request.headers.get('x-vercel-forwarded-for') ||
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip');
+    const ip = rawIp?.split(',')[0]?.trim();
+
+    if (!ip) {
+      console.error('Missing ip in headers', { rawIp });
+      return NextResponse.json({ error: 'Missing ip in headers' }, { status: 400 });
+    }
+
+    if (!userAgent) {
+      console.error('Missing userAgent in headers', { userAgent });
+      return NextResponse.json({ error: 'Missing userAgent in headers' }, { status: 400 });
     }
 
     const cookieStore = await cookies();
@@ -25,7 +35,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the raw body as json
-    if (request.headers.get('content-type') !== 'application/json') {
+    const ct = request.headers.get('content-type') ?? '';
+    if (!ct.includes('application/json')) {
       console.error('Invalid content-type, expected application/json');
       return NextResponse.json({ error: 'Invalid content-type, expected application/json' }, { status: 400 });
     }
@@ -56,7 +67,7 @@ export async function POST(request: NextRequest) {
     const trackingProperties: TTrackEventProperties = {
       twclid,
       anonymousId,
-      walletAddress: body.walletAddress,
+      walletAddress: body.walletAddress?.toLowerCase(),
       savingsChainId: body.savingsChainId,
       userAgent: userAgent,
       ip: ip,
@@ -86,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (eventType === EAnalyticsEvent.WalletConnected) {
-      await aliasEvent(anonymousId, body.walletAddress, {
+      await aliasEvent(anonymousId, body.walletAddress?.toLowerCase(), {
         ip,
         userAgent,
         twclid,
