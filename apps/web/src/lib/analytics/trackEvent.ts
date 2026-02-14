@@ -8,14 +8,14 @@ export type TTrackEventProperties = {
   savingsChainId: number;
   allowance?: number;
   transactionHash?: string;
-  ip?: string;
-  userAgent?: string;
+  ip: string;
+  userAgent: string;
 };
 
 export async function aliasEvent(
   previousId: string,
   userId: string,
-  properties: { ip?: string; userAgent?: string; twclid?: string },
+  properties: { ip: string; userAgent: string; twclid?: string },
 ) {
   try {
     const aliasParams = {
@@ -48,10 +48,12 @@ export async function trackEvent(event: string, properties: TTrackEventPropertie
       | {
           event: string;
           anonymousId: string;
+          context: {
+            ip: string;
+            userAgent: string;
+          };
           properties: {
             twclid?: string;
-            ip_address?: string;
-            user_agent?: string;
             conversionId: string;
             description: string;
           };
@@ -59,10 +61,12 @@ export async function trackEvent(event: string, properties: TTrackEventPropertie
       | {
           event: string;
           userId: string;
+          context: {
+            ip: string;
+            userAgent: string;
+          };
           properties: {
             twclid?: string;
-            ip_address?: string;
-            user_agent?: string;
             conversionId: string;
             description: string;
           };
@@ -72,9 +76,11 @@ export async function trackEvent(event: string, properties: TTrackEventPropertie
       params = {
         event,
         anonymousId: properties.anonymousId || '',
+        context: {
+          ip: properties.ip,
+          userAgent: properties.userAgent,
+        },
         properties: {
-          ip_address: properties.ip,
-          user_agent: properties.userAgent,
           conversionId: `${event.split(' ').join('_').toLowerCase()}`,
           description: 'page_visited',
         },
@@ -83,9 +89,11 @@ export async function trackEvent(event: string, properties: TTrackEventPropertie
       params = {
         event,
         userId: properties.walletAddress,
+        context: {
+          ip: properties.ip,
+          userAgent: properties.userAgent,
+        },
         properties: {
-          ip_address: properties.ip,
-          user_agent: properties.userAgent,
           conversionId: `${event.split(' ').join('_').toLowerCase()}:${properties.walletAddress}`,
           description: `chain:${properties.savingsChainId} ${
             properties.allowance
