@@ -9,23 +9,30 @@ export function useAnalytics() {
       console.error('Event name is required to track analytics event');
       return;
     }
-    if (!walletAddress) {
+
+    if (event !== EAnalyticsEvent.PageVisited && !walletAddress) {
       console.error('Wallet address is required to track analytics event');
       return;
+    }
+
+    let bodyObject: Record<string, string | number | null | undefined> = {
+      eventType: event,
+      ...(properties ?? {}),
+    };
+
+    if (event !== EAnalyticsEvent.PageVisited) {
+      bodyObject = {
+        ...bodyObject,
+        walletAddress,
+        savingsChainId: savingsChainId ?? null,
+      };
     }
 
     try {
       const response = await fetch('/api/v1/analytics/rudderstack', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          eventType: event,
-          walletAddress,
-          savingsChainId: savingsChainId ?? null,
-          ...(properties ?? {}),
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyObject),
       });
 
       if (!response.ok) {
@@ -36,6 +43,10 @@ export function useAnalytics() {
     }
 
     return;
+  };
+
+  const trackPageVisitedEvent = async () => {
+    await trackAnalyticsEvent(EAnalyticsEvent.PageVisited);
   };
 
   const trackWalletConnectedEvent = async () => {
@@ -64,5 +75,6 @@ export function useAnalytics() {
     trackAnalyticsEvent,
     trackConfigSetEvent,
     trackWalletConnectedEvent,
+    trackPageVisitedEvent,
   };
 }
