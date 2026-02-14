@@ -3,7 +3,7 @@ import { rudderanalytics as client } from './client';
 
 export type TTrackEventProperties = {
   twclid?: string;
-  anonymousId?: string;
+  anonymousId: string;
   walletAddress: string;
   savingsChainId: number;
   allowance?: number;

@@ -14,8 +14,6 @@ export function trackPageVisited() {
 
       // check key in local storage
       if (typeof window !== 'undefined') {
-        console.log('trackPageVisited valueLs', valueLs);
-        console.log('trackPageVisited localStorage.getItem(keyLs)', localStorage.getItem(keyLs));
         if (localStorage.getItem(keyLs) && localStorage.getItem(keyLs) === valueLs) {
           return;
         }
