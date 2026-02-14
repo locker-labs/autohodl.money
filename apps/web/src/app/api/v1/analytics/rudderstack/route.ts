@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import { trackEvent, type TTrackEventProperties } from '@/lib/analytics';
+import { aliasEvent, trackEvent, type TTrackEventProperties } from '@/lib/analytics';
 import { EAnalyticsEvent } from '@/types/analytics';
 
 export async function POST(request: NextRequest) {
@@ -17,6 +17,12 @@ export async function POST(request: NextRequest) {
 
     const cookieStore = await cookies();
     const twclid = cookieStore.get('x_attr_id')?.value;
+    const anonymousId: string | undefined = cookieStore.get('autohodl_anonymous_id')?.value;
+
+    if (!anonymousId) {
+      console.error('No anonymousId found in cookies');
+      return NextResponse.json({ error: 'Missing anonymousId in cookies' }, { status: 400 });
+    }
 
     // Get the raw body as json
     if (request.headers.get('content-type') !== 'application/json') {
@@ -32,17 +38,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing eventType in body' }, { status: 400 });
     }
 
-    if (!body.walletAddress) {
-      console.error('No walletAddress provided in body');
-      return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
-    }
-    if (!body.savingsChainId) {
-      console.error('No savingsChainId provided in body');
-      return NextResponse.json({ error: 'Missing savingsChainId in body' }, { status: 400 });
+    if (
+      eventType === EAnalyticsEvent.AllowanceSet ||
+      eventType === EAnalyticsEvent.ConfigSet ||
+      eventType === EAnalyticsEvent.WalletConnected
+    ) {
+      if (!body.walletAddress) {
+        console.error('No walletAddress provided in body');
+        return NextResponse.json({ error: 'Missing walletAddress in body' }, { status: 400 });
+      }
+      if (!body.savingsChainId) {
+        console.error('No savingsChainId provided in body');
+        return NextResponse.json({ error: 'Missing savingsChainId in body' }, { status: 400 });
+      }
     }
 
     const trackingProperties: TTrackEventProperties = {
       twclid,
+      anonymousId,
       walletAddress: body.walletAddress,
       savingsChainId: body.savingsChainId,
       userAgent: userAgent,
@@ -50,6 +63,7 @@ export async function POST(request: NextRequest) {
     };
 
     switch (eventType) {
+      case EAnalyticsEvent.PageVisited:
       case EAnalyticsEvent.WalletConnected:
         break;
       case EAnalyticsEvent.AllowanceSet:
@@ -69,6 +83,14 @@ export async function POST(request: NextRequest) {
       default:
         console.error('Unknown eventType:', eventType);
         return NextResponse.json({ error: 'Unknown eventType' }, { status: 400 });
+    }
+
+    if (eventType === EAnalyticsEvent.WalletConnected) {
+      await aliasEvent(anonymousId, body.walletAddress, {
+        ip,
+        userAgent,
+        twclid,
+      });
     }
 
     await trackEvent(eventType, trackingProperties);

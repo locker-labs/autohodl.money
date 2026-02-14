@@ -17,11 +17,14 @@ export function trackWalletConnected() {
       if (walletAddress) {
         // check key in local storage
         if (typeof window !== 'undefined') {
+          console.log('valueLs', valueLs);
+          console.log('localStorage.getItem(keyLs)', localStorage.getItem(keyLs));
           if (localStorage.getItem(keyLs) && localStorage.getItem(keyLs) === valueLs) {
             return;
           }
 
           await trackWalletConnectedEvent();
+
           localStorage.setItem(keyLs, valueLs);
         }
       }
