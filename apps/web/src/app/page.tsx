@@ -8,11 +8,13 @@ import Dashboard from '@/components/view/Dashboard';
 import LandingPage from '@/components/view/Landing';
 import UserOnboarding from '@/components/view/UserOnboarding';
 import { useAutoHodl } from '@/context/AutoHodlContext';
+import { trackPageVisited } from '@/hooks/trackPageVisited';
 import { trackWalletConnected } from '@/hooks/trackWalletConnected';
 
 export default function Home() {
   const { isConnected, isConnecting, isReconnecting } = useConnection();
   const { loading, config } = useAutoHodl();
+  trackPageVisited();
   trackWalletConnected();
 
   if (loading || isConnecting || isReconnecting) {
