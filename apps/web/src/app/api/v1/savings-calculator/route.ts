@@ -30,14 +30,10 @@ export async function POST(request: NextRequest) {
 
     for (const tokenAddress of tokens) {
             let allTransfers: any[] = [];
-          console.log(`Processing token at address ${tokenAddress}...`);
           fromBlock = startBlock; // Reset fromBlock for each token
           // PAGINATION LOGIC
           while (fromBlock < currentBlock) {
               const toBlock = fromBlock + CHUNK_SIZE > currentBlock ? currentBlock : fromBlock + CHUNK_SIZE;
-
-              console.log(`Fetching blocks ${fromBlock} to ${toBlock}...`);
-
               const logs = await client.getLogs({
                   address: tokenAddress,
                   event: TRANSFER_EVENT_ABI,
@@ -67,8 +63,6 @@ export async function POST(request: NextRequest) {
           const savingsArray: number[] = [0, 0, 0];
 
           for (const transfer of allTransfers) {
-              console.log(`Transfer of ${transfer.amountFormatted} USDC at tx ${transfer.transactionHash}`);
-              console.log(transfer.amountRaw);
               const { roundUpAmount: a, savingsAmount: one } = computeRoundUpAndSavings(transfer.amountRaw, parseUnits('1', 6));
               savingsArray[0] += Number(one);
               const { roundUpAmount: b, savingsAmount: two } = computeRoundUpAndSavings(transfer.amountRaw, parseUnits('1', 7));
@@ -76,7 +70,6 @@ export async function POST(request: NextRequest) {
               const { roundUpAmount: c, savingsAmount: three } = computeRoundUpAndSavings(transfer.amountRaw, parseUnits('1', 8));
               savingsArray[2] += Number(three);
           }
-          console.log(`Total savings for token ${tokenAddress}:`, savingsArray);
           savingsMapping[tokenAddress] = savingsArray;
       }
       
