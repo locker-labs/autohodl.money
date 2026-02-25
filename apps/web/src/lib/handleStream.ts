@@ -4,6 +4,7 @@ import { type EChainId, SavingConfigSetEventSigHash, ViemChainNameMap } from '@/
 import { handleSavingsExecution } from '@/lib/handleSavingsExecution';
 import { verifySignature } from '@/lib/moralis';
 import { handleSavingConfigSetEvent } from './handleSavingConfigSetEvent';
+import { handleNotifications } from './handleNotifications';
 
 export async function handleStream(body: string, signature: string, webhookSecret: string): Promise<NextResponse> {
   try {
@@ -66,6 +67,7 @@ export async function handleStream(body: string, signature: string, webhookSecre
 
     try {
       txHash = await handleSavingsExecution(transfer, { streamId: payload.streamId, chainId: payload.chainId });
+      if (txHash) await handleNotifications(transfer, payload.chainId);
     } catch (error) {
       console.error(
         `Error processing savings execution for transfer with txHash ${transfer.transactionHash}:`,
