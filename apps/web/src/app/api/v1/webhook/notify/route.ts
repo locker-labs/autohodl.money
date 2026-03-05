@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Skipping confirmed log' });
     }
 
-    // 3. Process Logs (Custom Events) instead of erc20Transfers
+    // 3. Process Logs (Custom Events)
     if (!payload.logs || payload.logs.length === 0) {
       return NextResponse.json({ message: 'No logs found' });
     }
@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
 
           console.log(`Processing SavingExecuted: User ${user}, Value ${value}`);
 
-          // Update your notification handler to accept these specific args
           await handleNotifications({
             user,
             token,
