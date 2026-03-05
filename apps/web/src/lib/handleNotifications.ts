@@ -1,9 +1,16 @@
 import type { IERC20Transfer } from '@moralisweb3/streams-typings';
 import axios from 'axios';
 
-export async function handleNotifications(erc20Transfer: IERC20Transfer, chainId: string) {
-    const { from: userAddress, value: amount } = erc20Transfer;
-    await handleTelegram(userAddress, amount, chainId);
+interface HandleNotificationParams {
+    user: `0x${string}`,
+    token: `0x${string}`,
+    value: string,
+    transactionHash: string,
+    chainId: string;
+}
+
+export async function handleNotifications({user,token,value,transactionHash,chainId}:HandleNotificationParams) {
+    await handleTelegram(user, value, chainId);
 }
 
 async function handleTelegram(userAddress: string,amount: string, chainId: string) {
