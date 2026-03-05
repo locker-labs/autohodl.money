@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    const payload: IWebhook = JSON.parse(body);
+      const payload: IWebhook = JSON.parse(body);
+      console.log(payload);
 
     // 1. Log receipt
     console.log(`Stream ${payload.tag} received on chain ${payload.chainId}`);
