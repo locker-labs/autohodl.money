@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
 
       const payload: IWebhook = JSON.parse(body);
 
-    if (!payload.confirmed) {
-      console.log('Skipping unconfirmed log (waiting for confirmation).');
-      return NextResponse.json({ message: 'Unconfirmed logs ignored' });
+    if (payload.confirmed) {
+      console.log('Skipping confirmed log, should have already sent for unconfimed transaction.');
+      return NextResponse.json({ message: 'Confirmed logs ignored' });
     }
 
     if (!payload.logs || payload.logs.length === 0) {
