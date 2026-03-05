@@ -4,24 +4,23 @@ import { type NextRequest, NextResponse } from 'next/server';
 import type { IWebhook } from '@moralisweb3/streams-typings';
 import { handleNotifications } from '@/lib/handleNotifications';
 import { secrets } from '@/lib/secrets';
-import { type EChainId, ViemChainNameMap } from '@/lib/constants';
 import { verifySignature } from '@/lib/moralis';
-// Assuming you have a way to decode logs, e.g., via viem
 import { decodeEventLog } from 'viem'; 
 
-// Define your ABI for decoding
 const SAVING_EXECUTED_ABI = [
   {
+    name: 'SavingExecuted',
+    type: 'event',
     anonymous: false,
     inputs: [
       { indexed: true, name: 'user', type: 'address' },
-      { indexed: false, name: 'token', type: 'address' },
+      { indexed: true, name: 'token', type: 'address' },
       { indexed: false, name: 'value', type: 'uint256' },
     ],
-    name: 'SavingExecuted',
-    type: 'event',
   },
 ] as const;
+
+const SAVING_EXECUTED_TOPIC0 = '0x8d49b5ed017ceed9d5a9cffcf1e3e49fe216f324a40089bb800ebd6d3f319f2f';
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,32 +37,33 @@ export async function POST(request: NextRequest) {
     }
 
       const payload: IWebhook = JSON.parse(body);
-      console.log(payload);
 
-    // 1. Log receipt
-    console.log(`Stream ${payload.tag} received on chain ${payload.chainId}`);
-
-    // 2. Filter for confirmed/unconfirmed based on your logic
-    if (payload.confirmed) {
-      return NextResponse.json({ message: 'Skipping confirmed log' });
+    if (!payload.confirmed) {
+      console.log('Skipping unconfirmed log (waiting for confirmation).');
+      return NextResponse.json({ message: 'Unconfirmed logs ignored' });
     }
 
-    // 3. Process Logs (Custom Events)
     if (!payload.logs || payload.logs.length === 0) {
       return NextResponse.json({ message: 'No logs found' });
     }
 
-    for (const log of payload.logs) {
-      try {
-        // Decode the log using viem
-        const topics = [log.topic0, log.topic1, log.topic2, log.topic3].filter(Boolean) as [`0x${string}`, ...`0x${string}`[]];
-        const decoded = decodeEventLog({
-          abi: SAVING_EXECUTED_ABI,
-          data: log.data as `0x${string}`,
-          topics,
-        });
+    let processedCount = 0;
 
-        if (decoded.eventName === 'SavingExecuted') {
+    for (const log of payload.logs) {
+      // Only decode if the topic matches SavingExecuted
+      if (log.topic0 === SAVING_EXECUTED_TOPIC0) {
+        try {
+          // Reconstruct the topics array, filtering out nulls (like topic3 in your payload)
+          const topics = [log.topic0, log.topic1, log.topic2, log.topic3].filter(
+            (t): t is `0x${string}` => t !== null
+          );
+
+          const decoded = decodeEventLog({
+            abi: SAVING_EXECUTED_ABI,
+            data: log.data as `0x${string}`,
+            topics: topics as [`0x${string}`, ...`0x${string}`[]],
+          });
+
           const { user, token, value } = decoded.args;
 
           console.log(`Processing SavingExecuted: User ${user}, Value ${value}`);
@@ -71,18 +71,21 @@ export async function POST(request: NextRequest) {
           await handleNotifications({
             user,
             token,
-            value: value.toString(),
+            value: value.toString(), // BigInt to string
             transactionHash: log.transactionHash,
             chainId: payload.chainId
           });
+
+          processedCount++;
+        } catch (decodeError) {
+          console.warn('Failed to decode SavingExecuted log:', decodeError);
         }
-      } catch (decodeError) {
-        // This log might be a different event; skip or log error
-        console.warn('Could not decode log, skipping:', decodeError);
       }
     }
-
-    return NextResponse.json({ message: 'Webhook processed' });
+    return NextResponse.json({ 
+      message: 'Webhook processed', 
+      processedEvents: processedCount 
+    });
 
   } catch (error) {
     console.error('Webhook Error:', error);
