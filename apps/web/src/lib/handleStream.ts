@@ -67,7 +67,6 @@ export async function handleStream(body: string, signature: string, webhookSecre
 
     try {
       txHash = await handleSavingsExecution(transfer, { streamId: payload.streamId, chainId: payload.chainId });
-      if (txHash) await handleNotifications(transfer, payload.chainId);
     } catch (error) {
       console.error(
         `Error processing savings execution for transfer with txHash ${transfer.transactionHash}:`,
