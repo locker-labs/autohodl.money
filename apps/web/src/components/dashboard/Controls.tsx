@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ActiveSwitch from '@/components/subcomponents/ActiveSwitch';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
 import SavingsModeSelector from '@/components/subcomponents/SavingsModeSelector';
+import ScheduleAmountSelector from "../subcomponents/ScheduleAmountSelector";
 import { WithdrawSavings } from '@/components/subcomponents/WithdrawSavings';
 import YieldSwitch from '@/components/subcomponents/YieldSwitch';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,14 +29,16 @@ import { getUsdcAddressByChain } from '@/lib/helpers';
 import { ChainSelector } from '@/components/feature/ChainSelector';
 
 enum SectionId {
-  AccountDetails = 'account-details',
-  RoundupSettings = 'roundup-settings',
-  AdvancedOptions = 'advanced-options',
+  AccountDetails = "account-details",
+  RoundupSettings = "roundup-settings",
+  ScheduleSettings = "schedule-settings",
+  AdvancedOptions = "advanced-options",
 }
 
 const sections: { id: SectionId; label: string }[] = [
-  { id: SectionId.AccountDetails, label: 'Account Details' },
-  { id: SectionId.RoundupSettings, label: 'Round-up Settings' },
+  { id: SectionId.AccountDetails, label: "Account Details" },
+  { id: SectionId.RoundupSettings, label: "Round-up Settings" },
+  { id: SectionId.ScheduleSettings, label: "Schedule Settings" },
   // { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
 ];
 
@@ -116,7 +119,7 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
   });
 
   return (
-    <div className='group/container'>
+    <div className="group/container">
       <div
         className={`lg:min-h-[454px] lg:h-[454px] lg:max-h-[454px] 
         overflow-y-scroll 
@@ -133,34 +136,40 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
         {/* Account Details Section */}
         {selectedSection === SectionId.AccountDetails && (
           <div>
-            <div className=''>
+            <div className="">
               <ActiveSwitch />
             </div>
 
             {/* Source of Funds */}
-            <div className='mt-4 w-full'>
-              <p className='text-sm font-medium'>Source of Funds</p>
+            <div className="mt-4 w-full">
+              <p className="text-sm font-medium">Source of Funds</p>
 
-              <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
-                <div className='flex items-center justify-start gap-3'>
+              <div className="mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3">
+                <div className="flex items-center justify-start gap-3">
                   {displayAccount.Logo}
                   <div>
                     <div>
-                      <p className='text-[15px] whitespace-nowrap'>{displayAccount.title}</p>
-                      <CopyContentButton textToCopy={userAddress || ''} onCopyMessage='Address copied to clipboard'>
+                      <p className="text-[15px] whitespace-nowrap">
+                        {displayAccount.title}
+                      </p>
+                      <CopyContentButton
+                        textToCopy={userAddress || ""}
+                        onCopyMessage="Address copied to clipboard"
+                      >
                         {formatAddress(userAddress)}
                       </CopyContentButton>
                     </div>
                   </div>
                 </div>
 
-                <div className='flex flex-wrap items-center justify-end gap-1'>
+                <div className="flex flex-wrap items-center justify-end gap-1">
                   <p>Balance: </p>
                   {!token.isReady ? (
                     <PriceSkeleton />
                   ) : (
-                    <p className='whitespace-nowrap'>
-                      {formatAmount(token.balanceFormatted, '')} {TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}
+                    <p className="whitespace-nowrap">
+                      {formatAmount(token.balanceFormatted, "")}{" "}
+                      {TokenTickerMap[getUsdcAddressByChain(savingsChainId)]}
                     </p>
                   )}
                 </div>
@@ -168,35 +177,41 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
             </div>
 
             {/* Savings Destination */}
-            <div className='mt-4 mb-1'>
+            <div className="mt-4 mb-1">
               <div>
-                <p className='text-sm font-medium'>Savings Destination</p>
+                <p className="text-sm font-medium">Savings Destination</p>
               </div>
-              <div className='mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3'>
-                <div className='flex items-center justify-start gap-3'>
+              <div className="mt-2 w-full h-20 border border-gray-300 rounded-lg flex items-center justify-between gap-3 px-3">
+                <div className="flex items-center justify-start gap-3">
                   {config?.toYield ? (
                     <Image
-                      src={'/aave.svg'}
-                      alt='aave'
+                      src={"/aave.svg"}
+                      alt="aave"
                       width={20}
                       height={20}
-                      className='min-w-5 min-h-5 max-h-5 max-w-5'
+                      className="min-w-5 min-h-5 max-h-5 max-w-5"
                     />
                   ) : (
-                    <Lock className='min-w-5 min-h-5' size={20} />
+                    <Lock className="min-w-5 min-h-5" size={20} />
                   )}
                   {config?.toYield ? (
                     <div>
-                      <p className='text-[15px] whitespace-nowrap'>Aave Protocol</p>
-                      <p className='mt-1 text-[#4D4A4A] text-sm'>Earning ~{apyLoading ? '--' : apy}% APY</p>
+                      <p className="text-[15px] whitespace-nowrap">
+                        Aave Protocol
+                      </p>
+                      <p className="mt-1 text-[#4D4A4A] text-sm">
+                        Earning ~{apyLoading ? "--" : apy}% APY
+                      </p>
                     </div>
                   ) : (
                     <div>
-                      <p className='text-[15px] whitespace-nowrap'>Savings Account</p>
+                      <p className="text-[15px] whitespace-nowrap">
+                        Savings Account
+                      </p>
                       <CopyContentButton
-                        textToCopy={config?.savingAddress || ''}
-                        onCopyMessage='Savings address copied to clipboard'
-                        className='mt-1'
+                        textToCopy={config?.savingAddress || ""}
+                        onCopyMessage="Savings address copied to clipboard"
+                        className="mt-1"
                       >
                         {formatAddress(config?.savingAddress)}
                       </CopyContentButton>
@@ -205,26 +220,29 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
                 </div>
 
                 {config?.toYield ? null : (
-                  <div className='flex flex-wrap items-center justify-end gap-1 px-3'>
+                  <div className="flex flex-wrap items-center justify-end gap-1 px-3">
                     <p>Balance: </p>
                     {!savingsAddressToken.isReady ? (
                       <PriceSkeleton />
                     ) : (
-                      <p className='whitespace-nowrap'>{formatAmount(savingsAddressToken.balanceFormatted, '')} USDC</p>
+                      <p className="whitespace-nowrap">
+                        {formatAmount(savingsAddressToken.balanceFormatted, "")}{" "}
+                        USDC
+                      </p>
                     )}
                   </div>
                 )}
               </div>
             </div>
 
-            <div className='mt-4'>
+            <div className="mt-4">
               <SavingsLimit />
             </div>
 
             {/* Savings Chain */}
-            <div className='mt-4'>
-              <div className='w-full flex items-center justify-between gap-2 my-1'>
-                <p className='text-sm font-medium'>Savings Chain</p>
+            <div className="mt-4">
+              <div className="w-full flex items-center justify-between gap-2 my-1">
+                <p className="text-sm font-medium">Savings Chain</p>
                 <ChainSelector />
               </div>
             </div>
@@ -234,36 +252,42 @@ export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JS
         {/* Round-up Settings Section */}
         {selectedSection === SectionId.RoundupSettings && (
           <div>
-            <div className='mt-1'>
+            <div className="mt-1">
               <RoundupAmountSelector />
             </div>
 
-            <div className='mt-4'>
+            <div className="mt-4">
               <SavingsModeSelector />
             </div>
 
-            <div className='mt-4 mb-1'>
+            <div className="mt-4 mb-1">
               <YieldSwitch />
             </div>
           </div>
         )}
 
+        {selectedSection === SectionId.ScheduleSettings && (
+          <ScheduleAmountSelector />
+        )}
+
         {/* Advanced Options Section */}
         {selectedSection === SectionId.AdvancedOptions && (
           <div>
-            <div className='mt-1'>
+            <div className="mt-1">
               <ActiveSwitch />
             </div>
 
-            <div className='mt-2'>
+            <div className="mt-2">
               <SavingsLimit />
             </div>
           </div>
         )}
       </div>
-      <div className='mt-4 mr-2.5'>
-        <WithdrawSavings />
-      </div>
+      {selectedSection !== SectionId.ScheduleSettings && (
+        <div className="mt-4 mr-2.5">
+          <WithdrawSavings />
+        </div>
+      )}
     </div>
   );
 }

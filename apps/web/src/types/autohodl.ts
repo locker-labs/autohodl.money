@@ -9,10 +9,31 @@ export type SavingsConfigArray = [
   Hex, // extraData
 ];
 
+export type ScheduleConfigArray = [
+  Address, // savingAddress
+  Address, // delegate
+  bigint, // scheduleAmount
+  bigint, // scheduleCycle
+  boolean, // active
+  boolean, // toYield
+  Hex, // extraData
+];
+
 export type SavingsConfig = {
   savingAddress: Address;
   delegate: Address;
   roundUp: bigint;
+  active: boolean;
+  toYield: boolean;
+  extraData: Hex;
+  mode: SavingsMode;
+};
+
+export type ScheduleConfig = {
+  savingAddress: Address;
+  delegate: Address;
+  scheduleAmount: bigint;
+  scheduleCycle: bigint;
   active: boolean;
   toYield: boolean;
   extraData: Hex;

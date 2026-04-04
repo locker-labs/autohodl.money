@@ -4,9 +4,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useConnection, useSwitchChain } from 'wagmi';
 import { useERC20BalanceOf, type UseERC20BalanceOfReturn } from '@/hooks/useERC20Token';
-import { type EChainId, mockDefaultChainId, type SupportedAccounts } from '@/lib/constants';
-import { getSavingsConfig } from '@/lib/autohodl';
-import type { SavingsConfig } from '@/types/autohodl';
+import {
+  EChainId,
+  mockDefaultChainId,
+  type SupportedAccounts,
+} from "@/lib/constants";
+import { getSavingsConfig, getScheduleSavingsConfig } from "@/lib/autohodl";
+import type { SavingsConfig, ScheduleConfig } from "@/types/autohodl";
 import type { FC, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSupportedAccounts } from '@/lib/userAccounts';
@@ -17,7 +21,11 @@ import { getSusdcAddressByChain, getUsdcAddressByChain, getViemPublicClientByCha
 type AutoHodlContextType = {
   loading: boolean;
   config: SavingsConfig | null;
+  scheduleConfig: ScheduleConfig | null;
   setConfig: React.Dispatch<React.SetStateAction<SavingsConfig | null>>;
+  setScheduleConfig: React.Dispatch<
+    React.SetStateAction<ScheduleConfig | null>
+  >;
   setRefetchFlag: React.Dispatch<React.SetStateAction<boolean>>;
   accountsMap?: Map<EChainId, SupportedAccounts[]>;
   accounts: SupportedAccounts[];
@@ -47,6 +55,9 @@ type Props = {
 export const AutoHodlProvider: FC<Props> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [config, setConfig] = useState<SavingsConfig | null>(null);
+  const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig | null>(
+    null,
+  );
   const [refetchFlag, setRefetchFlag] = useState(false);
   const { address, isConnected } = useConnection();
   const [savingsChainId, setSavingsChainId] = useState<EChainId | null>(null);
@@ -125,7 +136,62 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
         setLoading(false);
       }
     }
+    async function fetchScheduleConfig() {
+      console.log("Fetching schedule config...");
+      if (!address || !isConnected) {
+        return;
+      }
 
+      try {
+        setLoading(true);
+        console.log("Checking chains for schedule config...");
+        let fallbackConfig: ScheduleConfig | null = null;
+        let fallbackChainId: EChainId | null = null;
+
+        for (const chain of chains) {
+          if (chain.id !== EChainId.Base) {
+            continue;
+          }
+          console.log(
+            `Checking chain ${chain.name} (${chain.id}) for schedule config...`,
+          );
+          const chainId = chain.id as EChainId;
+          const config = await getScheduleSavingsConfig(
+            getViemPublicClientByChain(chainId),
+            address,
+            getUsdcAddressByChain(chainId),
+            chainId,
+            true, // isSchedule = true
+          );
+          console.log(`Config for chain ${chain.name}:`, config);
+          if (config && config.delegate !== zeroAddress) {
+            if (!fallbackConfig && !fallbackChainId) {
+              fallbackConfig = config;
+              fallbackChainId = chainId;
+            }
+
+            if (config.active) {
+              setScheduleConfig(config);
+              return;
+            }
+          }
+        }
+
+        // if no config is active, set first config found as fallback
+        if (fallbackConfig && fallbackChainId) {
+          setScheduleConfig(fallbackConfig);
+          return;
+        }
+
+        setScheduleConfig(null);
+      } catch (error) {
+        console.error("Error fetching schedule config:", error);
+        setScheduleConfig(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchScheduleConfig();
     fetchSavingsConfigArray();
   }, [address, isConnected, refetchFlag]);
 
@@ -150,8 +216,10 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
       value={{
         loading: loading || loadingAccounts,
         config,
+        scheduleConfig,
         setRefetchFlag,
         setConfig,
+        setScheduleConfig,
         accountsMap,
         accounts,
         sToken,

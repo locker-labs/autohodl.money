@@ -176,6 +176,17 @@ const AutoHodlAddressMap = {
 } as const satisfies TChainIdMap<Address>;
 
 /**
+ * Schedule AutoHodl Contract Address
+ */
+
+const ScheduleAutoHodlAddressMap = {
+  [EChainId.Base]: '0x953a89CA21E0f4D6543684c082B98F5808080984',
+  [EChainId.ArcTestnet]: '0x0',
+  [EChainId.Linea]: '0x0',
+  [EChainId.Sepolia]: '0x0',
+} as const satisfies TChainIdMap<Address>;
+
+/**
  * Delegate Contract Address
  */
 
@@ -336,6 +347,7 @@ export {
   ERefetchInterval,
   chainIdToBlockExplorer,
   autohodlTokenImageUrl,
+  ScheduleAutoHodlAddressMap
 };
 
 export type { TUsdcAddress, TSusdcAddress, TTokenAddress };

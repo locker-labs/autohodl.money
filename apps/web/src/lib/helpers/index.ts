@@ -19,6 +19,7 @@ import {
   ViemChainMap,
   ViemChainImageMap,
   SUPPORTED_TOKENS,
+  ScheduleAutoHodlAddressMap
 } from '@/lib/constants';
 import { chains } from '@/config';
 
@@ -117,6 +118,10 @@ function getAutoHodlAddressByChain(chainId: EChainId | null): Address {
   if (!chainId) throw new Error('Missing chain');
   return AutoHodlAddressMap[chainId];
 }
+function getScheduleAutoHodlAddressByChain(chainId: EChainId | null): Address {
+  if (!chainId) throw new Error('Missing chain');
+  return ScheduleAutoHodlAddressMap[chainId];
+}
 
 function getDelegateAddressByChain(chainId: EChainId | null): Address {
   if (!chainId) throw new Error('Missing chain');
@@ -189,6 +194,111 @@ function getAavePoolAddressesProviderByChain(chainId: EChainId | null): Address 
   return poolAddressesProvider;
 }
 
+// Shared constants for time calculations (in seconds)
+const SECONDS_IN_A_MINUTE = 60;
+const SECONDS_IN_AN_HOUR = 3600;
+const SECONDS_IN_A_DAY = 86400;
+const SECONDS_IN_A_WEEK = 604800;
+const SECONDS_IN_TWO_WEEKS = 1209600;
+const SECONDS_IN_A_MONTH = 2592000;
+
+function convertCycle(period: bigint | null): string {
+  let remainingSeconds = Number(period);
+
+  // Fallback for 0 or negative
+  if (remainingSeconds <= 0) return '0 seconds';
+
+  // Exact matches for your preset UI buttons to ensure they highlight correctly
+  if (remainingSeconds === SECONDS_IN_A_DAY) return 'daily';
+  if (remainingSeconds === SECONDS_IN_A_WEEK) return 'weekly';
+  if (remainingSeconds === SECONDS_IN_A_WEEK * 2) return 'biweekly';
+  if (remainingSeconds === SECONDS_IN_A_DAY * 30) return 'monthly';
+
+  // Dynamic calculation for custom periods
+  const weeks = Math.floor(remainingSeconds / SECONDS_IN_A_WEEK);
+  remainingSeconds %= SECONDS_IN_A_WEEK;
+
+  const days = Math.floor(remainingSeconds / SECONDS_IN_A_DAY);
+  remainingSeconds %= SECONDS_IN_A_DAY;
+
+  const hours = Math.floor(remainingSeconds / SECONDS_IN_AN_HOUR);
+  remainingSeconds %= SECONDS_IN_AN_HOUR;
+
+  const minutes = Math.floor(remainingSeconds / SECONDS_IN_A_MINUTE);
+  remainingSeconds %= SECONDS_IN_A_MINUTE;
+
+  const parts = [];
+
+  if (weeks > 0) parts.push(`${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
+  if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+  if (hours > 0) parts.push(`${hours} ${hours === 1 ? 'hr' : 'hrs'}`);
+  if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? 'min' : 'mins'}`);
+  
+  // Only show seconds if the interval is less than a minute
+  if (remainingSeconds > 0 && parts.length === 0) {
+    parts.push(`${remainingSeconds} ${remainingSeconds === 1 ? 'sec' : 'secs'}`);
+  }
+
+  return parts.join(' '); // Returns formats like "1 week 2 days" or "12 hrs 30 mins"
+}
+
+function convertCycleToBigInt(cycle: string): bigint {
+  const normalizedCycle = cycle.toLowerCase().trim();
+
+  // 1. Handle the exact preset matches from your UI
+  switch (normalizedCycle) {
+    case 'daily':
+      return BigInt(SECONDS_IN_A_DAY);
+    case 'weekly':
+      return BigInt(SECONDS_IN_A_WEEK);
+    case 'biweekly':
+      return BigInt(SECONDS_IN_TWO_WEEKS);
+    case 'monthly':
+      return BigInt(SECONDS_IN_A_MONTH);
+  }
+
+  // 2. Parse custom dynamic strings (e.g., "1 week 2 days 5 hrs")
+  let totalSeconds = 0;
+
+  // Regex matches a number followed by a unit (handling optional 's' for plurals)
+  const regex = /(\d+)\s*(week|day|hr|hour|min|minute|sec|second)s?/g;
+  let match;
+
+  while ((match = regex.exec(normalizedCycle)) !== null) {
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case 'week':
+        totalSeconds += value * SECONDS_IN_A_WEEK;
+        break;
+      case 'day':
+        totalSeconds += value * SECONDS_IN_A_DAY;
+        break;
+      case 'hr':
+      case 'hour':
+        totalSeconds += value * SECONDS_IN_AN_HOUR;
+        break;
+      case 'min':
+      case 'minute':
+        totalSeconds += value * SECONDS_IN_A_MINUTE;
+        break;
+      case 'sec':
+      case 'second':
+        totalSeconds += value;
+        break;
+    }
+  }
+
+  // 3. Fallback safety check
+  if (totalSeconds === 0) {
+    console.error(`Failed to parse schedule cycle: "${cycle}". Falling back to daily.`);
+    return BigInt(SECONDS_IN_A_DAY); 
+  }
+
+  return BigInt(totalSeconds);
+}
+
 export {
   computeRoundUpAndSavings,
   isAutoHodlSupportedToken,
@@ -211,4 +321,7 @@ export {
   getViemChainImage,
   isValidSourceChain,
   isAutoHodlSupportedTokenByChain,
+  getScheduleAutoHodlAddressByChain,
+  convertCycle,
+  convertCycleToBigInt
 };

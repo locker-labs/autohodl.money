@@ -5,11 +5,14 @@ import {
   type SavingsConfig,
   type SavingsConfigArray,
   SavingsMode,
+  type ScheduleConfig,
+  type ScheduleConfigArray,
   type SourceTxInfo,
 } from '@/types/autohodl';
 import { AutoHodlAbi } from '@/lib/abis/AutoHodl';
 import type { EChainId } from './constants';
-import { getAutoHodlAddressByChain } from './helpers';
+import { getAutoHodlAddressByChain, getScheduleAutoHodlAddressByChain } from './helpers';
+import { ScheduleHodlAbi } from './abis/ScheduleHodl';
 
 export function decodeDelegateSavingData(data: Hex, defaultChainId: EChainId): SourceTxInfo {
   // New format with sourceChainId (5 params)
@@ -63,6 +66,29 @@ export function parseSavingsConfig(arr: SavingsConfigArray | Readonly<SavingsCon
   };
 }
 
+export function parseScheduleConfig(arr: ScheduleConfigArray | Readonly<ScheduleConfigArray>): ScheduleConfig {
+  let mode: SavingsMode = SavingsMode.All;
+  if (arr[6] && arr[6] !== '0x') {
+    const decoded = decodeAbiParameters(extraDataParams, arr[6]);
+    if (decoded[0]) {
+      mode = decoded[0] as SavingsMode;
+    }
+  }
+
+  return {
+    savingAddress: arr[0],
+    delegate: arr[1],
+    scheduleAmount: arr[2],
+    scheduleCycle: arr[3],
+    active: arr[4],
+    toYield: arr[5],
+    extraData: arr[6],
+    mode,
+  };
+}
+
+
+
 export async function getSavingsConfig(
   viemPublicClient: PublicClient,
   user: Address,
@@ -77,4 +103,20 @@ export async function getSavingsConfig(
   });
 
   return parseSavingsConfig(configArray);
+}
+
+export async function getScheduleSavingsConfig(
+  viemPublicClient: PublicClient,
+  user: Address,
+  token: Address,
+  chainId: EChainId,
+): Promise<ScheduleConfig> {
+  const configArray: Readonly<ScheduleConfigArray> = await viemPublicClient.readContract({
+    address: getScheduleAutoHodlAddressByChain(chainId),
+    abi: ScheduleHodlAbi,
+    functionName: 'savings',
+    args: [user, token],
+  });
+
+  return parseScheduleConfig(configArray);
 }

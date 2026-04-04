@@ -62,6 +62,21 @@ export const savingOptions = [
   { label: '$100', value: 100, purchase: '$850', savings: '$50' },
 ];
 
+export const scheduleCycles = [
+  { label: 'Daily', value: 'daily' },
+  { label: 'Weekly', value: 'weekly' },
+  { label: 'Biweekly', value: 'biweekly' },
+  { label: 'Monthly', value: 'monthly' },
+]
+
+export const scheduleOptions = [
+  { label: '$10', value: 10 },
+  { label: '$50', value: 50 },
+  { label: '$100', value: 100 },
+  { label: '$250', value: 250 },
+];
+
+
 export const getSavingsModes = (hasMetaMaskCard: boolean) => [
   {
     label: 'MetaMask Card only',
