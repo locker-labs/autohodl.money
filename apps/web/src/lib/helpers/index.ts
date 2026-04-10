@@ -110,6 +110,7 @@ function getUsdcAddressByChain(chainId: EChainId | null): TUsdcAddress {
 }
 
 function getSusdcAddressByChain(chainId: EChainId | null): TSusdcAddress {
+  console.log("CHAINID",chainId);
   if (!chainId) throw new Error('Missing chain');
   return SusdcAddressMap[chainId];
 }

@@ -4,6 +4,7 @@
 import { wagmiAdapter, projectId, networks } from '@/config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
+import { base } from "viem/chains";
 import type { ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { AutoHodlProvider } from '@/context/AutoHodlContext';
@@ -26,9 +27,11 @@ export const modal = createAppKit({
   chainImages: ViemChainImageMap,
   adapters: [wagmiAdapter],
   projectId,
+  defaultNetwork: base,
   networks,
   metadata,
-  themeMode: 'light',
+  coinbasePreference: "smartWalletOnly",
+  themeMode: "light",
   features: {
     swaps: false,
     onramp: false,
@@ -39,7 +42,7 @@ export const modal = createAppKit({
     allWallets: true,
   },
   themeVariables: {
-    '--w3m-accent': '#000000',
+    "--w3m-accent": "#000000",
   },
 });
 

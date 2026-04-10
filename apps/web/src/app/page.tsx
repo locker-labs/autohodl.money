@@ -10,13 +10,17 @@ import UserOnboarding from '@/components/view/UserOnboarding';
 import { useAutoHodl } from '@/context/AutoHodlContext';
 import { trackPageVisited } from '@/hooks/trackPageVisited';
 import { trackWalletConnected } from '@/hooks/trackWalletConnected';
+import ScheduleOnboarding from "@/components/view/ScheduleOnboarding";
 
 export default function Home() {
+  const { connector } = useConnection();
   const { isConnected, isConnecting, isReconnecting } = useConnection();
-  const { loading, config } = useAutoHodl();
+  const { loading, config, scheduleConfig } = useAutoHodl();
+  const isOnboarded = !!config || !!scheduleConfig;
+  console.log(isOnboarded);
   trackPageVisited();
   trackWalletConnected();
-
+  const isCoinbaseFlow = connector?.id === "coinbaseWalletSDK";
   if (loading || isConnecting || isReconnecting) {
     return <Loading />;
   }
@@ -28,12 +32,20 @@ export default function Home() {
   return (
     <div
       className={`min-h-screen w-full flex flex-col items-center
-      ${config ? 'justify-between' : 'bg-[#F9FBED]'}
+      ${isOnboarded ? "justify-between" : "bg-[#F9FBED]"}
      `}
     >
-      <Header className={config ? 'lg:border-0' : ''} />
-      {!config ? <UserOnboarding /> : <Dashboard />}
-      {!config ? null : <Footer className='w-full' />}
+      <Header className={isOnboarded ? "lg:border-0" : ""} />
+      {!isOnboarded ? (
+        isCoinbaseFlow ? (
+          <ScheduleOnboarding />
+        ) : (
+          <UserOnboarding />
+        )
+      ) : (
+        <Dashboard />
+      )}
+      {!isOnboarded ? null : <Footer className="w-full" />}
     </div>
   );
 }

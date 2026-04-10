@@ -127,7 +127,7 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
         }
 
         setConfig(null);
-        setSavingsChainId(null);
+        // setSavingsChainId(null);
       } catch (error) {
         console.error('Error fetching savings config:', error);
         setConfig(null);
@@ -165,6 +165,8 @@ export const AutoHodlProvider: FC<Props> = ({ children }) => {
           );
           console.log(`Config for chain ${chain.name}:`, config);
           if (config && config.delegate !== zeroAddress) {
+            // TODO: update this logic in future when a user can have both round up and schedule savings
+            setSavingsChainId(chainId);
             if (!fallbackConfig && !fallbackChainId) {
               fallbackConfig = config;
               fallbackChainId = chainId;

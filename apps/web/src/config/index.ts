@@ -8,6 +8,7 @@ import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { type Chain, base, linea } from 'viem/chains';
 import { secrets } from '@/lib/secrets';
 import { SavingsMode } from '@/types/autohodl';
+import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 // NOTE: reown's AppKit does not yet include Arc Testnet yet, so we define it here
 // const arcTestnetAppKitNetwork: AppKitNetwork = defineChain({
@@ -36,6 +37,13 @@ export const wagmiAdapter = new WagmiAdapter({
   ssr: true,
   projectId,
   networks,
+  connectors: [
+    walletConnect({ projectId, showQrModal: false }),
+    injected({ shimDisconnect: true }), // Handles MetaMask, Trust, Phantom, etc.
+    coinbaseWallet({
+      appName: 'autoHODL',
+    }),
+  ]
 });
 
 export const config = wagmiAdapter.wagmiConfig;
@@ -65,7 +73,6 @@ export const savingOptions = [
 export const scheduleCycles = [
   { label: 'Daily', value: 'daily' },
   { label: 'Weekly', value: 'weekly' },
-  { label: 'Biweekly', value: 'biweekly' },
   { label: 'Monthly', value: 'monthly' },
 ]
 
