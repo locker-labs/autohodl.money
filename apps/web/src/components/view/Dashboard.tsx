@@ -1,6 +1,7 @@
 import Loading from '@/app/loading';
 import { Controls, RecentActivity, SavingsInfoCards } from '@/components/dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import MissedSavingBanner from "@/components/subcomponents/MissedSavingBanner";
 import useIsMobile from '@/hooks/useIsMobile';
 
 const Dashboard = () => {
@@ -49,20 +50,21 @@ const Dashboard = () => {
 
   // Desktop View
   return (
-    <div className=' max-w-[1080px] w-full px-4 py-5 lg:py-5 grid gap-5'>
-      <div className=''>
+    <div className=" max-w-[1080px] w-full px-4 py-5 lg:py-5 grid gap-5">
+      <MissedSavingBanner />
+      <div className="">
         {/* 1 - 2 - 3 */}
         <SavingsInfoCards />
       </div>
 
-      <div className='w-full gap-5 grid lg:grid-cols-12'>
+      <div className="w-full gap-5 grid lg:grid-cols-12">
         {/* 4 - Recent Transactions Card */}
-        <div className='w-full lg:col-span-6'>
+        <div className="w-full lg:col-span-6">
           <RecentActivity />
         </div>
 
         {/* 5 - Controls Card */}
-        <div className='w-full lg:col-span-6'>
+        <div className="w-full lg:col-span-6">
           <Controls />
         </div>
       </div>

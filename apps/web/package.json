@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@bgd-labs/aave-address-book": "^4.32.0",
+    "@coinbase/cdp-sdk": "^1.47.0",
     "@coinbase/wallet-sdk": "^4.3.7",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-dialog": "^1.1.15",

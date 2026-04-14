@@ -27,6 +27,7 @@ export function RecentActivity(): React.JSX.Element {
     () => [...allSavingsTxs, ...allWithdrawalTxs].sort(sortByTimestampDesc),
     [allSavingsTxs, allWithdrawalTxs],
   );
+  console.log("ALL TXS", allTxs);
 
   return (
     // py-4 pl-4 pr-0 lg:py-5 lg:pl-5 lg:pr-1
@@ -78,91 +79,101 @@ export function RecentActivity(): React.JSX.Element {
                 <Link
                   key={tx.id}
                   href={getTransactionLink(tx.txHash, tx.chainId)}
-                  target='_blank'
-                  className='no-underline rounded-[14px] transition-all ease-out duration-150'
+                  target="_blank"
+                  className="no-underline rounded-[14px] transition-all ease-out duration-150"
                 >
                   <div
                     className={`group/tx border border-gray-300 flex flex-col gap-5 rounded-xl cursor-pointer hover:bg-[#F5F5F5]
-                      ${allTxs.length - 1 === idx ? 'mb-5' : 'mb-3'}
+                      ${allTxs.length - 1 === idx ? "mb-5" : "mb-3"}
                       mr-1.5
                     `}
                   >
-                    <div className='flex items-center justify-between px-3 py-3.5'>
-                      <div className='flex items-center gap-[9px]'>
+                    <div className="flex items-center justify-between px-3 py-3.5">
+                      <div className="flex items-center gap-[9px]">
                         {isSelfWithdrawal ? (
                           <CircleArrowDown
-                            className='group-hover/tx:-rotate-135 transition-transform duration-300 ease-in min-size-fit'
+                            className="group-hover/tx:-rotate-135 transition-transform duration-300 ease-in min-size-fit"
                             strokeWidth={1.5}
                             size={38}
-                            color='#6B7280'
+                            color="#6B7280"
                           />
                         ) : isWithdrawalTx ? (
                           <CircleArrowRight
-                            className='-rotate-45 transition-transform duration-300 ease-in min-size-fit'
+                            className="-rotate-45 transition-transform duration-300 ease-in min-size-fit"
                             strokeWidth={1.5}
                             size={38}
-                            color='#F59E0B'
+                            color="#F59E0B"
                           />
                         ) : (
                           <CircleArrowUp
-                            className='group-hover/tx:rotate-45 transition-transform duration-300 ease-in min-size-fit'
+                            className="group-hover/tx:rotate-45 transition-transform duration-300 ease-in min-size-fit"
                             strokeWidth={1.5}
                             size={38}
-                            color='#22C55E'
+                            color="#22C55E"
                           />
                         )}
 
                         {/* Left div: Amount, title, savings chain */}
-                        <div className='grid grid-rows-3 gap-[6px]'>
-                          <div className='row-start-1 flex justify-start items-end'>
-                            <p className='font-semibold text-black text-base text-left leading-[16px]'>
+                        <div className="grid grid-rows-3 gap-[6px]">
+                          <div className="row-start-1 flex justify-start items-end">
+                            <p className="font-semibold text-black text-base text-left leading-[16px]">
                               {formatAmount(
                                 formatUnits(
                                   BigInt(tx.value ?? 0),
-                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.chainId)),
+                                  getTokenDecimalsByAddress(
+                                    getUsdcAddressByChain(tx.chainId),
+                                  ),
                                 ),
                               )}
                             </p>
                           </div>
-                          <div className='row-start-2'>
-                            <p className='font-normal text-[#6b6b6b] text-sm text-left leading-[16px]'>
+                          <div className="row-start-2">
+                            <p className="font-normal text-[#6b6b6b] text-sm text-left leading-[16px]">
                               {isSelfWithdrawal
                                 ? `Self withdrawal`
                                 : isWithdrawalTx
                                   ? `Sent to ${formatAddress(tx.to)}`
-                                  : 'Round-up saved'}
+                                  : tx.isScheduled
+                                    ? `Scheduled saving`
+                                    : `Round-up saving`}
                             </p>
                           </div>
-                          <div className='row-start-3 flex justify-start items-start'>
+                          <div className="row-start-3 flex justify-start items-start">
                             <ChainDisplay chainId={tx.chainId} />
                           </div>
                         </div>
                       </div>
 
                       {/* Right div: Timestamp, Source chain, Purchase amount */}
-                      <div className='grid grid-rows-3 gap-[6px]'>
-                        <div className='row-start-1 flex justify-end items-end'>
+                      <div className="grid grid-rows-3 gap-[6px]">
+                        <div className="row-start-1 flex justify-end items-end">
                           {/* For savings tx, show purchase amount */}
-                          {!isWithdrawalTx && (
-                            <p className='font-normal text-[#6b6b6b] text-[10px] text-right leading-[16px]'>
-                              purchase:{' '}
+                          {!isWithdrawalTx && !tx.isScheduled && (
+                            <p className="font-normal text-[#6b6b6b] text-[10px] text-right leading-[16px]">
+                              purchase:{" "}
                               {formatAmount(
                                 formatUnits(
                                   BigInt(tx.purchaseValue),
-                                  getTokenDecimalsByAddress(getUsdcAddressByChain(tx.sourceChainId)),
+                                  getTokenDecimalsByAddress(
+                                    getUsdcAddressByChain(tx.sourceChainId),
+                                  ),
                                 ),
                               )}
                             </p>
                           )}
                         </div>
-                        <div className='row-start-2'>
-                          <p className='font-normal text-[#0f0f0f] text-sm text-right leading-[16px]'>
-                            {tx?.timestamp ? timeAgoFromHex(tx.timestamp) : null}
+                        <div className="row-start-2">
+                          <p className="font-normal text-[#0f0f0f] text-sm text-right leading-[16px]">
+                            {tx?.timestamp
+                              ? timeAgoFromHex(tx.timestamp)
+                              : null}
                           </p>
                         </div>
-                        <div className='row-start-3 flex justify-end items-start'>
+                        <div className="row-start-3 flex justify-end items-start">
                           {/* For savings tx: show source & savings chain */}
-                          {!isWithdrawalTx && <ChainDisplay chainId={tx.sourceChainId} />}
+                          {!isWithdrawalTx && (
+                            <ChainDisplay chainId={tx.sourceChainId} />
+                          )}
                         </div>
                       </div>
                     </div>

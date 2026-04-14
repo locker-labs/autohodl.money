@@ -1,6 +1,6 @@
 import { Lock, ChevronDown, Check } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from "react";
 import ActiveSwitch from '@/components/subcomponents/ActiveSwitch';
 import RoundupAmountSelector from '@/components/subcomponents/RoundupAmountSelector';
 import SavingsModeSelector from '@/components/subcomponents/SavingsModeSelector';
@@ -27,6 +27,7 @@ import SavingsLimit from '@/components/subcomponents/SavingsLimit';
 import { formatAmount } from '@/lib/math';
 import { getUsdcAddressByChain } from '@/lib/helpers';
 import { ChainSelector } from '@/components/feature/ChainSelector';
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 enum SectionId {
   AccountDetails = "account-details",
@@ -35,15 +36,33 @@ enum SectionId {
   AdvancedOptions = "advanced-options",
 }
 
-const sections: { id: SectionId; label: string }[] = [
-  { id: SectionId.AccountDetails, label: "Account Details" },
-  { id: SectionId.RoundupSettings, label: "Round-up Settings" },
-  { id: SectionId.ScheduleSettings, label: "Schedule Settings" },
-  // { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
-];
+// const sections: { id: SectionId; label: string }[] = [
+//   { id: SectionId.AccountDetails, label: "Account Details" },
+//   { id: SectionId.RoundupSettings, label: "Round-up Settings" },
+//   { id: SectionId.ScheduleSettings, label: "Schedule Settings" },
+//   // { id: SectionId.AdvancedOptions, label: 'Advanced Options' },
+// ];
 
 export function Controls(): React.JSX.Element {
   const [selectedSection, setSelectedSection] = useState<SectionId>(SectionId.AccountDetails);
+    const { connector, address, chainId } = useConnection();
+  const { data: isSmartWallet } = useSmartWallet(address, chainId);
+  const isCoinbaseFlow = connector?.id === "coinbaseWalletSDK" && isSmartWallet;
+
+  const sections = useMemo(() => {
+    const baseSections = [
+      { id: SectionId.AccountDetails, label: "Account Details" },
+      { id: SectionId.ScheduleSettings, label: "Schedule Settings" },
+    ];
+    if (!isSmartWallet || !isCoinbaseFlow) {
+      baseSections.splice(1, 0, {
+        id: SectionId.RoundupSettings,
+        label: "Round-up Settings",
+      });
+    }
+
+    return baseSections;
+  }, [isSmartWallet]);
 
   const currentSection = sections.find((s) => s.id === selectedSection);
 
@@ -89,7 +108,14 @@ interface ControlsInnerProps {
 
 export function ControlsInner({ selectedSection }: ControlsInnerProps): React.JSX.Element {
   const { address: userAddress } = useConnection();
-  const { accounts, config, token, savingsChainId } = useAutoHodl();
+  const {
+    accounts,
+    config: roundUpConfig,
+    scheduleConfig,
+    token,
+    savingsChainId,
+  } = useAutoHodl();
+  const config = roundUpConfig || scheduleConfig;
   const { data: apy, isLoading: apyLoading } = useAaveAPY();
   const hasMetaMaskCard: boolean = accounts.some((acc) => acc === SupportedAccounts.MetaMask);
 

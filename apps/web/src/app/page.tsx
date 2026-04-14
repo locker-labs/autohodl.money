@@ -11,16 +11,21 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import { trackPageVisited } from '@/hooks/trackPageVisited';
 import { trackWalletConnected } from '@/hooks/trackWalletConnected';
 import ScheduleOnboarding from "@/components/view/ScheduleOnboarding";
+import { useEffect, useState } from "react";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 export default function Home() {
   const { connector } = useConnection();
-  const { isConnected, isConnecting, isReconnecting } = useConnection();
+  const { isConnected, isConnecting, isReconnecting, address, chainId } =
+    useConnection();
+  const { data: isSmartWallet } = useSmartWallet(address, chainId);
+  console.log("Is Smart Wallet:", isSmartWallet);
   const { loading, config, scheduleConfig } = useAutoHodl();
   const isOnboarded = !!config || !!scheduleConfig;
   console.log(isOnboarded);
   trackPageVisited();
   trackWalletConnected();
-  const isCoinbaseFlow = connector?.id === "coinbaseWalletSDK";
+  const isCoinbaseFlow = connector?.id === "coinbaseWalletSDK" && isSmartWallet;
   if (loading || isConnecting || isReconnecting) {
     return <Loading />;
   }

@@ -6,10 +6,25 @@ import { useAutoHodl } from '@/context/AutoHodlContext';
 import useCreateConfig from '@/hooks/useCreateConfig';
 import { TokenDecimalMap } from '@/lib/constants';
 import { getUsdcAddressByChain } from '@/lib/helpers';
+import { SavingsConfig, ScheduleConfig } from "@/types/autohodl";
+import useCreateScheduleConfig from "@/hooks/useCreateScheduleConfig";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useConnection } from "wagmi";
 
 const ActiveSwitch = () => {
-  const { config, setConfig, savingsChainId } = useAutoHodl();
+  const { address, chainId, connector } = useConnection();
+  const { data: isSmartWallet } = useSmartWallet(address, chainId);
+  const isCoinbaseFlow = connector?.id === "coinbaseWalletSDK" && isSmartWallet;
+  const {
+    config: roundUpConfig,
+    setConfig,
+    savingsChainId,
+    scheduleConfig,
+  } = useAutoHodl();
+  const isScheduleSaving: boolean = !!scheduleConfig && !!isCoinbaseFlow;
+  const config = roundUpConfig || scheduleConfig;
   const { createConfig } = useCreateConfig();
+  const { createScheduleConfig } = useCreateScheduleConfig();
   //   TODO: add error toast
   const [activeLocal, setActiveLocal] = useState(config?.active ?? false);
   const isPending = activeLocal !== config?.active;
@@ -22,10 +37,34 @@ const ActiveSwitch = () => {
       const active = config.active;
 
       if (active !== activeLocal) {
+        if (isScheduleSaving) {
+          try {
+            await createScheduleConfig({
+              active: activeLocal,
+              scheduleAmount: Number((config as ScheduleConfig).scheduleAmount),
+              cycle: (config as ScheduleConfig).scheduleCycle,
+              savingsAddress: config.savingAddress,
+              mode: config.mode,
+              toYield: config.toYield,
+              savingsChainId,
+            });
+            setConfig((prev) =>
+              prev ? { ...prev, active: activeLocal } : prev,
+            );
+          } catch {
+            setActiveLocal(active);
+          }
+          return;
+        }
         try {
           await createConfig({
             active: activeLocal,
-            roundUp: Number(formatUnits(config.roundUp, TokenDecimalMap[usdc])),
+            roundUp: Number(
+              formatUnits(
+                (config as SavingsConfig).roundUp,
+                TokenDecimalMap[usdc],
+              ),
+            ),
             savingsAddress: config.savingAddress,
             mode: config.mode,
             toYield: config.toYield,

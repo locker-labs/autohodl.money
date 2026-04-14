@@ -27,6 +27,7 @@ export interface ISavingsTx {
   purchaseValue: bigint;
   chainId: EChainId;
   sourceChainId: EChainId;
+  isScheduled?: boolean; 
 }
 
 export type ITx = IWithdrawalTx | ISavingsTx;

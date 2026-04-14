@@ -6,7 +6,7 @@ import { useConnection } from 'wagmi';
 import { chains } from '@/config';
 import { ERefetchInterval, type EChainId } from '@/lib/constants';
 import { fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
-import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
+import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens, getScheduleAutoHodlAddressByChain } from '@/lib/helpers';
 import { roundOff } from '@/lib/math';
 
 export type LifetimeSavingsMap = Map<EChainId, number>;
@@ -29,6 +29,7 @@ export function useLifetimeSavings() {
         chains.map(async (chain) => {
           const chainId = chain.id as EChainId;
           const autohodl = getAutoHodlAddressByChain(chainId);
+          const scheduleHodl = getScheduleAutoHodlAddressByChain(chainId);
           const autohodlTokens = getAutoHodlSupportedTokens(chainId);
 
           if (!autohodl || !autohodlTokens || autohodlTokens.length === 0) return;
@@ -44,12 +45,24 @@ export function useLifetimeSavings() {
               },
               chainId,
             );
+            const res2 = await fetchErc20Transfers(
+              {
+                fromAddress: address,
+                toAddress: scheduleHodl,
+                contractAddresses: autohodlTokens,
+                maxCount: 1000,
+                order: 'desc',
+              },
+              chainId,
+            );
 
-            // Calculate total for this chain
-            const total = res.transfers.reduce((acc, t) => acc + t.value, 0);
+            const roundUpTransfers = res.transfers.map((tx) => ({ ...tx, isSchedule: false }));
+            const scheduledTransfers = res2.transfers.map((tx) => ({ ...tx, isSchedule: true }));
+            
+            const combinedTransfers = [...roundUpTransfers, ...scheduledTransfers];
 
-            // Only add to map if there's a non-zero value, or if we want to track 0s
-            // storing roundOff value directly
+            const total = combinedTransfers.reduce((acc, t) => acc + t.value, 0);
+
             savingsMap.set(chainId, roundOff(total, 2));
           } catch (err) {
             console.error(`Error fetching lifetime savings for chain ${chainId}`, err);

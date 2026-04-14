@@ -77,10 +77,9 @@ export const scheduleCycles = [
 ]
 
 export const scheduleOptions = [
-  { label: '$10', value: 10 },
-  { label: '$50', value: 50 },
+  { label: '$1', value: 1 },
+  { label: '$5', value: 5 },
   { label: '$100', value: 100 },
-  { label: '$250', value: 250 },
 ];
 
 

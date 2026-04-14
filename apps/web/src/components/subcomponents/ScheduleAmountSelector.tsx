@@ -117,22 +117,6 @@ const ScheduleAmountSelector = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Current Plan Display */}
-      <div className="p-4 bg-gray-50 border rounded-lg flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
-            Current Schedule
-          </p>
-          <p className="text-lg font-medium text-black">
-            ${globalAmount}{" "}
-            <span className="text-gray-500 text-base capitalize font-normal">
-              / {globalCycleUI}
-            </span>
-          </p>
-        </div>
-        {loading && <LoaderSecondary />}
-      </div>
-
       {/* 1. Schedule Amount Selector */}
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-black flex items-center gap-2">

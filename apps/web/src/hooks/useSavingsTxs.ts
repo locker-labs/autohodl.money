@@ -1,16 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
-import { useConnection } from 'wagmi';
-import { chains } from '@/config';
-import { type Erc20Transfer, fetchErc20Transfers } from '@/lib/data/fetchErc20Transfers';
-import { type Hex, parseUnits } from 'viem';
-import { fetchSourceTxInfoInBatch } from '@/lib/data/fetchSourceTxInfoInBatch';
-import type { SourceTxInfo } from '@/types/autohodl';
-import { EAutoHodlTxType } from '@/enums';
-import { fetchBlockByNumberInBatch } from '@/lib/data/fetchBlockByNumberInBatch';
-import { ERefetchInterval, type EChainId } from '@/lib/constants';
-import { getAutoHodlAddressByChain, getAutoHodlSupportedTokens } from '@/lib/helpers';
-import type { ISavingsTx } from '@/types/tx';
-import { sortByTimestampDesc } from '@/lib/helpers/sort';
+import { useQuery } from "@tanstack/react-query";
+import { useConnection } from "wagmi";
+import { chains } from "@/config";
+import {
+  type Erc20Transfer,
+  fetchErc20Transfers,
+} from "@/lib/data/fetchErc20Transfers";
+import { type Hex, parseUnits } from "viem";
+import { fetchSourceTxInfoInBatch } from "@/lib/data/fetchSourceTxInfoInBatch";
+import type { SourceTxInfo } from "@/types/autohodl";
+import { EAutoHodlTxType } from "@/enums";
+import { fetchBlockByNumberInBatch } from "@/lib/data/fetchBlockByNumberInBatch";
+import { ERefetchInterval, type EChainId } from "@/lib/constants";
+import {
+  getAutoHodlAddressByChain,
+  getAutoHodlSupportedTokens,
+  getScheduleAutoHodlAddressByChain,
+} from "@/lib/helpers";
+import type { ISavingsTx } from "@/types/tx";
+import { sortByTimestampDesc } from "@/lib/helpers/sort";
 
 export function useSavingsTxs() {
   const { address } = useConnection();
@@ -20,7 +27,7 @@ export function useSavingsTxs() {
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchInterval: ERefetchInterval.FAST,
-    queryKey: ['savings-txs', address],
+    queryKey: ["savings-txs", address],
     queryFn: async () => {
       const allTransfers: ISavingsTx[] = [];
 
@@ -30,9 +37,11 @@ export function useSavingsTxs() {
         chains.map(async (chain) => {
           const chainId = chain.id as EChainId;
           const autohodl = getAutoHodlAddressByChain(chainId);
+          const scheduleHodl = getScheduleAutoHodlAddressByChain(chainId);
           const autohodlTokens = getAutoHodlSupportedTokens(chainId);
 
-          if (!autohodl || !autohodlTokens || autohodlTokens.length === 0) return;
+          if (!autohodl || !autohodlTokens || autohodlTokens.length === 0)
+            return;
 
           try {
             const response = await fetchErc20Transfers(
@@ -45,27 +54,80 @@ export function useSavingsTxs() {
               chainId,
             );
 
-            if (response.transfers.length === 0) return;
+            const response2 = await fetchErc20Transfers(
+              {
+                fromAddress: address,
+                toAddress: scheduleHodl,
+                contractAddresses: autohodlTokens,
+                maxCount: 100,
+              },
+              chainId,
+            );
 
-            const blockNumbers = response.transfers.map((tx) => tx.blockNum);
-            const blocks = await fetchBlockByNumberInBatch(blockNumbers, chainId);
+            const roundUpTransfers = response.transfers.map((tx) => ({
+              ...tx,
+              isSchedule: false,
+            }));
+            const scheduledTransfers = response2.transfers.map((tx) => ({
+              ...tx,
+              isSchedule: true,
+            }));
+
+            const combinedTransfers = [
+              ...roundUpTransfers,
+              ...scheduledTransfers,
+            ];
+
+            if (combinedTransfers.length === 0) return;
+
+            const blockNumbers = combinedTransfers.map((tx) => tx.blockNum);
+            const blocks = await fetchBlockByNumberInBatch(
+              blockNumbers,
+              chainId,
+            );
             const blockTimestamps = blocks.map((block) => block.timestamp);
 
-            const transactionHashes = response.transfers.map((tx) => tx.hash);
-            const sourceTxInfoArray = await fetchSourceTxInfoInBatch(transactionHashes, chainId);
+            const roundUpHashes = combinedTransfers
+              .filter((tx) => !tx.isSchedule)
+              .map((tx) => tx.hash);
 
-            for (let i = 0; i < response.transfers.length; i++) {
-              const transferWithSourceTxInfo = {
-                ...response.transfers[i],
+            const fetchedSourceInfo = await fetchSourceTxInfoInBatch(
+              roundUpHashes,
+              chainId,
+            );
+
+            // 4. Reconstruct the Source Info Array to align with combinedTransfers
+            let sourceInfoIndex = 0;
+            const sourceTxInfoArray = combinedTransfers.map((tx) => {
+              if (tx.isSchedule) {
+                // Fallback for scheduled transfers
+                return {
+                  sourceTxHash: "0x0" as `0x${string}`,
+                  purchaseAmount: BigInt(0),
+                  sourceChainId: chainId,
+                };
+              }
+              // Pull from the batch result and increment the pointer
+              return fetchedSourceInfo[sourceInfoIndex++];
+            });
+
+            // 5. Final Mapping
+            for (let i = 0; i < combinedTransfers.length; i++) {
+              const transferWithMetadata = {
+                ...combinedTransfers[i],
                 ...sourceTxInfoArray[i],
                 metadata: {
                   blockTimestamp: blockTimestamps[i],
                 },
               };
-              allTransfers.push(savingsTxMapper(transferWithSourceTxInfo, chainId));
+
+              allTransfers.push(savingsTxMapper(transferWithMetadata, chainId));
             }
           } catch (err) {
-            console.error(`Error fetching savings txs for chain ${chainId}`, err);
+            console.error(
+              `Error fetching savings txs for chain ${chainId}`,
+              err,
+            );
           }
         }),
       );
@@ -82,7 +144,10 @@ export function useSavingsTxs() {
   };
 }
 
-function savingsTxMapper(tx: Erc20Transfer & SourceTxInfo, chainId: EChainId): ISavingsTx {
+function savingsTxMapper(
+  tx: Erc20Transfer & SourceTxInfo & { isSchedule: boolean },
+  chainId: EChainId,
+): ISavingsTx {
   return {
     id: tx.uniqueId,
     timestamp: tx.metadata?.blockTimestamp,
@@ -96,5 +161,6 @@ function savingsTxMapper(tx: Erc20Transfer & SourceTxInfo, chainId: EChainId): I
     type: EAutoHodlTxType.Savings,
     chainId,
     sourceChainId: tx.sourceChainId as EChainId,
+    isScheduled: tx.isSchedule || false,
   };
 }
