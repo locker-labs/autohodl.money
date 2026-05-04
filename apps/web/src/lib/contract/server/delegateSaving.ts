@@ -1,7 +1,7 @@
 import type { Address, Hex } from 'viem';
 import { encodeAbiParameters } from 'viem';
 import { MMCardDelegateAbi } from '@/lib/abis';
-import { account, getViemWalletClientByChain } from '@/lib/clients/server';
+import { getAccount, getViemWalletClientByChain } from '@/lib/clients/server';
 import type { EChainId } from '@/lib/constants';
 import {
   getDelegateAddressByChain,
@@ -57,7 +57,7 @@ export async function delegateSaving({
     abi: MMCardDelegateAbi,
     functionName: "delegateSaving" as const,
     args: [user, asset, value, encoded],
-    account,
+    account: getAccount(),
   };
   const estimatedGas = await publicClient.estimateContractGas(contractConfig);
   const gasWithBuffer =

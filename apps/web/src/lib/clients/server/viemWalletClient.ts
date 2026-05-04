@@ -4,31 +4,38 @@ import { EChainId } from '@/lib/constants';
 import { secrets } from '@/lib/secrets';
 import { getAlchemyApiUrlByChain, getViemChain } from '@/lib/helpers';
 
-export const account = privateKeyToAccount(secrets.privateKeyExecutor as `0x${string}`);
+let _account: ReturnType<typeof privateKeyToAccount> | null = null;
+let _clientMap: Record<EChainId, WalletClient> | null = null;
 
-function createWalletClientForChain(chainId: EChainId) {
-  const alchemyUrl = getAlchemyApiUrlByChain(chainId);
-  const chain = getViemChain(chainId);
-
-  return createWalletClient({
-    chain,
-    transport: http(alchemyUrl),
-    account,
-  });
+export function getAccount() {
+  if (!_account) {
+    _account = privateKeyToAccount(secrets.privateKeyExecutor as `0x${string}`);
+  }
+  return _account;
 }
 
-const baseClient = createWalletClientForChain(EChainId.Base);
-const arcTestnetClient = createWalletClientForChain(EChainId.ArcTestnet);
-const lineaClient = createWalletClientForChain(EChainId.Linea);
-const sepoliaClient = createWalletClientForChain(EChainId.Sepolia);
+function getClientMap(): Record<EChainId, WalletClient> {
+  if (!_clientMap) {
+    const account = getAccount();
 
-export const ViemWalletClientMap: Record<EChainId, WalletClient> = {
-  [EChainId.Base]: baseClient,
-  [EChainId.ArcTestnet]: arcTestnetClient,
-  [EChainId.Linea]: lineaClient,
-  [EChainId.Sepolia]: sepoliaClient,
-};
+    function createWalletClientForChain(chainId: EChainId) {
+      return createWalletClient({
+        chain: getViemChain(chainId),
+        transport: http(getAlchemyApiUrlByChain(chainId)),
+        account,
+      });
+    }
+
+    _clientMap = {
+      [EChainId.Base]: createWalletClientForChain(EChainId.Base),
+      [EChainId.ArcTestnet]: createWalletClientForChain(EChainId.ArcTestnet),
+      [EChainId.Linea]: createWalletClientForChain(EChainId.Linea),
+      [EChainId.Sepolia]: createWalletClientForChain(EChainId.Sepolia),
+    };
+  }
+  return _clientMap;
+}
 
 export function getViemWalletClientByChain(chainId: EChainId) {
-  return ViemWalletClientMap[chainId];
+  return getClientMap()[chainId];
 }
