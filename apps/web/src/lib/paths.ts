@@ -15,3 +15,8 @@ export const links = {
   docs: 'https://docs.autohodl.money',
   perch: 'https://perch.bio/autohodl',
 };
+
+export const legalPaths = {
+  terms: '/terms',
+  privacy: '/privacy',
+};
