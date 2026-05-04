@@ -32,10 +32,10 @@ export async function aliasEvent(
       aliasParams.traits = { twclid: properties.twclid };
     }
 
-    client.alias(aliasParams);
+    client().alias(aliasParams);
     console.log('Alias call tracked:', aliasParams);
 
-    await client.flush();
+    await client().flush();
     console.log('Alias call flushed successfully');
   } catch (error) {
     console.error('Alias call tracking/flushing failed:', error);
@@ -112,10 +112,10 @@ export async function trackEvent(event: string, properties: TTrackEventPropertie
       params.properties.twclid = properties.twclid;
     }
 
-    client.track(params);
+    client().track(params);
     console.log(`${event} event tracked:`, params);
 
-    await client.flush();
+    await client().flush();
     console.log(`${event} event flushed successfully`);
   } catch (error) {
     console.error(`${event} event tracking/flushing failed:`, error);

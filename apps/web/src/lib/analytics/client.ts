@@ -1,11 +1,18 @@
 import Analytics from '@rudderstack/rudder-sdk-node';
 import { secrets } from '@/lib/secrets';
 
-const client = new Analytics(secrets.rudderstackWriteKey, {
-  dataPlaneUrl: secrets.rudderstackDataPlaneUrl,
-  flushAt: 1, // Send immediately for serverless
-  flushInterval: 1000, // Flush every 1 second
-  logLevel: 'info',
-});
+let _client: Analytics | null = null;
 
-export { client as rudderanalytics };
+function getClient(): Analytics {
+  if (!_client) {
+    _client = new Analytics(secrets.rudderstackWriteKey, {
+      dataPlaneUrl: secrets.rudderstackDataPlaneUrl,
+      flushAt: 1,
+      flushInterval: 1000,
+      logLevel: 'info',
+    });
+  }
+  return _client;
+}
+
+export { getClient as rudderanalytics };

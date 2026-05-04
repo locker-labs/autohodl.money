@@ -1,5 +1,7 @@
+'use client';
+
 import Link from 'next/link';
-import { links } from '@/lib/paths';
+import { legalPaths, links } from '@/lib/paths';
 
 const footerLinks = [
   // { href: links.telegram, label: 'Telegram' },
@@ -8,6 +10,11 @@ const footerLinks = [
   // { href: links.contact, label: 'Email' },
   // { href: links.docs, label: 'Documentation' },
   { href: links.perch, label: 'Bio' },
+];
+
+const legalLinks = [
+  { href: legalPaths.terms, label: 'Terms' },
+  { href: legalPaths.privacy, label: 'Privacy' },
 ];
 
 export function Footer({ innerClassName = '', className }: { innerClassName?: string; className?: string }) {
@@ -26,9 +33,14 @@ export function Footer({ innerClassName = '', className }: { innerClassName?: st
           <div className='flex flex-col sm:flex-row items-center sm:items-start lg:items-center justify-center gap-[12px] lg:gap-[32px] text-[16px] text-[#4D4A4A]'>
             <p className='sm:hidden text-sm font-bold'>Connect</p>
             {footerLinks.map((item, idx) => (
-              <ExternalLink href={item.href} key={`footer-link-${`${idx}`}`}>
+              <ExternalLink href={item.href} key={`footer-link-${idx}`}>
                 <p className='text-sm lg:text-base'>{item.label}</p>
               </ExternalLink>
+            ))}
+            {legalLinks.map((item, idx) => (
+              <InternalLink href={item.href} key={`legal-link-${idx}`}>
+                <p className='text-sm lg:text-base'>{item.label}</p>
+              </InternalLink>
             ))}
           </div>
         </div>
@@ -40,6 +52,14 @@ export function Footer({ innerClassName = '', className }: { innerClassName?: st
 function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link href={href} target='_blank' className='hover:text-black transition-colors duration-300'>
+      {children}
+    </Link>
+  );
+}
+
+function InternalLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className='hover:text-black transition-colors duration-300'>
       {children}
     </Link>
   );

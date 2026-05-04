@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useConnection } from 'wagmi';
 import Loading from '@/app/loading';
 import Header from '@/components/subcomponents/Header';
@@ -12,12 +13,17 @@ import { trackPageVisited } from '@/hooks/trackPageVisited';
 import { trackWalletConnected } from '@/hooks/trackWalletConnected';
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const { isConnected, isConnecting, isReconnecting } = useConnection();
   const { loading, config } = useAutoHodl();
   trackPageVisited();
   trackWalletConnected();
 
-  if (loading || isConnecting || isReconnecting) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || loading || isConnecting || isReconnecting) {
     return <Loading />;
   }
 
