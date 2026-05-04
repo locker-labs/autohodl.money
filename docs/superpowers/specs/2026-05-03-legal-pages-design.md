@@ -40,7 +40,7 @@ Both pages use the existing layout. Links to both pages added to the site footer
 ```
 Terms of Service
 
-Effective Date: [DATE]
+Effective Date: June 1, 2025
 
 These Terms of Service ("Terms") govern your access to and use of the autoHODL interface, available at autohodl.money (the "Interface"), operated by Locker Labs ("we," "us," or "our"). By accessing or using the Interface, you agree to be bound by these Terms.
 
@@ -159,7 +159,7 @@ You agree to indemnify, defend, and hold harmless Locker Labs and its officers, 
 
 These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict of law principles.
 
-Any dispute arising out of or relating to these Terms or your use of the Interface shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association, conducted in Delaware. You waive any right to participate in a class action lawsuit or class-wide arbitration.
+Any dispute arising out of or relating to these Terms or your use of the Interface shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association, conducted in Louisiana. You waive any right to participate in a class action lawsuit or class-wide arbitration.
 
 ---
 
@@ -174,7 +174,7 @@ We may update these Terms from time to time. When we do, we will update the effe
 If you have questions about these Terms, please contact us at:
 
 Locker Labs
-legal@autohodl.money
+contact@autohodl.money
 ```
 
 ---
@@ -191,7 +191,7 @@ legal@autohodl.money
 ```
 Privacy Policy
 
-Effective Date: [DATE]
+Effective Date: June 1, 2025
 
 This Privacy Policy explains how Locker Labs ("we," "us," or "our") collects, uses, and shares information when you use the autoHODL interface at autohodl.money (the "Interface"). This policy is governed by the laws of the State of Delaware, United States.
 
@@ -290,7 +290,7 @@ If you are a California resident, you have the right to:
 - Opt out of the sale of your personal information (we do not sell personal information)
 - Not be discriminated against for exercising these rights
 
-To exercise any of these rights, contact us at legal@autohodl.money.
+To exercise any of these rights, contact us at contact@autohodl.money.
 
 **All Users**
 You may request deletion of your Telegram or Twitter profile data at any time by contacting us. You can also disconnect your social accounts through the Interface settings.
@@ -320,7 +320,7 @@ We may update this Privacy Policy from time to time. When we do, we will update 
 For privacy-related questions or requests:
 
 Locker Labs
-legal@autohodl.money
+contact@autohodl.money
 ```
 
 ---
@@ -328,7 +328,7 @@ legal@autohodl.money
 ## Implementation Notes
 
 - Both pages should be statically rendered (no auth required)
-- The effective date `[DATE]` should be replaced with the deployment date
-- The email `legal@autohodl.money` should be confirmed as active before going live
+- Effective date is June 1, 2025
+- Contact email is contact@autohodl.money
 - Both links (`/terms` and `/privacy`) must be added to the Footer component so they are visible on every page — this is a MoonPay KYB requirement
 - No special styling required beyond what existing pages use; consistent with site design
